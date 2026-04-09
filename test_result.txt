@@ -1,3 +1,21 @@
+bash-5.2# python 1.py
+已注册的 fbgemm ops（含 linearize）：
+
+[CPU] 调用 linearize_cache_indices_from_row_idx ...
+  CPU 调用成功，输出: [0, 0]  dtype=torch.int32
+  注意：CPU 实现为 stub，输出为未初始化值（empty_like），属正常现象
+
+[NPU] 调用 linearize_cache_indices_from_row_idx on npu:0 ...
+[W409 11:24:34.470120540 compiler_depend.ts:250] Warning: CAUTION: The operator 'fbgemm::linearize_cache_indices_from_row_idx' is not currently supported on the NPU backend and will fall back to run on the CPU. This may have performance implications. (function npu_cpu_fallback)
+  NPU 调用成功，输出: [-1431050767, 10]  dtype=torch.int32
+  输出设备: npu:0
+  结果与期望不符（期望 [3, 17]），NPU kernel 可能未实现或为 stub。
+
+
+
+
+
+
 ________________________________________________________________________________________________________________________________________ test_pruned_row_indices[index_dtype0] ________________________________________________________________________________________________________________________________________
 
 index_dtype = torch.int32
