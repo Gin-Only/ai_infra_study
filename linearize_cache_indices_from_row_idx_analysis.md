@@ -896,3 +896,13 @@ def ref_impl(cache_hash_size_cumsum, update_table_indices, update_row_indices):
 | 支持 VBE | ✅（通过 `B_offsets` 参数） | ❌ 不支持 |
 | 输出 dtype | 固定 `int64` | 与输入 `update_row_indices` 相同 |
 | CUDA Kernel 复杂度 | O(log T) per thread | O(1) per thread |
+
+| 用例描述                             | 用例模型                                                                                                                                                                            | 预期结果                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **基础功能测试（不同表数量、缓存大小、更新数量、索引类型）** | `num_tables ∈ {1,4,8,16}`，`table_cache_size ∈ {12,64,256}`，`num_updates ∈ {0,1,16,128,1024}`，`index_dtype ∈ {torch.int32, torch.int64}`<br>随机生成 `table_indices` 和 `row_indices` | 输出形状与输入 `row_indices` 相同，类型与 `index_dtype` 相同，计算结果与 reference 函数一致     |
+| **空输入序列**                        | `num_updates = 0`，`table_indices = []`，`row_indices = []`                                                                                                                       | 输出为空 tensor（`numel() == 0`）                                            |
+| **未缓存表测试（特殊序列）**                 | `uncached_tables={1,3}`，其他参数如 `num_tables=4, table_cache_size=12, num_updates=32`，随机生成 `table_indices` 和 `row_indices`                                                          | 对未缓存表的行索引结果使用 sentinel（`max_offset`），其他表计算正常，类型正确                      |
+| **被剪枝的行索引（异常/特殊序列）**             | `pruned_ratio = 0.3`，随机生成 `row_indices`，部分值设为 `-1`                                                                                                                              | 被剪枝（`row_indices=-1`）的输出结果为 sentinel，其他正常                              |
+| **边界用例**                         | `EDGE_CASE_PARAMS = [(1,1,1),(1,1,0),(2,10,5),(32,512,2048)]`，随机生成索引，`index_dtype ∈ {torch.int32, torch.int64}`                                                                 | 输出与 reference 结果一致，类型与输入索引类型一致                                         |
+| **文档示例用例**                       | `cumsum = [0,12,-1,24,36]`，`table_indices = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]`，`row_indices = [10,2,3,7,1,4,5,9,2,7,6,8,5,1,0,4]`                                               | 输出与示例 `expected = [10,2,3,7,13,16,17,21,36,36,36,36,29,25,24,28]` 完全一致 |
+
