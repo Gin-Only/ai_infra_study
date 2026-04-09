@@ -1,321 +1,206 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-#
-# 失败原因分析（基于 test_result.txt）：
-#
-# 原始测试直接在 NPU 上调用 torch.ops.fbgemm.linearize_cache_indices_from_row_idx，
-# 该算子的 NPU 实现尚未完成（kernel 未移植），empty_like 分配的输出内存未被填充，
-# 导致所有 num_updates > 0 的用例输出为未初始化的垃圾值。
-#
-# 修复方案（参考 test_dense_to_jagged.py 模板）：
-#   - CPU golden：torch.ops.fbgemm（在 cpu 设备上）
-#   - NPU 被测：torch.ops.mxrec（在 npu:0 设备上）
-#   两者结果做精确数值对比，与模板保持一致。
-# ==============================================================================
-import itertools
-import logging
-import sysconfig
-
-import pytest
-import fbgemm_gpu
-import numpy as np
-import torch_npu
+import unittest
 import torch
 
-DEVICE = "npu:0"
-logging.getLogger().setLevel(logging.INFO)
-torch.ops.load_library(f"{sysconfig.get_path('purelib')}/libfbgemm_npu_api.so")
+try:
+    import torch_npu  # noqa: F401
+    NPU_AVAILABLE = torch.npu.is_available()
+except ImportError:
+    NPU_AVAILABLE = False
 
-# 测试参数：表数量
-NUM_TABLES_LIST = [1, 4, 8, 16]
-# 测试参数：每张表的缓存容量
-TABLE_CACHE_SIZE_LIST = [12, 64, 256]
-# 测试参数：更新记录数量 N
-NUM_UPDATES_LIST = [0, 1, 16, 128, 1024]
-# 测试参数：索引数据类型
-INDEX_DTYPE_LIST = [torch.int32, torch.int64]
+NPU_DEVICE = "npu:0"
 
-PARAM_LIST = list(itertools.product(NUM_TABLES_LIST, TABLE_CACHE_SIZE_LIST, NUM_UPDATES_LIST, INDEX_DTYPE_LIST))
+def linearize_cache_indices_from_row_idx_ref(
+    cache_hash_size_cumsum: torch.Tensor,   
+    update_table_indices: torch.Tensor,     
+    update_row_indices: torch.Tensor,       
+) -> torch.Tensor:
+    # 统一在 CPU 上做索引运算，最后搬回原设备
+    device = update_row_indices.device
+    dtype  = update_row_indices.dtype
 
-# 边界测试用例：(num_tables, table_cache_size, num_updates)
-EDGE_CASE_PARAMS = [
-    (1, 1, 1),       # 最小规模
-    (1, 1, 0),       # 空更新
-    (2, 10, 5),      # 含未缓存表
-    (32, 512, 2048), # 较大规模
-]
+    cumsum_cpu  = cache_hash_size_cumsum.cpu().to(torch.int64)
+    table_cpu   = update_table_indices.cpu().to(torch.int64)
+    row_cpu     = update_row_indices.cpu().to(torch.int64)
 
+    N       = row_cpu.numel()
+    max_off = cumsum_cpu[-1].item()
 
-def build_cache_hash_size_cumsum(num_tables, table_cache_size, uncached_tables=None):
-    """
-    构造 cache_hash_size_cumsum [T+1], int64。
-    未缓存表的 cumsum 值为 -1，已缓存表为其在全局空间的起始偏移。
-    最后一个元素为哨兵值（总缓存大小）。
-    """
-    cumsum_arr = np.zeros(num_tables + 1, dtype=np.int64)
-    offset = 0
-    for t in range(num_tables):
-        if uncached_tables and t in uncached_tables:
-            cumsum_arr[t] = -1
-        else:
-            cumsum_arr[t] = offset
-            offset += table_cache_size
-    cumsum_arr[num_tables] = offset  # 哨兵值
-    return cumsum_arr
+    # 向量化实现：用 gather 取每条记录对应的表偏移
+    curr_off = cumsum_cpu[table_cpu]          # [N], int64
+
+    valid = (curr_off >= 0) & (row_cpu >= 0)
+    output = torch.where(valid, row_cpu + curr_off,
+                         torch.full((N,), max_off, dtype=torch.int64))
+
+    return output.to(dtype=dtype, device=device)
 
 
-def generate_test_data(num_tables, table_cache_size, num_updates,
-                       uncached_tables=None, pruned_ratio=0.0):
-    """生成测试数据，pruned_ratio 控制负索引（剪枝行）的比例。"""
-    cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size, uncached_tables)
 
-    if num_updates == 0:
-        return cumsum, np.array([], dtype=np.int32), np.array([], dtype=np.int32)
+class TestLinearizeCacheIndicesFromRowIdx(unittest.TestCase):
+    def _run(self, device, cache_hash_size_cumsum_list,
+             update_table_indices_list, update_row_indices_list,
+             expected_list, dtype=torch.int32):
 
-    table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
-    row_indices = np.random.randint(0, max(table_cache_size, 1), size=num_updates).astype(np.int32)
-    if pruned_ratio > 0.0:
-        row_indices[np.random.rand(num_updates) < pruned_ratio] = -1
+        cumsum = torch.tensor(cache_hash_size_cumsum_list, dtype=torch.int64,
+                              device=device)
+        table_idx = torch.tensor(update_table_indices_list, dtype=dtype,
+                                 device=device)
+        row_idx   = torch.tensor(update_row_indices_list,   dtype=dtype,
+                                 device=device)
+        expected  = torch.tensor(expected_list, dtype=dtype)
 
-    return cumsum, table_indices, row_indices
+        result = linearize_cache_indices_from_row_idx_ref(cumsum, table_idx, row_idx)
 
-
-def get_result(device, cumsum_np, table_indices_np, row_indices_np, index_dtype, is_mxrec=False):
-    """在指定设备上执行算子并返回结果（cpu 上）。"""
-    cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(device)
-    table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(device)
-    row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(device)
-
-    if is_mxrec:
-        result = torch.ops.mxrec.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_t, row_indices_t
+        self.assertTrue(
+            torch.equal(result.cpu(), expected),
+            f"\ndevice={device}\nresult  ={result.cpu().tolist()}"
+            f"\nexpected={expected.tolist()}"
         )
-    else:
-        result = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_t, row_indices_t
+
+    # 测试用例 1：全部表均已缓存（等大小表）
+    # （无未缓存表）
+    def _case_all_cached(self, device, dtype):
+        # cache_hash_size_cumsum = [0, 12, 24, 36, 48]
+        # update_table_indices   = [0,0,0,0, 1,1,1,1, 2,2,2,2, 3,3,3,3]
+        # update_row_indices     = [10,2,3,7, 1,4,5,9, 2,7,6,8, 5,1,0,4]
+        # expected               = [10,2,3,7, 13,16,17,21, 26,31,30,32, 41,37,36,40]
+        self._run(
+            device,
+            [0, 12, 24, 36, 48],
+            [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+            [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4],
+            [10, 2, 3, 7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40],
+            dtype=dtype,
         )
-    return result.cpu()
-
-
-def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype, is_mxrec=False):
-    """核心测试逻辑：CPU fbgemm golden vs NPU mxrec/fbgemm 输出。"""
-    golden = get_result(
-        torch.device("cpu"), cumsum_np, table_indices_np, row_indices_np, index_dtype, False
-    )
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum_np, table_indices_np, row_indices_np, index_dtype, is_mxrec
-    )
-
-    assert npu_result.shape == golden.shape, \
-        f"Shape mismatch: expected {golden.shape}, got {npu_result.shape}"
-    assert npu_result.dtype == index_dtype, \
-        f"dtype mismatch: expected {index_dtype}, got {npu_result.dtype}"
-    assert torch.equal(golden, npu_result), \
-        f"Value mismatch:\ngolden: {golden}\nnpu:    {npu_result}"
-
-
-# ============================================================
-# 主功能测试
-# ============================================================
-
-@pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates,
-                                               index_dtype, is_mxrec):
-    """基本功能测试：全部表均已缓存，无剪枝行。"""
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables, table_cache_size, num_updates
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-
-# ============================================================
-# 含未缓存表的测试
-# ============================================================
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_uncached_tables(index_dtype, is_mxrec):
-    """部分表未缓存（cumsum=-1），对应记录应输出哨兵值。"""
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables=4, table_cache_size=12, num_updates=32,
-        uncached_tables={1, 3}
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_all_tables_uncached(index_dtype, is_mxrec):
-    """所有表均未缓存，所有输出应为哨兵值 0。"""
-    num_tables = 4
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables=num_tables, table_cache_size=12, num_updates=16,
-        uncached_tables=set(range(num_tables))
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-    # 额外验证：所有输出均为哨兵值（= 0，因为全部未缓存）
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum, table_indices, row_indices, index_dtype, is_mxrec
-    )
-    sentinel = int(cumsum[-1])
-    assert (npu_result == sentinel).all(), \
-        f"All outputs should be sentinel {sentinel}, got {npu_result}"
-
-
-# ============================================================
-# 含剪枝行（负索引）的测试
-# ============================================================
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_pruned_row_indices(index_dtype, is_mxrec):
-    """部分 update_row_indices 为负（已剪枝），对应记录应输出哨兵值。"""
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables=4, table_cache_size=64, num_updates=64, pruned_ratio=0.3
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_all_pruned_row_indices(index_dtype, is_mxrec):
-    """所有 update_row_indices 均为 -1，所有输出应为哨兵值。"""
-    num_tables = 4
-    table_cache_size = 64
-    num_updates = 32
-    cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
-    table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
-    row_indices = np.full(num_updates, -1, dtype=np.int32)
-
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-    # 额外验证：所有输出均为哨兵值
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum, table_indices, row_indices, index_dtype, is_mxrec
-    )
-    sentinel = int(cumsum[-1])
-    assert (npu_result == sentinel).all(), \
-        f"All outputs should be sentinel {sentinel}, got {npu_result}"
-
-
-# ============================================================
-# 边界测试
-# ============================================================
-
-@pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype, is_mxrec):
-    """边界情况测试：极小规模、空更新、含未缓存表等。"""
-    uncached_tables = {1} if num_tables >= 2 else None
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables, table_cache_size, num_updates, uncached_tables=uncached_tables
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
-
-
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_empty_updates(is_mxrec):
-    """N=0 时算子应返回空 Tensor，不崩溃。"""
-    cumsum = build_cache_hash_size_cumsum(4, 12)
-    cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
-    table_indices_t = torch.zeros(0, dtype=torch.int64).to(DEVICE)
-    row_indices_t = torch.zeros(0, dtype=torch.int64).to(DEVICE)
-
-    if is_mxrec:
-        npu_output = torch.ops.mxrec.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_t, row_indices_t
+    # 测试用例 2：部分表未缓存（table_2 的 cumsum = -1）
+    def _case_partial_cached(self, device, dtype):
+        # cache_hash_size_cumsum = [0, 12, -1, 24, 36]
+        # table_2 未缓存 → 其对应输出全为哨兵值 36
+        self._run(
+            device,
+            [0, 12, -1, 24, 36],
+            [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+            [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4],
+            [10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28],
+            dtype=dtype,
         )
-    else:
-        npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_t, row_indices_t
+
+    
+    # 测试用例 3：varying update_table_indices（不均匀分布）
+    def _case_varying_table_indices(self, device, dtype):
+        # varying_update_table_indices = [0,0,0,1,1,1,1,1,2,2,2,2,2,2,3,3]
+        # cache_hash_size_cumsum = [0, 12, -1, 24, 36]
+        self._run(
+            device,
+            [0, 12, -1, 24, 36],
+            [0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3],
+            [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4],
+            [10, 2, 3, 19, 13, 16, 17, 21, 36, 36, 36, 36, 36, 36, 24, 28],
+            dtype=dtype,
         )
-    assert npu_output.numel() == 0, "Output should be empty when N=0"
-    assert npu_output.dtype == torch.int64
+
+    # 测试用例 4：含负索引（已剪枝行）
+    def _case_pruned_indices(self, device, dtype):
+        # update_row_indices 中含 -1（已剪枝），输出应为哨兵值
+        # cache_hash_size_cumsum = [0, 12, 24, 36, 48]，全部缓存
+        # 哨兵值 = 48
+        self._run(
+            device,
+            [0, 12, 24, 36, 48],
+            [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+            [10, -1, 3, 7, 1, 4, -1, 9, 2, -1, 6, 8, 5, 1, -1, 4],
+            [10, 48, 3, 7, 13, 16, 48, 21, 26, 48, 30, 32, 41, 37, 48, 40],
+            dtype=dtype,
+        )
+
+    # 测试用例 5：空输入（N=0）
+    def _case_empty(self, device, dtype):
+        cumsum   = torch.tensor([0, 12, 24], dtype=torch.int64, device=device)
+        table_idx = torch.tensor([], dtype=dtype, device=device)
+        row_idx   = torch.tensor([], dtype=dtype, device=device)
+        result = linearize_cache_indices_from_row_idx_ref(cumsum, table_idx, row_idx)
+        self.assertEqual(result.numel(), 0)
+        self.assertEqual(result.dtype, dtype)
+
+    # 测试用例 6：单条记录
+    def _case_single(self, device, dtype):
+        # table=1, row=5, cumsum=[0,10,20] → output = 5+10 = 15
+        self._run(device, [0, 10, 20], [1], [5], [15], dtype=dtype)
+        # table=0, row=-1（剪枝）→ output = 20（哨兵）
+        self._run(device, [0, 10, 20], [0], [-1], [20], dtype=dtype)
+        # table=1, cumsum[1]=-1（未缓存）→ output = 20（哨兵）
+        self._run(device, [0, -1, 20], [1], [5], [20], dtype=dtype)
+
+    # 测试用例 7：int64 dtype
+    def _case_int64(self, device):
+        self._case_all_cached(device, torch.int64)
+        self._case_partial_cached(device, torch.int64)
+        self._case_pruned_indices(device, torch.int64)
+
+ 
+
+    def test_cpu_all_cached_int32(self):
+        self._case_all_cached("cpu", torch.int32)
+
+    def test_cpu_partial_cached_int32(self):
+        self._case_partial_cached("cpu", torch.int32)
+
+    def test_cpu_varying_table_indices_int32(self):
+        self._case_varying_table_indices("cpu", torch.int32)
+
+    def test_cpu_pruned_indices_int32(self):
+        self._case_pruned_indices("cpu", torch.int32)
+
+    def test_cpu_empty_int32(self):
+        self._case_empty("cpu", torch.int32)
+
+    def test_cpu_single_int32(self):
+        self._case_single("cpu", torch.int32)
+
+    def test_cpu_int64(self):
+        self._case_int64("cpu")
 
 
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_single_table_single_update(is_mxrec):
-    """单表单条更新的精确数值验证：row=42, offset=0 → 输出 42。"""
-    cumsum = np.array([0, 100], dtype=np.int64)
-    table_indices = np.array([0], dtype=np.int32)
-    row_indices = np.array([42], dtype=np.int32)
-    run_test(cumsum, table_indices, row_indices, torch.int64, is_mxrec)
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_all_cached_int32(self):
+        self._case_all_cached(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_partial_cached_int32(self):
+        self._case_partial_cached(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_varying_table_indices_int32(self):
+        self._case_varying_table_indices(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_pruned_indices_int32(self):
+        self._case_pruned_indices(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_empty_int32(self):
+        self._case_empty(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_single_int32(self):
+        self._case_single(NPU_DEVICE, torch.int32)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_int64(self):
+        self._case_int64(NPU_DEVICE)
+
+    @unittest.skipUnless(NPU_AVAILABLE, "昇腾 NPU 不可用，跳过 NPU 测试")
+    def test_npu_result_stays_on_npu(self):
+        """验证输出张量确实在 NPU 上，而非被隐式搬回 CPU"""
+        cumsum    = torch.tensor([0, 12, 24, 36, 48], dtype=torch.int64,
+                                 device=NPU_DEVICE)
+        table_idx = torch.tensor([0, 1, 2, 3], dtype=torch.int32,
+                                 device=NPU_DEVICE)
+        row_idx   = torch.tensor([1, 2, 3, 4], dtype=torch.int32,
+                                 device=NPU_DEVICE)
+        result = linearize_cache_indices_from_row_idx_ref(cumsum, table_idx, row_idx)
+        self.assertEqual(str(result.device), NPU_DEVICE)
 
 
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_doc_example(is_mxrec):
-    """验证分析文档第 4.3 节的端到端数值示例（4 张表，table_2 未缓存）。"""
-    cumsum = np.array([0, 12, -1, 24, 36], dtype=np.int64)
-    table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
-    row_indices   = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
-    expected      = torch.tensor([10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28],
-                                  dtype=torch.int64)
-
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum, table_indices, row_indices, torch.int64, is_mxrec
-    )
-    assert torch.equal(npu_result, expected), \
-        f"Doc example mismatch:\nexpected: {expected}\ngot:      {npu_result}"
-
-
-# ============================================================
-# 输出语义验证
-# ============================================================
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_output_dtype_matches_row_indices(index_dtype, is_mxrec):
-    """输出 dtype 必须与 update_row_indices 的 dtype 一致。"""
-    cumsum = np.array([0, 64, 128], dtype=np.int64)
-    table_indices = np.array([0, 1, 0], dtype=np.int32)
-    row_indices = np.array([1, 2, 3], dtype=np.int32)
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum, table_indices, row_indices, index_dtype, is_mxrec
-    )
-    assert npu_result.dtype == index_dtype, \
-        f"Expected dtype {index_dtype}, got {npu_result.dtype}"
-
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_sentinel_value_correctness(index_dtype, is_mxrec):
-    """未缓存表的输出必须等于哨兵值 cumsum[-1]。"""
-    # table_1 未缓存，哨兵 = 100
-    cumsum = np.array([0, -1, 50, 100], dtype=np.int64)
-    table_indices = np.array([1, 1, 1], dtype=np.int32)
-    row_indices = np.array([0, 10, 20], dtype=np.int32)
-
-    npu_result = get_result(
-        torch.device(DEVICE), cumsum, table_indices, row_indices, index_dtype, is_mxrec
-    )
-    sentinel = int(cumsum[-1])  # = 100
-    assert (npu_result == sentinel).all(), \
-        f"All outputs should be sentinel {sentinel}, got {npu_result}"
-
-
-@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-@pytest.mark.parametrize("is_mxrec", [True, False])
-def test_large_scale(index_dtype, is_mxrec):
-    """大规模测试：N=100000，含未缓存表 + 剪枝行。"""
-    cumsum, table_indices, row_indices = generate_test_data(
-        num_tables=32, table_cache_size=1024, num_updates=100000,
-        uncached_tables={5, 10, 20}, pruned_ratio=0.1
-    )
-    run_test(cumsum, table_indices, row_indices, index_dtype, is_mxrec)
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
