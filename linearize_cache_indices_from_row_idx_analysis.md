@@ -366,7 +366,527 @@ linear_cache_indices = [10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24,
 
 ---
 
-## 七、与 `linearize_cache_indices` 对比
+## 七、计算流程伪代码
+
+### 7.1 顶层调度入口（Python / TorchScript）
+
+```python
+# ============================================================
+# 顶层调度入口
+# 文件：split_table_batched_embeddings_ops_inference.py 第 2010 行
+# ============================================================
+
+function emb_inplace_update_entry(update_table_indices, update_row_indices):
+
+    # 仅当缓存权重非空（即启用了 LRU/LFU 缓存）时才执行线性化
+    if lxu_cache_weights.numel() > 0:
+
+        # ① 调用本算子：将局部 (表号, 行号) 映射为全局缓存地址
+        linear_cache_indices =
+            torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+                cache_hash_size_cumsum,    # [T+1], int64
+                update_table_indices,      # [N],   int32/int64
+                update_row_indices         # [N],   int32/int64
+            )
+        # 返回值 linear_cache_indices: [N], dtype 与 update_row_indices 相同
+
+        # ② 将全局缓存地址送入预取/查找流程
+        if cache_assoc in [32, 64]:
+            prefetch_32way(linear_cache_indices)
+        elif cache_assoc == 1:
+            prefetch_1way(linear_cache_indices)
+
+        lxu_cache_locations = lxu_cache_locations_list.pop()
+
+    # ③ 使用缓存位置执行原地权重更新
+    torch.ops.fbgemm.emb_inplace_update(
+        ...,
+        lxu_cache_locations = lxu_cache_locations
+    )
+```
+
+---
+
+### 7.2 Host 侧主函数伪代码（C++）
+
+```
+# ============================================================
+# Host 侧主函数
+# 文件：linearize_cache_indices.cu  第 157~191 行
+# 对应实现：linearize_cache_indices_from_row_idx_cuda()
+# ============================================================
+
+function linearize_cache_indices_from_row_idx_cuda(
+    cache_hash_size_cumsum,   # Tensor [T+1], int64,        CUDA
+    update_table_indices,     # Tensor [N],   int32/int64,  CUDA
+    update_row_indices        # Tensor [N],   int32/int64,  CUDA
+) -> Tensor:
+
+    # ── 步骤 1：设备校验 ──────────────────────────────────────
+    # 三个张量必须位于同一块 CUDA GPU（宏展开为 TORCH_CHECK）
+    ASSERT: cache_hash_size_cumsum, update_table_indices,
+            update_row_indices 在同一 CUDA 设备上
+    # 对应源码：TENSORS_ON_SAME_CUDA_GPU_IF_NOT_OPTIONAL(...)
+
+    # ── 步骤 2：锁定 CUDA 设备上下文 ────────────────────────────
+    CUDA_DEVICE_GUARD(cache_hash_size_cumsum)
+    # 防止多 GPU 环境下的上下文切换错误
+
+    # ── 步骤 3：计算表数量并做合法性校验 ─────────────────────────
+    T = cache_hash_size_cumsum.size(0) - 1
+    ASSERT T > 0                     # 至少有一张嵌入表
+    # 对应源码：TORCH_CHECK(T > 0)
+
+    # ── 步骤 4：分配输出 Tensor ───────────────────────────────
+    # 形状、dtype、设备均与 update_row_indices 完全相同
+    linear_cache_indices = at::empty_like(update_row_indices)
+    # 此时内存已在 GPU 上分配，但内容未初始化
+
+    # ── 步骤 5：空输入快速返回路径 ────────────────────────────
+    N = update_row_indices.numel()
+    if N == 0:
+        return linear_cache_indices   # 直接返回空 Tensor，不启动 Kernel
+
+    # ── 步骤 6：dtype 分发 ────────────────────────────────────
+    # 根据 update_row_indices 的实际 dtype（int32 或 int64）
+    # 在编译期实例化对应模板版本的 Kernel
+    AT_DISPATCH_INDEX_TYPES(update_row_indices.scalar_type()):
+        # index_t = int32  或  index_t = int64
+
+        # ── 步骤 7：计算 CUDA Grid/Block 尺寸 ─────────────────
+        block_size = kMaxThreads               # 通常为 512 或 1024
+        grid_size  = ceil(N / block_size)      # ⌈N / kMaxThreads⌉
+
+        # ── 步骤 8：启动 CUDA Kernel（异步） ──────────────────
+        FBGEMM_LAUNCH_KERNEL(
+            kernel  = linearize_cache_indices_from_row_idx_kernel<index_t>,
+            grid    = grid_size,
+            block   = block_size,
+            stream  = cuda_current_stream(),
+            args    = (
+                cache_hash_size_cumsum,   # 只读，经 L1 只读缓存访问
+                update_table_indices,     # 只读
+                update_row_indices,       # 只读
+                linear_cache_indices      # 写出
+            )
+        )
+        # Kernel 在 GPU 上异步执行，CPU 立即返回
+
+    # ── 步骤 9：返回结果 ──────────────────────────────────────
+    return linear_cache_indices
+    # 调用方使用时会隐式同步，或由 CUDA stream 保序
+```
+
+---
+
+### 7.3 CUDA Kernel 伪代码（单线程视角）
+
+```
+# ============================================================
+# CUDA Kernel（每个 GPU 线程独立执行此函数一次）
+# 文件：linearize_cache_indices.cu  第 126~153 行
+# 函数：linearize_cache_indices_from_row_idx_kernel<index_t>
+#
+# 执行配置：
+#   gridDim.x  = ⌈N / kMaxThreads⌉
+#   blockDim.x = kMaxThreads
+#   总线程数   = gridDim.x × blockDim.x  ≥ N
+# ============================================================
+
+kernel linearize_cache_indices_from_row_idx_kernel(
+    cache_hash_size_cumsum,   # int64[T+1]，全局内存只读区
+    update_table_indices,     # index_t[N]，全局内存只读区
+    update_row_indices,       # index_t[N]，全局内存只读区
+    linear_cache_indices      # index_t[N]，全局内存写出区
+):
+
+    # ── 阶段 1：计算全局线程 ID（唯一对应一条输入记录）─────────
+    index = blockIdx.x * blockDim.x + threadIdx.x
+    #        块偏移                  块内线程偏移
+    # 每个线程的 index 在 [0, gridDim.x × blockDim.x) 范围内唯一
+
+    # ── 阶段 2：越界保护（尾部 block 的多余线程直接退出）────────
+    if index >= update_row_indices.size(0):   # 即 index >= N
+        return
+    # 保证不越界访问 update_table_indices / update_row_indices
+
+    # ── 阶段 3：读取本线程负责的记录所属表号 ─────────────────
+    t = update_table_indices[index]
+    # 全局内存随机读（各线程的 t 值通常不同，存在非合并访问）
+
+    # ── 阶段 4：读取哨兵值和当前表偏移（走 L1 只读缓存）────────
+    # __ldg：Load via Read-Only Data Cache（纹理缓存路径）
+    # cache_hash_size_cumsum 是小数组（T+1 个 int64），
+    # 高概率全部驻留在 L1 只读缓存中，多线程访问时直接广播
+    max_offset  = __ldg( &cache_hash_size_cumsum[T] )
+    #                      ↑ 最后一个元素 = 总缓存大小 = 哨兵值
+    curr_offset = __ldg( &cache_hash_size_cumsum[t] )
+    #                      ↑ 第 t 张表的全局起始偏移
+
+    # ── 阶段 5：有效性判断（双重条件）────────────────────────
+    #   条件 A：curr_offset >= 0  →  该表已缓存（非 -1）
+    #   条件 B：update_row_indices[index] >= 0  →  该行未被剪枝
+    if curr_offset >= 0 AND update_row_indices[index] >= 0:
+
+        # ── 阶段 6a：正常路径 —— 局部行号加表偏移 ─────────────
+        linear_cache_indices[index] =
+            update_row_indices[index] + curr_offset
+        #   ↑ 全局缓存地址 = 表内局部行号 + 该表在全局空间的起始偏移
+
+    else:
+
+        # ── 阶段 6b：无效路径 —— 写入哨兵值 ───────────────────
+        # 触发条件（满足其一即可）：
+        #   - curr_offset < 0：该表未被缓存（整表不在 GPU 缓存中）
+        #   - update_row_indices[index] < 0：该行已被剪枝（pruning）
+        linear_cache_indices[index] = max_offset
+        # 哨兵值 = cache_hash_size_cumsum[T] = 总缓存大小
+        # 下游算子（lxu_cache_lookup）见到此值时将视为"缓存未命中"
+```
+
+---
+
+### 7.4 CPU 存根伪代码（仅占位，无实际计算）
+
+```
+# ============================================================
+# CPU 实现（存根，不做实际计算）
+# 文件：linearize_cache_indices.cpp  第 25~30 行
+# ============================================================
+
+function linearize_cache_indices_from_row_idx_cpu(
+    cache_hash_size_cumsum,   # 忽略（参数名注释掉）
+    update_table_indices,     # 忽略（参数名注释掉）
+    update_row_indices        # 仅用于确定输出形状和 dtype
+) -> Tensor:
+
+    # 仅分配同形状的空 Tensor，不填充任何值
+    return at::empty_like(update_row_indices)
+
+# ⚠️ 注意：该算子在 CPU 上无实际语义，
+#    实际使用必须将三个输入 Tensor 置于 CUDA 设备上。
+```
+
+---
+
+### 7.5 伪代码执行流程总览
+
+```
+调用方（Python）
+    │
+    │  torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+    │      cache_hash_size_cumsum,        # GPU 内存
+    │      update_table_indices,          # GPU 内存
+    │      update_row_indices             # GPU 内存
+    │  )
+    │
+    ▼
+【Host C++ 函数：linearize_cache_indices_from_row_idx_cuda】
+    │
+    ├─ [1] 设备校验：三张量在同一 CUDA GPU
+    ├─ [2] 锁定设备上下文（CUDA_DEVICE_GUARD）
+    ├─ [3] 提取 T，断言 T > 0
+    ├─ [4] 分配输出 Tensor（GPU，empty_like）
+    ├─ [5] N == 0 ? ──YES──► 返回空 Tensor
+    │               NO
+    ├─ [6] dtype 分发（int32 / int64）
+    ├─ [7] 计算 grid = ⌈N/kMaxThreads⌉
+    └─ [8] 异步启动 CUDA Kernel ──────────────────────────────┐
+                                                              │
+    ◄─────────────────────────────────────────────────────────┘
+    │  （CPU 立即返回，GPU 异步执行）
+    └─ [9] 返回 linear_cache_indices Tensor
+
+                    ┌─────────────────────────────────────┐
+                    │  GPU 异步执行：N 个线程并行          │
+                    │                                      │
+                    │  Thread 0    Thread 1  ...  Thread N-1
+                    │     │           │                │
+                    │  [A] 计算 index（全局线程ID）      │
+                    │  [B] 越界检查（index >= N → return）│
+                    │  [C] 读 update_table_indices[index] │
+                    │      → 得到表号 t                   │
+                    │  [D] __ldg 读 cumsum[T] → max_offset│
+                    │  [E] __ldg 读 cumsum[t] → curr_off  │
+                    │  [F] 双重判断：                      │
+                    │      curr_off>=0 AND row_idx>=0?    │
+                    │        YES → output = row_idx+curr_off
+                    │        NO  → output = max_offset    │
+                    └─────────────────────────────────────┘
+```
+
+---
+
+## 八、NPU 算子精度测试用例设计
+
+### 8.1 测试策略
+
+**验证目标**：NPU kernel 输出与 CPU 参考实现逐元素完全相等。
+
+**精度标准**：`torch.equal`（整数运算，无浮点误差，要求完全相等，不设容差）。
+
+**数据类型**：仅 `int32` / `int64`（算子语义为索引映射，不涉及浮点计算，f16/f32/bf16 不适用）。
+
+**测试框架**：
+
+```
+同一份输入数据
+    │
+    ├──→ CPU 参考实现（纯 Python）──→ golden（正确答案）
+    │
+    └──→ torch.ops.fbgemm.linearize_cache_indices_from_row_idx（NPU）──→ npu_result
+                                                                              │
+                                                              torch.equal(npu_result.cpu(), golden)
+                                                                              │
+                                                              True  → NPU kernel 正确
+                                                              False → NPU kernel 有 bug
+```
+
+---
+
+### 8.2 CPU 参考实现（golden 生成）
+
+```python
+def ref_impl(cache_hash_size_cumsum, update_table_indices, update_row_indices):
+    dtype  = update_row_indices.dtype
+    cumsum = cache_hash_size_cumsum.cpu().to(torch.int64)
+    table  = update_table_indices.cpu().to(torch.int64)
+    row    = update_row_indices.cpu().to(torch.int64)
+    max_off  = cumsum[-1].item()
+    curr_off = cumsum[table]
+    valid    = (curr_off >= 0) & (row >= 0)
+    output   = torch.where(valid, row + curr_off,
+                           torch.full_like(row, max_off))
+    return output.to(dtype=dtype)
+```
+
+---
+
+### 8.3 测试用例
+
+#### TC-01：全部表已缓存（等大小表）
+
+**目的**：验证正常路径，所有表均在缓存中，所有行均有效。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, 24, 36, 48]   # 4 张表，每张容量 12，哨兵=48
+  update_table_indices   = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+  update_row_indices     = [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4]
+  dtype                  = int32 / int64
+
+期望输出：
+  [10, 2, 3, 7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40]
+
+验证逻辑：
+  table=0: off=0,  row+off = [10,2,3,7]
+  table=1: off=12, row+off = [13,16,17,21]
+  table=2: off=24, row+off = [26,31,30,32]
+  table=3: off=36, row+off = [41,37,36,40]
+```
+
+---
+
+#### TC-02：部分表未缓存（cumsum 含 -1）
+
+**目的**：验证未缓存表的哨兵值输出路径（`curr_offset < 0` 分支）。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, -1, 24, 36]   # table_2 未缓存，哨兵=36
+  update_table_indices   = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+  update_row_indices     = [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4]
+  dtype                  = int32 / int64
+
+期望输出：
+  [10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28]
+
+验证逻辑：
+  table=0: off=0,  正常 → [10,2,3,7]
+  table=1: off=12, 正常 → [13,16,17,21]
+  table=2: off=-1, 未缓存 → 全部输出哨兵 36
+  table=3: off=24, 正常 → [29,25,24,28]
+```
+
+---
+
+#### TC-03：不均匀 update_table_indices 分布
+
+**目的**：验证每条记录的表号独立查表，不依赖连续分布假设。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, -1, 24, 36]   # table_2 未缓存，哨兵=36
+  update_table_indices   = [0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3]
+  update_row_indices     = [10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4]
+  dtype                  = int32 / int64
+
+期望输出：
+  [10, 2, 3, 19, 13, 16, 17, 21, 36, 36, 36, 36, 36, 36, 24, 28]
+
+验证逻辑：
+  table=0: off=0,  3条 → [10,2,3]
+  table=1: off=12, 5条 → [19,13,16,17,21]
+  table=2: off=-1, 6条 → 全部哨兵 36
+  table=3: off=24, 2条 → [24,28]
+```
+
+---
+
+#### TC-04：含剪枝行（row_idx 为负数）
+
+**目的**：验证 `update_row_indices[i] < 0` 时输出哨兵值（`row_idx < 0` 分支）。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, 24, 36, 48]   # 全部缓存，哨兵=48
+  update_table_indices   = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+  update_row_indices     = [10, -1, 3, 7, 1, 4, -1, 9, 2, -1, 6, 8, 5, 1, -1, 4]
+  dtype                  = int32 / int64
+
+期望输出：
+  [10, 48, 3, 7, 13, 16, 48, 21, 26, 48, 30, 32, 41, 37, 48, 40]
+
+验证逻辑：
+  row=-1 的位置（idx=1,6,9,14）输出哨兵 48，其余正常映射
+```
+
+---
+
+#### TC-05：部分未缓存 + 含剪枝行（双重无效）
+
+**目的**：同时覆盖两种无效路径，验证 OR 逻辑正确。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, -1, 24, 36]   # table_2 未缓存，哨兵=36
+  update_table_indices   = [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+  update_row_indices     = [10, -1, 3, 7, 1, 4, -1, 9, 2, -1, 6, 8, 5, 1, -1, 4]
+  dtype                  = int32 / int64
+
+期望输出：
+  [10, 36, 3, 7, 13, 16, 36, 21, 36, 36, 36, 36, 29, 25, 36, 28]
+
+验证逻辑：
+  table=2 全部哨兵（未缓存）
+  table=0/1/3 中 row=-1 的位置也输出哨兵
+```
+
+---
+
+#### TC-06：空输入（N=0）
+
+**目的**：验证空输入快速返回路径，输出为空张量且 dtype 一致。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, 12, 24]
+  update_table_indices   = []   # N=0
+  update_row_indices     = []   # N=0
+  dtype                  = int32 / int64
+
+期望输出：
+  []   # 空张量，numel=0，dtype 与输入一致
+
+验证逻辑：
+  result.numel() == 0
+  result.dtype == dtype
+```
+
+---
+
+#### TC-07：单条记录（N=1）
+
+**目的**：验证最小非空输入，覆盖正常/剪枝/未缓存三种情形。
+
+```
+子用例 A（正常）：
+  cumsum=[0,10,20], table=[1], row=[5], dtype=int32/int64
+  期望：[15]   # 5 + 10 = 15
+
+子用例 B（剪枝行）：
+  cumsum=[0,10,20], table=[0], row=[-1], dtype=int32/int64
+  期望：[20]   # 哨兵 20
+
+子用例 C（未缓存表）：
+  cumsum=[0,-1,20], table=[1], row=[5], dtype=int32/int64
+  期望：[20]   # 哨兵 20
+
+子用例 D（边界：row=0, off=0）：
+  cumsum=[0,10,20], table=[0], row=[0], dtype=int32/int64
+  期望：[0]    # 0 + 0 = 0
+```
+
+---
+
+#### TC-08：全部表未缓存
+
+**目的**：验证所有 cumsum 均为 -1 时，全部输出哨兵值。
+
+```
+输入：
+  cache_hash_size_cumsum = [0, -1, -1, -1, 36]   # 哨兵=36
+  update_table_indices   = [0, 1, 2, 3, 0, 1, 2, 3]
+  update_row_indices     = [1, 2, 3, 4, 5, 6, 7, 8]
+  dtype                  = int32
+
+期望输出：
+  [36, 36, 36, 36, 36, 36, 36, 36]   # 全部哨兵
+```
+
+---
+
+#### TC-09：大批量随机数据（N=4096，T=8）
+
+**目的**：验证大规模并行场景下 NPU kernel 与参考实现完全一致。
+
+```
+配置：
+  T = 8，N = 4096
+  table_2 和 table_5 标记为未缓存（cumsum=-1）
+  约 5% 的 row_idx 为 -1（模拟剪枝）
+  dtype = int32 / int64
+
+验证方式：
+  torch.equal(npu_result.cpu(), ref_impl(cumsum, table_idx, row_idx))
+
+精度标准：
+  完全相等（torch.equal），不设容差
+```
+
+---
+
+### 8.4 用例覆盖矩阵
+
+| 用例 | 全部缓存 | 部分未缓存 | 含剪枝行 | 空输入 | 单条记录 | int32 | int64 |
+|------|----------|------------|----------|--------|----------|-------|-------|
+| TC-01 | ✅ | | | | | ✅ | ✅ |
+| TC-02 | | ✅ | | | | ✅ | ✅ |
+| TC-03 | | ✅ | | | | ✅ | ✅ |
+| TC-04 | ✅ | | ✅ | | | ✅ | ✅ |
+| TC-05 | | ✅ | ✅ | | | ✅ | ✅ |
+| TC-06 | | | | ✅ | | ✅ | ✅ |
+| TC-07 | ✅ | ✅ | ✅ | | ✅ | ✅ | ✅ |
+| TC-08 | | ✅（全未缓存）| | | | ✅ | |
+| TC-09 | | ✅ | ✅ | | | ✅ | ✅ |
+
+---
+
+### 8.5 不适用的数据类型说明
+
+| 数据类型 | 是否适用 | 原因 |
+|----------|----------|------|
+| `int32` | ✅ | 算子原生支持的索引类型 |
+| `int64` | ✅ | 算子原生支持的索引类型 |
+| `float32` | ❌ | 算子语义为整数索引映射，无浮点输入 |
+| `float16` | ❌ | 同上 |
+| `bfloat16` | ❌ | 同上 |
+
+精度标准统一为 `torch.equal`（整数完全相等），无需 `atol`/`rtol` 容差。
+
+---
+
+## 九、与 `linearize_cache_indices` 对比
 
 | 对比项 | `linearize_cache_indices` | `linearize_cache_indices_from_row_idx` |
 |--------|--------------------------|----------------------------------------|
