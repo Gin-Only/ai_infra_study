@@ -1,58 +1,203 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-最小验证脚本：检查 linearize_cache_indices_from_row_idx 是否在昇腾环境可调用。
-在昇腾机器上运行：python check_op_available.py
-"""
-import sysconfig
-import fbgemm_gpu  # noqa: F401
+import itertools
+import logging
+
+import pytest
+import numpy as np
 import torch
-import torch_npu  # noqa: F401
 
-torch.ops.load_library(f"{sysconfig.get_path('purelib')}/libfbgemm_npu_api.so")
+# 关键：注册 fbgemm 算子
+import fbgemm_gpu  
 
-DEVICE = "npu:0"
+logging.getLogger().setLevel(logging.INFO)
 
-# ── 步骤1：确认 op 已注册 ──────────────────────────────────────────────────
-print("已注册的 fbgemm ops（含 linearize）：")
-for name in dir(torch.ops.fbgemm):
-    if "linearize" in name:
-        print(f"  torch.ops.fbgemm.{name}")
+# =========================
+# 测试参数
+# =========================
+NUM_TABLES_LIST = [1, 4, 8, 16]
+TABLE_CACHE_SIZE_LIST = [12, 64, 256]
+NUM_UPDATES_LIST = [0, 1, 16, 128, 1024]
+INDEX_DTYPE_LIST = [torch.int32, torch.int64]
 
-# ── 步骤2：用最小输入在 CPU 上调用，确认 op 本身可找到 ──────────────────────
-print("\n[CPU] 调用 linearize_cache_indices_from_row_idx ...")
-cumsum    = torch.tensor([0, 12, 24], dtype=torch.int64)
-table_idx = torch.tensor([0, 1],     dtype=torch.int32)
-row_idx   = torch.tensor([3, 5],     dtype=torch.int32)
+PARAM_LIST = list(itertools.product(
+    NUM_TABLES_LIST,
+    TABLE_CACHE_SIZE_LIST,
+    NUM_UPDATES_LIST,
+    INDEX_DTYPE_LIST
+))
 
-try:
-    result_cpu = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum, table_idx, row_idx
+EDGE_CASE_PARAMS = [
+    (1, 1, 1),
+    (1, 1, 0),
+    (2, 10, 5),
+    (32, 512, 2048),
+]
+
+# =========================
+# 构造数据
+# =========================
+def build_cache_hash_size_cumsum(num_tables, table_cache_size, uncached_tables=None):
+    cumsum_arr = np.zeros(num_tables + 1, dtype=np.int64)
+    offset = 0
+    for t in range(num_tables):
+        cumsum_arr[t] = -1 if (uncached_tables and t in uncached_tables) else offset
+        if not (uncached_tables and t in uncached_tables):
+            offset += table_cache_size
+    cumsum_arr[num_tables] = offset
+    return cumsum_arr
+
+
+# =========================
+# Reference 实现（黄金标准）
+# =========================
+def linearize_cache_indices_from_row_idx_ref(
+    cache_hash_size_cumsum,
+    update_table_indices,
+    update_row_indices,
+):
+    N = len(update_row_indices)
+    T = len(cache_hash_size_cumsum) - 1
+    max_offset = cache_hash_size_cumsum[T]
+
+    output = np.empty(N, dtype=update_row_indices.dtype)
+
+    for i in range(N):
+        t = update_table_indices[i]
+        curr_offset = cache_hash_size_cumsum[t]
+
+        if curr_offset >= 0 and update_row_indices[i] >= 0:
+            output[i] = update_row_indices[i] + curr_offset
+        else:
+            output[i] = max_offset
+
+    return output
+
+
+# =========================
+# fbgemm 调用（关键修改点）
+# =========================
+def linearize_cache_indices_from_row_idx(cumsum_t, table_indices_t, row_indices_t):
+    return torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        cache_hash_size_cumsum=cumsum_t,
+        update_table_indices=table_indices_t,
+        update_row_indices=row_indices_t,
     )
-    print(f"  CPU 调用成功，输出: {result_cpu.tolist()}  dtype={result_cpu.dtype}")
-    print(f"  注意：CPU 实现为 stub，输出为未初始化值（empty_like），属正常现象")
-except Exception as e:
-    print(f"  CPU 调用失败: {e}")
 
-# ── 步骤3：在 NPU 上调用，确认 dispatch 是否命中 NPU kernel ─────────────────
-print(f"\n[NPU] 调用 linearize_cache_indices_from_row_idx on {DEVICE} ...")
-cumsum_npu    = cumsum.to(DEVICE)
-table_idx_npu = table_idx.to(DEVICE)
-row_idx_npu   = row_idx.to(DEVICE)
 
-try:
-    result_npu = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_npu, table_idx_npu, row_idx_npu
+# =========================
+# 数据生成
+# =========================
+def generate_test_data(num_tables, table_cache_size, num_updates, index_dtype,
+                       uncached_tables=None, pruned_ratio=0.0):
+
+    cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size, uncached_tables)
+
+    if num_updates == 0:
+        return cumsum, np.array([], dtype=np.int32), np.array([], dtype=np.int32)
+
+    table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
+
+    row_indices = np.random.randint(0, max(table_cache_size, 1), size=num_updates).astype(np.int32)
+
+    if pruned_ratio > 0.0:
+        mask = np.random.rand(num_updates) < pruned_ratio
+        row_indices[mask] = -1
+
+    return cumsum, table_indices, row_indices
+
+
+# =========================
+# 核心测试逻辑
+# =========================
+def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+
+    ref_output = linearize_cache_indices_from_row_idx_ref(
+        cumsum_np, table_indices_np, row_indices_np
     )
-    print(f"  NPU 调用成功，输出: {result_npu.cpu().tolist()}  dtype={result_npu.dtype}")
-    print(f"  输出设备: {result_npu.device}")
 
-    # 期望值（参考实现）：[3+0, 5+12] = [3, 17]
-    expected = torch.tensor([3, 17], dtype=torch.int32)
-    if torch.equal(result_npu.cpu(), expected):
-        print(f"  结果正确！NPU kernel 已实现并可用。")
-    else:
-        print(f"  结果与期望不符（期望 {expected.tolist()}），NPU kernel 可能未实现或为 stub。")
-except Exception as e:
-    print(f"  NPU 调用失败: {e}")
-    print(f"  => linearize_cache_indices_from_row_idx 尚未在 NPU 上注册，需要实现 NPU kernel。")
+    cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64)
+    table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype)
+    row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype)
+
+    output = linearize_cache_indices_from_row_idx(
+        cumsum_t, table_indices_t, row_indices_t
+    )
+
+    assert output.shape == row_indices_t.shape
+    assert output.dtype == index_dtype
+
+    ref_t = torch.from_numpy(ref_output).to(index_dtype)
+    assert torch.equal(ref_t, output), \
+        f"\nref: {ref_t}\nout: {output}"
+
+
+# =========================
+# 测试用例
+# =========================
+
+@pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+def test_basic(num_tables, table_cache_size, num_updates, index_dtype):
+    cumsum, table_indices, row_indices = generate_test_data(
+        num_tables, table_cache_size, num_updates, index_dtype
+    )
+    run_test(cumsum, table_indices, row_indices, index_dtype)
+
+
+@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+def test_uncached_tables(index_dtype):
+    cumsum, table_indices, row_indices = generate_test_data(
+        4, 12, 32, index_dtype, uncached_tables={1, 3}
+    )
+    run_test(cumsum, table_indices, row_indices, index_dtype)
+
+
+@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+def test_pruned(index_dtype):
+    cumsum, table_indices, row_indices = generate_test_data(
+        4, 64, 64, index_dtype, pruned_ratio=0.3
+    )
+    run_test(cumsum, table_indices, row_indices, index_dtype)
+
+
+@pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+@pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+def test_edge(num_tables, table_cache_size, num_updates, index_dtype):
+    cumsum, table_indices, row_indices = generate_test_data(
+        num_tables, table_cache_size, num_updates, index_dtype
+    )
+    run_test(cumsum, table_indices, row_indices, index_dtype)
+
+
+def test_empty():
+    cumsum = build_cache_hash_size_cumsum(4, 12)
+
+    output = linearize_cache_indices_from_row_idx(
+        torch.from_numpy(cumsum),
+        torch.zeros(0, dtype=torch.int64),
+        torch.zeros(0, dtype=torch.int64),
+    )
+
+    assert output.numel() == 0
+
+
+def test_doc_example():
+    cumsum = np.array([0, 12, -1, 24, 36], dtype=np.int64)
+    table_indices = np.array(
+        [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3], dtype=np.int32
+    )
+    row_indices = np.array(
+        [10,2,3,7,1,4,5,9,2,7,6,8,5,1,0,4], dtype=np.int32
+    )
+    expected = np.array(
+        [10,2,3,7,13,16,17,21,36,36,36,36,29,25,24,28], dtype=np.int32
+    )
+
+    cumsum_t = torch.from_numpy(cumsum)
+    output = linearize_cache_indices_from_row_idx(
+        cumsum_t,
+        torch.from_numpy(table_indices),
+        torch.from_numpy(row_indices),
+    )
+
+    assert torch.equal(output, torch.from_numpy(expected))
