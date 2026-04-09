@@ -905,4 +905,9 @@ def ref_impl(cache_hash_size_cumsum, update_table_indices, update_row_indices):
 | **被剪枝的行索引（异常/特殊序列）**             | `pruned_ratio = 0.3`，随机生成 `row_indices`，部分值设为 `-1`                                                                                                                              | 被剪枝（`row_indices=-1`）的输出结果为 sentinel，其他正常                              |
 | **边界用例**                         | `EDGE_CASE_PARAMS = [(1,1,1),(1,1,0),(2,10,5),(32,512,2048)]`，随机生成索引，`index_dtype ∈ {torch.int32, torch.int64}`                                                                 | 输出与 reference 结果一致，类型与输入索引类型一致                                         |
 | **文档示例用例**                       | `cumsum = [0,12,-1,24,36]`，`table_indices = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]`，`row_indices = [10,2,3,7,1,4,5,9,2,7,6,8,5,1,0,4]`                                               | 输出与示例 `expected = [10,2,3,7,13,16,17,21,36,36,36,36,29,25,24,28]` 完全一致 |
+| 不一致类型                                              | 表现                                | 是否会异常                           |
+| -------------------------------------------------- | --------------------------------- | ------------------------------- |
+| `update_table_indices` 与 `update_row_indices` 长度不同 | 遍历循环时 i 超出较短数组                    | Python 会报 IndexError → **真正异常** |
+| `cache_hash_size_cumsum` 长度 < `num_tables + 1`     | 访问 `cumsum[t]` 时 t >= len(cumsum) | IndexError → **真正异常**           |
+| 空数组（长度 0）                                          | 函数返回空 tensor                      | 不是异常，仅特殊情况                      |
 
