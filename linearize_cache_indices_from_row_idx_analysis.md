@@ -15,7 +15,40 @@ for (int i = 0; i < block_len; i++) {
 ub_out[i] = ub_cumsum[table_id] + row_id; 
 }
 3.	CopyOut (UB → GM) 写回 linear_cache_indices[start:end]
-4.	先写一个scale实现：
+4.	先写一个scale实现
+struct LinearizeCacheIndicesTilingData {
+    int64_t total_length;
+    int64_t block_size;
+    int64_t num_tables_1;
+};
+
+extern "C"
+__global__ void LinearizeCacheIndicesScalarKernel(
+    const __gm__ int64_t* cache_hash_size_cumsum,  // [N+1]
+    const __gm__ int64_t* update_table_indices,    // [K]
+    const __gm__ int64_t* update_row_indices,       // [K]
+    __gm__ int64_t* linear_cache_indices,           // [K]
+    const LinearizeCacheIndicesTilingData* tiling
+) {
+    // 解析分块信息
+    int64_t total_length = tiling->total_length;
+    int64_t block_size = tiling->block_size;
+    int64_t num_tables_1 = tiling->num_tables_1;
+
+    // 计算全局线程索引
+    int64_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    // 边界判断
+    if (idx >= total_length) return;
+
+    int64_t table_id = update_table_indices[idx];
+    int64_t row_id = update_row_indices[idx];
+   
+    int64_t offset = cache_hash_size_cumsum[table_id]; 
+    int64_t result = offset + row_id;
+
+    linear_cache_indices[idx] = result;
+}
 
 # `linearize_cache_indices_from_row_idx` 算子分析文档
 
