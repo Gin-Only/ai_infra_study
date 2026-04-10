@@ -1,3 +1,22 @@
+5.2	分核设计
+分核方式是在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。 
+分块大小 block_size = 256 block_num = ceil(K / 256) 
+第 i 个 block 处理区间 
+start = i * 256 
+end = start + 256 
+实际长度 = end – start
+ 4. 核执行流程（dim=0 块）
+1.	CopyIn (GM → UB) 
+读取当前块：table_indices[start:end] 读取当前块：row_indices[start:end] 全量读取 cumsum
+2.	Compute 运行 
+for (int i = 0; i < block_len; i++) {
+ table_id = ub_table[i];
+ row_id = ub_row[i]; 
+ub_out[i] = ub_cumsum[table_id] + row_id; 
+}
+3.	CopyOut (UB → GM) 写回 linear_cache_indices[start:end]
+4.	先写一个scale实现：
+
 # `linearize_cache_indices_from_row_idx` 算子分析文档
 
 > 源码版本：FBGEMM 1.5.0
