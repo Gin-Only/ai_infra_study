@@ -911,3 +911,28 @@ def ref_impl(cache_hash_size_cumsum, update_table_indices, update_row_indices):
 | `cache_hash_size_cumsum` 长度 < `num_tables + 1`     | 访问 `cumsum[t]` 时 t >= len(cumsum) | IndexError → **真正异常**           |
 | 空数组（长度 0）                                          | 函数返回空 tensor                      | 不是异常，仅特殊情况                      |
 
+分核方式
+仅在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。
+分块大小
+block_size = 256
+block_num = ceil(K / 256)
+第 i 个 block 处理区间
+plaintext
+start = i * 256
+end = start + 256
+实际长度 = end - start
+4. 核执行流程（dim=0 块）
+1) CopyIn (GM → UB)
+读取当前块：table_indices[start:end]
+读取当前块：row_indices[start:end]
+全量读取 cumsum
+2) Compute
+cpp
+运行
+for (int i = 0; i < block_len; i++) {
+    table_id = ub_table[i];
+    row_id = ub_row[i];
+    ub_out[i] = ub_cumsum[table_id] + row_id;
+}
+3) CopyOut (UB → GM)
+写回 linear_cache_indices[start:end]
