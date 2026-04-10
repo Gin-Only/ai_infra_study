@@ -21,7 +21,7 @@ struct LinearizeCacheIndicesTilingData {
     int64_t block_size;
     int64_t num_tables_1;
 };
-
+```python
 extern "C"
 __global__ void LinearizeCacheIndicesScalarKernel(
     const __gm__ int64_t* cache_hash_size_cumsum,  // [N+1]
@@ -49,7 +49,7 @@ __global__ void LinearizeCacheIndicesScalarKernel(
 
     linear_cache_indices[idx] = result;
 }
-
+```
 # `linearize_cache_indices_from_row_idx` 算子分析文档
 
 > 源码版本：FBGEMM 1.5.0
