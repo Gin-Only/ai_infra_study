@@ -50,6 +50,70 @@ __global__ void LinearizeCacheIndicesScalarKernel(
     linear_cache_indices[idx] = result;
 }
 ```
+ub
+```python
+static ge::graphStatus TilingFunc(gert::TilingContext* context) {
+    OPS_LOG_E_IF_NULL("context", context, return GRAPH_FAILED);
+
+    // 获取输入shape
+    auto tableShape = context->GetInputShape(1);
+    auto cumsumShape = context->GetInputShape(0);
+    OPS_LOG_E_IF_NULL("tableShape", tableShape, return GRAPH_FAILED);
+    OPS_LOG_E_IF_NULL("cumsumShape", cumsumShape, return GRAPH_FAILED);
+
+    int64_t totalLength = tableShape->GetOriginShape().GetShapeSize();
+    int64_t numTablesPlus1 = cumsumShape->GetOriginShape().GetShapeSize();
+
+    const auto ascendPlatform = platform_ascend::PlatformAscendC(context->GetPlatformInfo());
+    ascendPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);
+    uint32_t ubSize = 0;
+    auto ret = ascendPlatform.GetCoreMemSize(CoreMemType::UB, ubSize);
+    OPS_LOG_E_IF(ret != 0, context, return GRAPH_FAILED, "get ub size failed");
+
+    // 预留安全空间，目标使用≈240KB
+    uint32_t usableUB = ubSize - 16 * 1024;
+    uint32_t perBufferUB = usableUB / BUFFER_NUM;
+
+    // 计算最大block size（UB占满）
+    int64_t elementsPerBlock = perBufferUB / DATA_TYPE_BYTES;
+    elementsPerBlock = (elementsPerBlock / MAX_THREADS_PER_BLOCK) * MAX_THREADS_PER_BLOCK;
+
+    // 最小保护
+    if (elementsPerBlock < MAX_THREADS_PER_BLOCK) {
+        elementsPerBlock = MAX_THREADS_PER_BLOCK;
+    }
+
+    // 计算分块
+    int64_t totalBlocks = (totalLength + elementsPerBlock - 1) / elementsPerBlock;
+    size_t maxCores = ascendPlatform.GetCoreNumAiv();
+    size_t coreNum = std::min(totalBlocks, maxCores);
+
+    // workspace
+    size_t* workspaceSize = context->GetWorkspaceSizes(1);
+    workspaceSize[0] = ascendPlatform.GetLibApiWorkSpaceSize();
+
+    // 填充tiling
+    LinearizeTilingData tiling{};
+    tiling.totalLength = totalLength;
+    tiling.elementsPerBlock = elementsPerBlock;
+    tiling.numTablesPlus1 = numTablesPlus1;
+
+    // 下发配置
+    context->SetBlockDim(coreNum);
+    context->SetLocalMemorySize(ubSize);
+
+    // 保存tiling
+    tiling.SaveToBuffer(
+        context->GetRawTilingData()->GetData(),
+        context->GetRawTilingData()->GetCapacity()
+    );
+    context->GetRawTilingData()->SetDataSize(sizeof(tiling));
+
+    return GRAPH_SUCCESS;
+}
+
+REGISTER_TILING_FUNC(LinearizeCacheIndicesFromRowIdx, TilingFunc);
+```
 # `linearize_cache_indices_from_row_idx` 算子分析文档
 
 > 源码版本：FBGEMM 1.5.0
