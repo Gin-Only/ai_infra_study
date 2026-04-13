@@ -39,12 +39,12 @@ if [ "$#" -eq 1 ]; then
 fi
 
 # 利用msopgen生成可编译文件
-rm -rf ./asynchronous_complete_cumsum
-msopgen gen -i asynchronous_complete_cumsum.json -f tf -c ${ai_core} -lan cpp -out ./asynchronous_complete_cumsum -m 0 -op AsynchronousCompleteCumsum
-cp -rf op_kernel asynchronous_complete_cumsum/
-cp -rf op_host asynchronous_complete_cumsum/
-cp -rf ../../common/kernel_common_utils.h asynchronous_complete_cumsum/op_kernel
-cd asynchronous_complete_cumsum
+rm -rf ./linearize_cache_indices_from_row_idx
+msopgen gen -i linearize_cache_indices_from_row_idx.json -f tf -c ${ai_core} -lan cpp -out ./linearize_cache_indices_from_row_idx -m 0 -op LinearizeCacheIndicesFromRowIdx
+cp -rf op_kernel linearize_cache_indices_from_row_idx/
+cp -rf op_host linearize_cache_indices_from_row_idx/
+cp -rf ../../common/kernel_common_utils.h linearize_cache_indices_from_row_idx/op_kernel
+cd linearize_cache_indices_from_row_idx
 
 # 判断当前目录下是否存在CMakePresets.json文件
 if [ ! -f "CMakePresets.json" ]; then
@@ -62,10 +62,10 @@ fi
 # 修改vendor_name 防止覆盖之前vendor_name为customize的算子;
 # vendor_name需要和aclnn中的CMakeLists.txt中的CUST_PKG_PATH值同步，不同步aclnn会调用失败;
 # vendor_name字段值不能包含customize；包含会导致多算子部署场景CANN的vendors路径下config.ini文件内容截取错误
-sed -i 's:"customize":"asynchronous_complete_cumsum":g' CMakePresets.json
+sed -i 's:"customize":"linearize_cache_indices_from_row_idx":g' CMakePresets.json
 
 if [ "$ai_core" = "ai_core-Ascend310P3" ]; then
-    sed -i "1i #define SUPPORT_V200" ./op_kernel/asynchronous_complete_cumsum.cpp
+    sed -i "1i #define SUPPORT_V200" ./op_kernel/linearize_cache_indices_from_row_idx.cpp
 fi
 
 line=`awk '/ENABLE_SOURCE_PACKAGE/{print NR}' CMakePresets.json`
