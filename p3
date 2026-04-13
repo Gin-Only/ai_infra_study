@@ -1,0 +1,565 @@
+bash-5.2# bash run.sh
+2026-04-13 15:31:45 (149751) - [INFO] Start to generate AI Core operator files. 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse the ir template:/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx.json 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse 'LinearizeCacheIndicesFromRowIdx' in the json ir template. 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse the input_desc: cache_hash_size_cumsum 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse the input_desc: update_table_indices 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse the input_desc: update_row_indices 
+2026-04-13 15:31:45 (149751) - [INFO] Start to parse the output_desc: linear_cache_indices 
+2026-04-13 15:31:45 (149751) - [WARNING] The "attr" value is invalid or no "attr" exists in the map. 
+2026-04-13 15:31:45 (149751) - [INFO] Start to check the type and format between the inputs/outputs in IR template. 
+2026-04-13 15:31:45 (149751) - [INFO] Start to generate a new project. 
+2026-04-13 15:31:45 (149751) - [WARNING] File config.cmake lack of ASCEND_FRAMEWORK_TYPE. Please check your config env. 
+2026-04-13 15:31:45 (149751) - [WARNING] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/config.cmake already exists and will be overwrite! 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/config.cmake generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx_tiling.h generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/framework/tf_plugin/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/framework/tf_plugin/CMakeLists.txt generated successfully. 
+2026-04-13 15:31:45 (149751) - [INFO] Generation completed. 
+using ASCEND_HOME_PATH: /usr/local/Ascend/cann-9.0.0
+Preset CMake variables:
+
+  ASCEND_CANN_PACKAGE_PATH:PATH="/usr/local/Ascend/cann-9.0.0"
+  ASCEND_COMPUTE_UNIT:STRING="ascend950"
+  ASCEND_PACK_SHARED_LIBRARY:BOOL="False"
+  ASCEND_PYTHON_EXECUTABLE:STRING="python3"
+  CMAKE_BUILD_TYPE:STRING="Release"
+  CMAKE_CROSS_PLATFORM_COMPILER:PATH="/usr/bin/aarch64-linux-gnu-g++"
+  CMAKE_INSTALL_PREFIX:PATH="/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out"
+  ENABLE_BINARY_PACKAGE:BOOL="True"
+  ENABLE_CROSS_COMPILE:BOOL="False"
+  ENABLE_SOURCE_PACKAGE:BOOL="False"
+  ENABLE_TEST:BOOL="True"
+  vendor_name:STRING="linearize_cache_indices_from_row_idx"
+
+-- The C compiler identification is GNU 12.3.1
+-- The CXX compiler identification is GNU 12.3.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Opbuild generating sources
+-- Opbuild generating sources - done
+CMake Warning (dev) at cmake/func.cmake:272 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  cmake/func.cmake:424 (add_kernels_install)
+  op_kernel/CMakeLists.txt:6 (add_kernels_compile)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at cmake/func.cmake:276 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  cmake/func.cmake:424 (add_kernels_install)
+  op_kernel/CMakeLists.txt:6 (add_kernels_compile)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (3.3s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CROSS_PLATFORM_COMPILER
+
+
+-- Build files have been written to: /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out
+[ 66%] Generating tbe/op_info_cfg/ai_core/ascend950/aic-ascend950-ops-info.json
+[ 66%] Building CXX object op_host/CMakeFiles/cust_optiling.dir/linearize_cache_indices_from_row_idx.cpp.o
+
+
+==============check valid for ops info start==============
+==============check valid for ops info end================
+
+
+Compile op info cfg successfully.
+[ 66%] Built target ops_info_gen_ascend950
+[100%] Linking CXX shared library libcust_opmaster_rt2.0.so
+[100%] Built target cust_optiling
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 ...
+Opc tool start working now, please wait for a moment.
+[2026-04-13 15:32:05] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+  DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:86:3: error: expected identifier
+  DT_UINT8 = ::C_DT_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:23:18: note: expanded from macro 'DT_UINT8'
+#define DT_UINT8 4            // u8
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:87:3: error: expected identifier
+  DT_INT16 = ::C_DT_INT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:24:18: note: expanded from macro 'DT_INT16'
+#define DT_INT16 6            // int16
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:88:3: error: expected identifier
+  DT_UINT16 = ::C_DT_UINT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:25:19: note: expanded from macro 'DT_UINT16'
+#define DT_UINT16 7           // u16
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:89:3: error: expected identifier
+  DT_UINT32 = ::C_DT_UINT32,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:27:19: note: expanded from macro 'DT_UINT32'
+#define DT_UINT32 8           // u32
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:90:3: error: expected identifier
+  DT_INT64 = ::C_DT_INT64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:26:18: note: expanded from macro 'DT_INT64'
+#define DT_INT64 9            // int64
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:91:3: error: expected identifier
+  DT_UINT64 = ::C_DT_UINT64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:28:19: note: expanded from macro 'DT_UINT64'
+#define DT_UINT64 10          // u64
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:92:3: error: expected identifier
+  DT_DOUBLE = ::C_DT_DOUBLE,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:29:19: note: expanded from macro 'DT_DOUBLE'
+#define DT_DOUBLE 11          // double
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:93:3: error: expected identifier
+  DT_BOOL = ::C_DT_BOOL,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:30:17: note: expanded from macro 'DT_BOOL'
+#define DT_BOOL 12            // bool
+                ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:94:3: error: expected identifier
+  DT_STRING = ::C_DT_STRING,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:31:19: note: expanded from macro 'DT_STRING'
+#define DT_STRING 13          // string
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:95:3: error: expected identifier
+  DT_DUAL_SUB_INT8 = ::C_DT_DUAL_SUB_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:32:26: note: expanded from macro 'DT_DUAL_SUB_INT8'
+#define DT_DUAL_SUB_INT8 14   // dual output int8
+                         ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:96:3: error: expected identifier
+  DT_DUAL_SUB_UINT8 = ::C_DT_DUAL_SUB_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:33:27: note: expanded from macro 'DT_DUAL_SUB_UINT8'
+#define DT_DUAL_SUB_UINT8 15  // dual output u8
+                          ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:97:3: error: expected identifier
+  DT_COMPLEX64 = ::C_DT_COMPLEX64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:34:22: note: expanded from macro 'DT_COMPLEX64'
+#define DT_COMPLEX64 16       // complex64
+                     ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:98:3: error: expected identifier
+  DT_COMPLEX128 = ::C_DT_COMPLEX128,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:35:23: note: expanded from macro 'DT_COMPLEX128'
+#define DT_COMPLEX128 17      // complex128
+                      ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:99:3: error: expected identifier
+  DT_QINT8 = ::C_DT_QINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:36:18: note: expanded from macro 'DT_QINT8'
+#define DT_QINT8 18           // qint8
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:100:3: error: expected identifier
+  DT_QINT16 = ::C_DT_QINT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:37:19: note: expanded from macro 'DT_QINT16'
+#define DT_QINT16 19          // qint16
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
+make[4]: *** Waiting for unfinished jobs....
+Opc tool start working now, please wait for a moment.
+[2026-04-13 15:32:05] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+  DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:86:3: error: expected identifier
+  DT_UINT8 = ::C_DT_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:23:18: note: expanded from macro 'DT_UINT8'
+#define DT_UINT8 4            // u8
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:87:3: error: expected identifier
+  DT_INT16 = ::C_DT_INT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:24:18: note: expanded from macro 'DT_INT16'
+#define DT_INT16 6            // int16
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:88:3: error: expected identifier
+  DT_UINT16 = ::C_DT_UINT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:25:19: note: expanded from macro 'DT_UINT16'
+#define DT_UINT16 7           // u16
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:89:3: error: expected identifier
+  DT_UINT32 = ::C_DT_UINT32,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:27:19: note: expanded from macro 'DT_UINT32'
+#define DT_UINT32 8           // u32
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:90:3: error: expected identifier
+  DT_INT64 = ::C_DT_INT64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:26:18: note: expanded from macro 'DT_INT64'
+#define DT_INT64 9            // int64
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:91:3: error: expected identifier
+  DT_UINT64 = ::C_DT_UINT64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:28:19: note: expanded from macro 'DT_UINT64'
+#define DT_UINT64 10          // u64
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:92:3: error: expected identifier
+  DT_DOUBLE = ::C_DT_DOUBLE,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:29:19: note: expanded from macro 'DT_DOUBLE'
+#define DT_DOUBLE 11          // double
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:93:3: error: expected identifier
+  DT_BOOL = ::C_DT_BOOL,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:30:17: note: expanded from macro 'DT_BOOL'
+#define DT_BOOL 12            // bool
+                ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:94:3: error: expected identifier
+  DT_STRING = ::C_DT_STRING,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:31:19: note: expanded from macro 'DT_STRING'
+#define DT_STRING 13          // string
+                  ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:95:3: error: expected identifier
+  DT_DUAL_SUB_INT8 = ::C_DT_DUAL_SUB_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:32:26: note: expanded from macro 'DT_DUAL_SUB_INT8'
+#define DT_DUAL_SUB_INT8 14   // dual output int8
+                         ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:96:3: error: expected identifier
+  DT_DUAL_SUB_UINT8 = ::C_DT_DUAL_SUB_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:33:27: note: expanded from macro 'DT_DUAL_SUB_UINT8'
+#define DT_DUAL_SUB_UINT8 15  // dual output u8
+                          ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:97:3: error: expected identifier
+  DT_COMPLEX64 = ::C_DT_COMPLEX64,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:34:22: note: expanded from macro 'DT_COMPLEX64'
+#define DT_COMPLEX64 16       // complex64
+                     ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:98:3: error: expected identifier
+  DT_COMPLEX128 = ::C_DT_COMPLEX128,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:35:23: note: expanded from macro 'DT_COMPLEX128'
+#define DT_COMPLEX128 17      // complex128
+                      ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:99:3: error: expected identifier
+  DT_QINT8 = ::C_DT_QINT8,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:36:18: note: expanded from macro 'DT_QINT8'
+#define DT_QINT8 18           // qint8
+                 ^
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:20:
+In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/../../include/graph/types.h:100:3: error: expected identifier
+  DT_QINT16 = ::C_DT_QINT16,
+  ^
+/usr/local/Ascend/cann-9.0.0/aarch64-linux/asc/include/basic_api/kernel_type.h:37:19: note: expanded from macro 'DT_QINT16'
+#define DT_QINT16 19          // qint16
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
+    kernel_builder.ascendc_build()
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
+    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
+RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
+gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:513: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:455: op_kernel/CMakeFiles/binary.dir/rule] Error 2
+gmake: *** [Makefile:293: binary] Error 2
+[ 41%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
+[ 41%] Generating scripts/install.sh, scripts/upgrade.sh
+[ 41%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
+[ 41%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
+[ 41%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
+[ 50%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 58%] Built target ops_info_gen_ascend950
+[ 58%] Built target gen_version_info
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
+[ 75%] Built target cust_optiling
+[ 75%] Built target modify_vendor
+[ 75%] Built target optiling_compat
+[INFO] Succed generated /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 75%] Built target npu_supported_ops
+[ 83%] Linking CXX shared library libcust_opapi.so
+[ 83%] Built target cust_opapi
+[ 91%] Linking CXX shared library libcust_tf_parsers.so
+[ 91%] Built target cust_tf_parsers
+[100%] Linking CXX shared library libcust_opsproto_rt2.0.so
+[100%] Built target cust_op_proto
+Run CPack packaging tool...
+CPack: Create package using External
+CPack: Install projects
+CPack: - Run preinstall target for: opp
+CPack: - Install project: opp []
+CMake Error at /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/cmake_install.cmake:58 (file):
+  file INSTALL cannot find
+  "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/config":
+  No such file or directory.
+Call Stack (most recent call first):
+  /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/cmake_install.cmake:57 (include)
+
+
+CPack Error: Error when generating package: opp
+gmake: *** [Makefile:71: package] Error 1
