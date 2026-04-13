@@ -1,3 +1,30 @@
+[INFO] Succed generated /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 75%] Built target npu_supported_ops
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:48:41: error: expected primary-expression before ‘inputDesc0_0’
+   48 | uint32_t socSupportList[] = {TensorDesc inputDesc0_0[3] =
+      |                                         ^~~~~~~~~~~~
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:48:41: error: expected ‘}’ before ‘inputDesc0_0’
+   48 | uint32_t socSupportList[] = {TensorDesc inputDesc0_0[3] =
+      |                             ~           ^~~~~~~~~~~~
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:60:24: error: ‘inputDesc0_0’ was not declared in this scope; did you mean ‘inputDesc0_1’?
+   60 | SupportInfo list0_0 = {inputDesc0_0, 3, outputDesc0_0, 1};
+      |                        ^~~~~~~~~~~~
+      |                        inputDesc0_1
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp: In function ‘aclnnStatus aclnnLinearizeCacheIndicesFromRowIdxGetWorkspaceSize(const aclTensor*, const aclTensor*, const aclTensor*, const aclTensor*, uint64_t*, aclOpExecutor**)’:
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:170:95: error: ‘socSupportListLen’ was not declared in this scope
+  170 |     NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddSupportList(*executor, &supportList, socSupportList, socSupportListLen));
+      |                                                                                               ^~~~~~~~~~~~~~~~~
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:113:42: note: in definition of macro ‘NNOPBASE_ASSERT_OK_RETVAL’
+  113 |         const aclnnStatus _chk_stutus = (v);                            \
+      |                                          ^
+gmake[2]: *** [op_host/CMakeFiles/cust_opapi.dir/build.make:79: op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:352: op_host/CMakeFiles/cust_opapi.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+[ 83%] Linking CXX shared library libcust_tf_parsers.so
+[ 83%] Built target cust_tf_parsers
+[ 91%] Linking CXX shared library libcust_opsproto_rt2.0.so
+[ 91%] Built target cust_op_proto
+gmake: *** [Makefile:156: all] Error 2
 FAILED 1.py::test_basic[1-12-1-index_dtype2] - AssertionError: 
 FAILED 1.py::test_basic[1-12-1-index_dtype3] - AssertionError: 
 FAILED 1.py::test_basic[1-12-16-index_dtype4] - AssertionError: 
