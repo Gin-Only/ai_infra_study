@@ -1,3 +1,178 @@
+bash-5.2# bash run.sh
+2026-04-13 14:02:55 (8684) - [INFO] Start to generate AI Core operator files. 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse the ir template:/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx.json 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse 'LinearizeCacheIndicesFromRowIdx' in the json ir template. 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse the input_desc: cache_hash_size_cumsum 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse the input_desc: update_table_indices 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse the input_desc: update_row_indices 
+2026-04-13 14:02:55 (8684) - [INFO] Start to parse the output_desc: linear_cache_indices 
+2026-04-13 14:02:55 (8684) - [WARNING] The "attr" value is invalid or no "attr" exists in the map. 
+2026-04-13 14:02:55 (8684) - [INFO] Start to check the type and format between the inputs/outputs in IR template. 
+2026-04-13 14:02:55 (8684) - [INFO] Start to generate a new project. 
+2026-04-13 14:02:55 (8684) - [WARNING] File config.cmake lack of ASCEND_FRAMEWORK_TYPE. Please check your config env. 
+2026-04-13 14:02:55 (8684) - [WARNING] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/config.cmake already exists and will be overwrite! 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/config.cmake generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx_tiling.h generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/framework/tf_plugin/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/framework/tf_plugin/CMakeLists.txt generated successfully. 
+2026-04-13 14:02:55 (8684) - [INFO] Generation completed. 
+using ASCEND_HOME_PATH: /usr/local/Ascend/ascend-toolkit/latest
+Preset CMake variables:
+
+  ASCEND_CANN_PACKAGE_PATH:PATH="/usr/local/Ascend/ascend-toolkit/latest"
+  ASCEND_COMPUTE_UNIT:STRING="ascend950"
+  ASCEND_PACK_SHARED_LIBRARY:BOOL="False"
+  ASCEND_PYTHON_EXECUTABLE:STRING="python3"
+  CMAKE_BUILD_TYPE:STRING="Release"
+  CMAKE_CROSS_PLATFORM_COMPILER:PATH="/usr/bin/aarch64-linux-gnu-g++"
+  CMAKE_INSTALL_PREFIX:PATH="/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out"
+  ENABLE_BINARY_PACKAGE:BOOL="True"
+  ENABLE_CROSS_COMPILE:BOOL="False"
+  ENABLE_SOURCE_PACKAGE:BOOL="False"
+  ENABLE_TEST:BOOL="True"
+  vendor_name:STRING="linearize_cache_indices_from_row_idx"
+
+-- The C compiler identification is GNU 12.3.1
+-- The CXX compiler identification is GNU 12.3.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Opbuild generating sources
+opbuild ops info: 
+opbuild ops error: Invalid socVersion ascend950 of op LinearizeCacheIndicesFromRowIdx
+
+-- Opbuild generating sources - done
+CMake Warning (dev) at cmake/func.cmake:271 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  cmake/func.cmake:370 (add_kernels_install)
+  op_kernel/CMakeLists.txt:6 (add_kernels_compile)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at cmake/func.cmake:275 (install):
+  Policy CMP0177 is not set: install() DESTINATION paths are normalized.  Run
+  "cmake --help-policy CMP0177" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  cmake/func.cmake:370 (add_kernels_install)
+  op_kernel/CMakeLists.txt:6 (add_kernels_compile)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (3.2s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CROSS_PLATFORM_COMPILER
+
+
+-- Build files have been written to: /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out
+[ 66%] Generating tbe/op_info_cfg/ai_core/ascend950/aic-ascend950-ops-info.json
+[ 66%] Building CXX object op_host/CMakeFiles/cust_optiling.dir/linearize_cache_indices_from_row_idx.cpp.o
+
+
+==============check valid for ops info start==============
+==============check valid for ops info end================
+
+
+Compile op info cfg successfully.
+[ 66%] Built target ops_info_gen_ascend950
+[100%] Linking CXX shared library libcust_opmaster_rt2.0.so
+[100%] Built target cust_optiling
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 ...
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
+Traceback (most recent call last):
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/opc.py", line 748, in <module>
+    main()
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/opc.py", line 735, in main
+    load_op_info_store(opt_parser.get_option(OpcOptions.SOC_VERSION))
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/op_info_store.py", line 515, in load_op_info_store
+    platform_info.set_current_compile_soc_info(soc_version)
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/tbe/common/platform/platform_info.py", line 262, in set_current_compile_soc_info
+    value = func(soc_version, core_type, aicore_num, l1_fusion)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/tbe/tvm/_ffi/_ctypes/packed_func.py", line 239, in __call__
+    raise get_last_ffi_error()
+tvm.error_mgr.tbe_python_error_mgr.TBEPythonError: 
+[errClass:Inner Error]
+[errCode:[EB9000]]
+[message:Traceback (most recent call last):
+  4: TVMFuncCall
+  3: std::_Function_handler<void (ascend_tvm::runtime::TVMArgs, ascend_tvm::runtime::TVMRetValue*), ascend_tvm::cceconf::{lambda(ascend_tvm::runtime::TVMArgs, ascend_tvm::runtime::TVMRetValue*)#1}>::_M_invoke(std::_Any_data const&, ascend_tvm::runtime::TVMArgs&&, ascend_tvm::runtime::TVMRetValue*&&)
+  2: ascend_tvm::cceconf::TargetInit(std::string const&)
+  1: ascend_tvm::runtime::detail::LogFatal::Entry::Finalize()
+  0: ascend_tvm::runtime::Backtrace()
+  File "target_api.cc", line 107
+
+TVMError: [EB9000] Check failed: (get_platform_info_flag == 0) is false: get platform info failed]
+[errPcause:N/A]
+[errSolution:N/A]
+Traceback (most recent call last):
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/opc.py", line 748, in <module>
+    main()
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/opc.py", line 735, in main
+    load_op_info_store(opt_parser.get_option(OpcOptions.SOC_VERSION))
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/opc_tool/op_info_store.py", line 515, in load_op_info_store
+    platform_info.set_current_compile_soc_info(soc_version)
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/tbe/common/platform/platform_info.py", line 262, in set_current_compile_soc_info
+    value = func(soc_version, core_type, aicore_num, l1_fusion)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/ascend-toolkit/8.3.RC1/python/site-packages/tbe/tvm/_ffi/_ctypes/packed_func.py", line 239, in __call__
+    raise get_last_ffi_error()
+tvm.error_mgr.tbe_python_error_mgr.TBEPythonError: 
+[errClass:Inner Error]
+[errCode:[EB9000]]
+[message:Traceback (most recent call last):
+  4: TVMFuncCall
+  3: std::_Function_handler<void (ascend_tvm::runtime::TVMArgs, ascend_tvm::runtime::TVMRetValue*), ascend_tvm::cceconf::{lambda(ascend_tvm::runtime::TVMArgs, ascend_tvm::runtime::TVMRetValue*)#1}>::_M_invoke(std::_Any_data const&, ascend_tvm::runtime::TVMArgs&&, ascend_tvm::runtime::TVMRetValue*&&)
+  2: ascend_tvm::cceconf::TargetInit(std::string const&)
+  1: ascend_tvm::runtime::detail::LogFatal::Entry::Finalize()
+  0: ascend_tvm::runtime::Backtrace()
+  File "target_api.cc", line 107
+
+TVMError: [EB9000] Check failed: (get_platform_info_flag == 0) is false: get platform info failed]
+[errPcause:N/A]
+[errSolution:N/A]
+Opc tool start working now, please wait for a moment.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
+make[4]: *** Waiting for unfinished jobs....
+Opc tool start working now, please wait for a moment.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
+    kernel_builder.ascendc_build()
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
+    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
+RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
+gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:513: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:455: op_kernel/CMakeFiles/binary.dir/rule] Error 2
+gmake: *** [Makefile:293: binary] Error 2
+[  8%] Generating scripts/install.sh, scripts/upgrade.sh
+[ 16%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
+[ 25%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
+[ 41%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 41%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
+[ 58%] Built target ops_info_gen_ascend950
+[ 58%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
+[ 58%] Built target gen_version_info
+[ 75%] Built target cust_optiling
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
+[ 75%] Built target modify_vendor
+[ 75%] Built target optiling_compat
 [INFO] Succed generated /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
 [ 75%] Built target npu_supported_ops
 /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:48:41: error: expected primary-expression before ‘inputDesc0_0’
@@ -25,109 +200,3 @@ gmake[1]: *** Waiting for unfinished jobs....
 [ 91%] Linking CXX shared library libcust_opsproto_rt2.0.so
 [ 91%] Built target cust_op_proto
 gmake: *** [Makefile:156: all] Error 2
-FAILED 1.py::test_basic[1-12-1-index_dtype2] - AssertionError: 
-FAILED 1.py::test_basic[1-12-1-index_dtype3] - AssertionError: 
-FAILED 1.py::test_basic[1-12-16-index_dtype4] - AssertionError: 
-FAILED 1.py::test_basic[1-12-16-index_dtype5] - AssertionError: 
-FAILED 1.py::test_basic[1-12-128-index_dtype6] - AssertionError: 
-FAILED 1.py::test_basic[1-12-128-index_dtype7] - AssertionError: 
-FAILED 1.py::test_basic[1-12-1024-index_dtype8] - AssertionError: 
-FAILED 1.py::test_basic[1-12-1024-index_dtype9] - AssertionError: 
-FAILED 1.py::test_basic[1-64-1-index_dtype12] - AssertionError: 
-FAILED 1.py::test_basic[1-64-1-index_dtype13] - AssertionError: 
-FAILED 1.py::test_basic[1-64-16-index_dtype14] - AssertionError: 
-FAILED 1.py::test_basic[1-64-16-index_dtype15] - AssertionError: 
-FAILED 1.py::test_basic[1-64-128-index_dtype16] - AssertionError: 
-FAILED 1.py::test_basic[1-64-128-index_dtype17] - AssertionError: 
-FAILED 1.py::test_basic[1-64-1024-index_dtype18] - AssertionError: 
-FAILED 1.py::test_basic[1-64-1024-index_dtype19] - AssertionError: 
-FAILED 1.py::test_basic[1-256-1-index_dtype22] - AssertionError: 
-FAILED 1.py::test_basic[1-256-1-index_dtype23] - AssertionError: 
-FAILED 1.py::test_basic[1-256-16-index_dtype24] - AssertionError: 
-FAILED 1.py::test_basic[1-256-16-index_dtype25] - AssertionError: 
-FAILED 1.py::test_basic[1-256-128-index_dtype26] - AssertionError: 
-FAILED 1.py::test_basic[1-256-128-index_dtype27] - AssertionError: 
-FAILED 1.py::test_basic[1-256-1024-index_dtype28] - AssertionError: 
-FAILED 1.py::test_basic[1-256-1024-index_dtype29] - AssertionError: 
-FAILED 1.py::test_basic[4-12-1-index_dtype32] - AssertionError: 
-FAILED 1.py::test_basic[4-12-1-index_dtype33] - AssertionError: 
-FAILED 1.py::test_basic[4-12-16-index_dtype34] - AssertionError: 
-FAILED 1.py::test_basic[4-12-16-index_dtype35] - AssertionError: 
-FAILED 1.py::test_basic[4-12-128-index_dtype36] - AssertionError: 
-FAILED 1.py::test_basic[4-12-128-index_dtype37] - AssertionError: 
-FAILED 1.py::test_basic[4-12-1024-index_dtype38] - AssertionError: 
-FAILED 1.py::test_basic[4-12-1024-index_dtype39] - AssertionError: 
-FAILED 1.py::test_basic[4-64-1-index_dtype42] - AssertionError: 
-FAILED 1.py::test_basic[4-64-1-index_dtype43] - AssertionError: 
-FAILED 1.py::test_basic[4-64-16-index_dtype44] - AssertionError: 
-FAILED 1.py::test_basic[4-64-16-index_dtype45] - AssertionError: 
-FAILED 1.py::test_basic[4-64-128-index_dtype46] - AssertionError: 
-FAILED 1.py::test_basic[4-64-128-index_dtype47] - AssertionError: 
-FAILED 1.py::test_basic[4-64-1024-index_dtype48] - AssertionError: 
-FAILED 1.py::test_basic[4-64-1024-index_dtype49] - AssertionError: 
-FAILED 1.py::test_basic[4-256-1-index_dtype52] - AssertionError: 
-FAILED 1.py::test_basic[4-256-1-index_dtype53] - AssertionError: 
-FAILED 1.py::test_basic[4-256-16-index_dtype54] - AssertionError: 
-FAILED 1.py::test_basic[4-256-16-index_dtype55] - AssertionError: 
-FAILED 1.py::test_basic[4-256-128-index_dtype56] - AssertionError: 
-FAILED 1.py::test_basic[4-256-128-index_dtype57] - AssertionError: 
-FAILED 1.py::test_basic[4-256-1024-index_dtype58] - AssertionError: 
-FAILED 1.py::test_basic[4-256-1024-index_dtype59] - AssertionError: 
-FAILED 1.py::test_basic[8-12-1-index_dtype62] - AssertionError: 
-FAILED 1.py::test_basic[8-12-1-index_dtype63] - AssertionError: 
-FAILED 1.py::test_basic[8-12-16-index_dtype64] - AssertionError: 
-FAILED 1.py::test_basic[8-12-16-index_dtype65] - AssertionError: 
-FAILED 1.py::test_basic[8-12-128-index_dtype66] - AssertionError: 
-FAILED 1.py::test_basic[8-12-128-index_dtype67] - AssertionError: 
-FAILED 1.py::test_basic[8-12-1024-index_dtype68] - AssertionError: 
-FAILED 1.py::test_basic[8-12-1024-index_dtype69] - AssertionError: 
-FAILED 1.py::test_basic[8-64-1-index_dtype72] - AssertionError: 
-FAILED 1.py::test_basic[8-64-1-index_dtype73] - AssertionError: 
-FAILED 1.py::test_basic[8-64-16-index_dtype74] - AssertionError: 
-FAILED 1.py::test_basic[8-64-16-index_dtype75] - AssertionError: 
-FAILED 1.py::test_basic[8-64-128-index_dtype76] - AssertionError: 
-FAILED 1.py::test_basic[8-64-128-index_dtype77] - AssertionError: 
-FAILED 1.py::test_basic[8-64-1024-index_dtype78] - AssertionError: 
-FAILED 1.py::test_basic[8-64-1024-index_dtype79] - AssertionError: 
-FAILED 1.py::test_basic[8-256-1-index_dtype82] - AssertionError: 
-FAILED 1.py::test_basic[8-256-1-index_dtype83] - AssertionError: 
-FAILED 1.py::test_basic[8-256-16-index_dtype84] - AssertionError: 
-FAILED 1.py::test_basic[8-256-16-index_dtype85] - AssertionError: 
-FAILED 1.py::test_basic[8-256-128-index_dtype86] - AssertionError: 
-FAILED 1.py::test_basic[8-256-128-index_dtype87] - AssertionError: 
-FAILED 1.py::test_basic[8-256-1024-index_dtype88] - AssertionError: 
-FAILED 1.py::test_basic[8-256-1024-index_dtype89] - AssertionError: 
-FAILED 1.py::test_basic[16-12-1-index_dtype92] - AssertionError: 
-FAILED 1.py::test_basic[16-12-1-index_dtype93] - AssertionError: 
-FAILED 1.py::test_basic[16-12-16-index_dtype94] - AssertionError: 
-FAILED 1.py::test_basic[16-12-16-index_dtype95] - AssertionError: 
-FAILED 1.py::test_basic[16-12-128-index_dtype96] - AssertionError: 
-FAILED 1.py::test_basic[16-12-128-index_dtype97] - AssertionError: 
-FAILED 1.py::test_basic[16-12-1024-index_dtype98] - AssertionError: 
-FAILED 1.py::test_basic[16-12-1024-index_dtype99] - AssertionError: 
-FAILED 1.py::test_basic[16-64-1-index_dtype102] - AssertionError: 
-FAILED 1.py::test_basic[16-64-1-index_dtype103] - AssertionError: 
-FAILED 1.py::test_basic[16-64-16-index_dtype104] - AssertionError: 
-FAILED 1.py::test_basic[16-64-16-index_dtype105] - AssertionError: 
-FAILED 1.py::test_basic[16-64-128-index_dtype106] - AssertionError: 
-FAILED 1.py::test_basic[16-64-128-index_dtype107] - AssertionError: 
-FAILED 1.py::test_basic[16-64-1024-index_dtype108] - AssertionError: 
-FAILED 1.py::test_basic[16-64-1024-index_dtype109] - AssertionError: 
-FAILED 1.py::test_basic[16-256-1-index_dtype112] - AssertionError: 
-FAILED 1.py::test_basic[16-256-1-index_dtype113] - AssertionError: 
-FAILED 1.py::test_basic[16-256-16-index_dtype114] - AssertionError: 
-FAILED 1.py::test_basic[16-256-16-index_dtype115] - AssertionError: 
-FAILED 1.py::test_basic[16-256-128-index_dtype116] - AssertionError: 
-FAILED 1.py::test_basic[16-256-128-index_dtype117] - AssertionError: 
-FAILED 1.py::test_basic[16-256-1024-index_dtype118] - AssertionError: 
-FAILED 1.py::test_basic[16-256-1024-index_dtype119] - AssertionError: 
-FAILED 1.py::test_uncached_tables[index_dtype0] - AssertionError: 
-FAILED 1.py::test_uncached_tables[index_dtype1] - AssertionError: 
-FAILED 1.py::test_pruned[index_dtype0] - AssertionError: 
-FAILED 1.py::test_pruned[index_dtype1] - AssertionError: 
-FAILED 1.py::test_edge[index_dtype0-2-10-5] - AssertionError: 
-FAILED 1.py::test_edge[index_dtype0-32-512-2048] - AssertionError: 
-FAILED 1.py::test_edge[index_dtype1-1-1-1] - AssertionError: 
-FAILED 1.py::test_edge[index_dtype1-2-10-5] - AssertionError: 
-FAILED 1.py::test_edge[index_dtype1-32-512-2048] - AssertionError: 
-FAILED 1.py::test_doc_example - assert False
