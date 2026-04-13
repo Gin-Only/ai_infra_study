@@ -1,3 +1,85 @@
+报错4：
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 ...
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
+Opc tool start working now, please wait for a moment.
+[2026-04-13 15:35:47] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:102: error: use of undeclared identifier 'kernel'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+                                                                                                     ^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:38: error: no member named 'LinearizeCacheIndicesFromRowIdxKernel' in namespace 'LinearizeCacheIndicesFromRowIdx'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:76: error: use of undeclared identifier 'DTYPE_Update_Row_Indices'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+                                                                           ^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:27:5: error: use of undeclared identifier 'kernel'
+    kernel.Compute();
+    ^
+4 errors generated.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
+make[4]: *** Waiting for unfinished jobs....
+Opc tool start working now, please wait for a moment.
+[2026-04-13 15:35:47] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:102: error: use of undeclared identifier 'kernel'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+                                                                                                     ^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:38: error: no member named 'LinearizeCacheIndicesFromRowIdxKernel' in namespace 'LinearizeCacheIndicesFromRowIdx'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:76: error: use of undeclared identifier 'DTYPE_Update_Row_Indices'
+    LinearizeCacheIndicesFromRowIdx::LinearizeCacheIndicesFromRowIdxKernel<DTYPE_Update_Row_Indices> kernel(args);
+                                                                           ^
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:27:5: error: use of undeclared identifier 'kernel'
+    kernel.Compute();
+    ^
+4 errors generated.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
+    kernel_builder.ascendc_build()
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
+    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
+RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
+gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:513: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:455: op_kernel/CMakeFiles/binary.dir/rule] Error 2
+gmake: *** [Makefile:293: binary] Error 2
+[ 25%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
+[ 25%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
+[ 25%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
+[ 33%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
+[ 41%] Generating scripts/install.sh, scripts/upgrade.sh
+[ 50%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 58%] Built target ops_info_gen_ascend950
+[ 66%] Built target gen_version_info
+[ 75%] Built target cust_optiling
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
+[ 75%] Built target modify_vendor
+[ 75%] Built target optiling_compat
+[INFO] Succed generated /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 75%] Built target npu_supported_ops
+[ 83%] Linking CXX shared library libcust_opapi.so
+[ 83%] Built target cust_opapi
+[ 91%] Linking CXX shared library libcust_tf_parsers.so
+[ 91%] Built target cust_tf_parsers
+[100%] Linking CXX shared library libcust_opsproto_rt2.0.so
+[100%] Built target cust_op_proto
+Run CPack packaging tool...
+CPack: Create package using External
+CPack: Install projects
+CPack: - Run preinstall target for: opp
+CPack: - Install project: opp []
+CMake Error at /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/cmake_install.cmake:58 (file):
+  file INSTALL cannot find
+  "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/config":
+  No such file or directory.
+Call Stack (most recent call first):
+  /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/cmake_install.cmake:57 (include)
+
+
+CPack Error: Error when generating package: opp
+gmake: *** [Makefile:71: package] Error 1
+
 ==============check valid for ops info start==============
 ==============check valid for ops info end================
 
