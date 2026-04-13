@@ -1,0 +1,50 @@
+[
+  {
+    "op": "LinearizeCacheIndicesFromRowIdx",
+    "language": "cpp",
+    "input_desc": [
+      {
+        "name": "cache_hash_size_cumsum",
+        "param_type": "required",
+        "format": [
+          "ND", "ND"
+        ],
+        "type": [
+          "int64", "int32"
+        ]
+      },
+      {
+        "name": "update_table_indices",
+        "param_type": "required",
+        "format": [
+          "ND", "ND"
+        ],
+        "type": [
+          "int64", "int32"
+        ]
+      },
+      {
+        "name": "update_row_indices",
+        "param_type": "required",
+        "format": [
+          "ND", "ND"
+        ],
+        "type": [
+          "int64", "int32"
+        ]
+      }
+    ],
+    "output_desc": [
+      {
+        "name": "linear_cache_indices",
+        "param_type": "required",
+        "format": [
+          "ND", "ND"
+        ],
+        "type": [
+          "int64", "int32"
+        ]
+      }
+    ]
+  }
+]
