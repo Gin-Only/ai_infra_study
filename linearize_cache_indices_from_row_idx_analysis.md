@@ -1,3 +1,19 @@
+分核方式是在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。 
+分块大小 block_size = 256 block_num = ceil(K / 256) 
+第 i 个 block 处理区间 
+start = i * 256 
+end = start + 256 
+实际长度 = end – start
+
+每个 block 固定使用：
+ub_cumsum：1024 × int64 = 8192 字节
+ub_table：256 × int64 = 2048 字节
+ub_row：256 × int64 = 2048 字节
+ub_out：256 × int64 = 2048 字节
+总使用 UB
+8192 + 2048 + 2048 + 2048 = 14336 字节 ≈ 14KB
+
+
 5.2	分核设计
 分核方式是在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。 
 分块大小 block_size = 256 block_num = ceil(K / 256) 
