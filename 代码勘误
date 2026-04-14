@@ -1,0 +1,72 @@
+1. gm初始化时，cumsumGT.SetGlobalBuffer(
+            reinterpret_cast<__gm__ T*>(args.cache_hash_size_cumsum), cumsumLength);需要加上每个核分配的数据量的偏移
+2.compute计算循环处理分配到的数据块，DataCopy计算计算量需要32B对齐，注意算子内部计算，大部分场景都需要控制计算量为sizeof(T)*count 32B对齐
+   __aicore__ inline void Compute()
+    {
+        LocalTensor<T> cumsumLt = cumsumBuf.Get<T>();
+        uint32_t copyLen = static_cast<uint32_t>(cumsumLength <= MAX_CUMSUM_UB_ELEMS
+                                                     ? cumsumLength
+                                                     : MAX_CUMSUM_UB_ELEMS);
+        DataCopy(cumsumLt, cumsumGT[0], copyLen);
+
+       
+        int64_t blockIdx  = static_cast<int64_t>(GetBlockIdx());
+        int64_t threadIdx = static_cast<int64_t>(GetSubBlockIdx());
+
+        
+        int64_t idx = blockIdx * static_cast<int64_t>(blockSize) + threadIdx;
+
+       
+        if (idx >= totalLength) {
+            return;
+        }
+
+        LocalTensor<T> scalarBuf = scalarTmpBuf.Get<T>();
+
+        DataCopy(scalarBuf, tableIdxGT[idx], 1);
+        T tableId = scalarBuf.GetValue(0);
+
+        DataCopy(scalarBuf, rowIdxGT[idx], 1);
+        T rowId = scalarBuf.GetValue(0);
+
+        T offset;
+        if (tableId < static_cast<T>(MAX_CUMSUM_UB_ELEMS)) {
+            offset = cumsumLt.GetValue(static_cast<uint32_t>(tableId));
+        } else {
+            // UB 未覆盖的极端情况：回退到 GM 读取
+            DataCopy(scalarBuf, cumsumGT[tableId], 1);
+            offset = scalarBuf.GetValue(0);
+        }
+
+        T result = offset + rowId;
+
+        scalarBuf.SetValue(0, result);
+        DataCopy(outputGT[idx], scalarBuf, 1);
+    }
+5.2	分核设计
+分核方式是在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。 
+分块大小 block_size = 240*1024/(4*8) =7680 block_num = ceil(K / 7680) 
+第 i 个 block 处理区间 
+start = i *7680  
+end = start + 7680
+实际长度 = end – start
+ 4. 核执行流程（dim=0 块）
+1.	CopyIn (GM → UB) 
+读取当前块：table_indices[start:end] 读取当前块：row_indices[start:end] 全量读取 cumsum
+2.	Compute 运行 
+for (int i = 0; i < block_len; i++) {
+ table_id = ub_table[i];
+ row_id = ub_row[i]; 
+ub_out[i] = ub_cumsum[table_id] + row_id; 
+}
+3.	CopyOut (UB → GM) 写回 linear_cache_indices[start:end]
+
+5.3	UB利用率
+每个 block 固定使用：
+ub_cumsum：1024 × int64 = 8192 字节
+ub_table：7680 × int64 = 60 KB
+ub_row：7680 × int64 = 60 KB
+ub_out：7680 × int64 = 60 KB
+总使用 UB
+60+60+60+8 = 188KB
+
