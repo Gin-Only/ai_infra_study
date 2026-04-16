@@ -1,0 +1,11 @@
+embedding 权重字节数组
+[0, total_cache_hash_size], 长度 T+1, 最后一个元素 = total_cache_hash_size > 0
+[0, T-1] 或 -1 (T=表数量, -1表示非缓存表)
+[0, total_weights_size], 递增序列
+{FP32=4, FP16=2, INT8=1, INT4=0.5, INT2=0.25}
+[0, total_D], 递增序列, D=embedding维度
+[0, total_cache_hash_size] 或 -1 (无效)
+shape [C, associativity], C=cache sets数量
+缓存权重存储
+shape [total_cache_hash_size], LFU频率计数器
+默认 16, 通常是 2^n (如 8, 16, 32)
