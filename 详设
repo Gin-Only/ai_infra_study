@@ -1,0 +1,131 @@
+linearize_cache_indices_from_row_idx算子功能增强-详细设计
+Detailed design of requirements
+
+
+
+
+
+ 
+1	简介
+1.1	背景
+linearize_cache_indices_from_row_idx专门用于表批量嵌入（TBE）缓存管理，线性化所有表的索引，使其唯一。其中update_table_indices 和 update_row_indices 来自行索引格式，用于就地更新，常见于推荐系统、大模型稀疏特征训练的缓存加速场景。
+表格批处理嵌入运算符 — FBGEMM 1.5.0 文档 - PyTorch 文档
+
+			
+ 
+3	接口说明
+3.1	入参说明
+名称	类型	数据类型	数据格式	备注
+cache_hash_size_cumsum
+	Tensor	INT64	1D,形状[T+1]	所有嵌入表哈希容量的前缀累加和
+[t] 为第 t 张表在全局缓存中的起始偏移
+-1 表示该表未缓存
+最后一个元素为总缓存大小（哨兵值）
+update_table_indices
+	Tensor	INT32/INT64	1D [N]	每条更新记录所属的表编号，取值范围 [0, T-1]
+update_row_indices
+	Tensor	INT32/INT64	1D [N]	每条更新记录在其所属表内的局部行号；负数表示该行已被剪枝
+3.2	出参说明
+名称	类型	数据类型	数据格式	备注
+linear_cache_indices
+	Tensor	INT32/INT64	1D [N]	　每条更新记录在全局缓存地址空间中的一维绝对地址
+3.3	参数约束
+入参约束
+T = cache_hash_size_cumsum.size(0) - 1，必须 T > 0
+update_table_indices 与 update_row_indices 长度相同，均为 N
+每张表的indices要小于表的大小
+update_table_indices  可能为乱序
+下标数量可能非常大->10w-100w级
+设 t   = update_table_indices[i]
+设 off = cache_hash_size_cumsum[t]
+设 max = cache_hash_size_cumsum[T]   ← 哨兵值
+
+if off >= 0  AND  update_row_indices[i] >= 0:
+    linear_cache_indices[i] = update_row_indices[i] + off   ← 正常映射
+else:
+    linear_cache_indices[i] = max                           ← 无效（未缓存/已剪枝）
+4	算子原理
+TBE 系统中存在 T 张独立嵌入表，每张表行号从 0 开始独立编号（局部坐标）。GPU 缓存将所有表统一映射到一段连续的全局地址空间（全局坐标）。cache_hash_size_cumsum 记录了每张表在该全局空间中的起始偏移量。
+4.1	全局缓存地址空间
+全局缓存地址空间分段布局（以 4 张表、每张容量 12 为例）
+ 
+含未缓存表的情况（cumsum[2] = -1，table_2 不在缓存中）
+ 
+4.2	坐标系变换（一次加法）
+算子本质是一次坐标系变换：将 (表号 t, 局部行号 r) 的二元组映射为全局一维地址。
+ 
+5	算子设计
+5.1	计算流程
+Algorithm 1: linearize_cache_indices_from_row_idx
+1	kernel linearize_cache_indices_from_row_idx_kernel(
+    cache_hash_size_cumsum,   // int64[T+1]，只读
+    update_table_indices,     // index_t[N]，只读
+    update_row_indices,       // index_t[N]，只读
+    linear_cache_indices      // index_t[N]，写出
+)：
+2	index = blockIdx.x * blockDim.x + threadIdx.x
+if index >= update_row_indices.size(0):
+        return
+// 读取该条记录所属的表号
+t = update_table_indices[index]
+
+// 用 __ldg 经 L1 只读缓存读取偏移（对所有线程广播）
+max_offset  = __ldg(&cache_hash_size_cumsum[T])   // 哨兵值
+curr_offset = __ldg(&cache_hash_size_cumsum[t])   // 表起始偏移
+
+// 有效性判断 + 输出
+if curr_offset >= 0 AND update_row_indices[index] >= 0:
+        linear_cache_indices[index] = update_row_indices[index] + curr_offset
+else:
+        linear_cache_indices[index] = max_offset
+
+
+
+5.2	分核设计
+分核方式是在 dim=0 均匀分片每个 AI Core 处理一段连续的 K 元素。 
+分块大小 block_size = 240*1024/(4*8) =7680 block_num = ceil(K / 7680) 
+第 i 个 block 处理区间 
+start = i * 256 
+end = start + 256 
+实际长度 = end – start
+ 4. 核执行流程（dim=0 块）
+1.	CopyIn (GM → UB) 
+读取当前块：table_indices[start:end] 读取当前块：row_indices[start:end] 全量读取 cumsum
+2.	Compute 运行 
+for (int i = 0; i < block_len; i++) {
+ table_id = ub_table[i];
+ row_id = ub_row[i]; 
+ub_out[i] = ub_cumsum[table_id] + row_id; 
+}
+3.	CopyOut (UB → GM) 写回 linear_cache_indices[start:end]
+
+5.3	UB利用率
+每个 block 固定使用：
+ub_cumsum：1024 × int64 = 8192 字节
+ub_table：7680 × int64 = 60 KB
+ub_row：7680 × int64 = 60 KB
+ub_out：7680 × int64 = 60 KB
+总使用 UB
+60+60+60+8 = 188KB
+
+5.4	用例设计
+特性/功能 名称	用例描述	用例模型	预期结果	备注
+功能	数据类型			
+功能	特殊序列	num_updates = 0	输出为空 tensor（numel() == 0）	空输入序列
+功能	特殊序列	table_indices = []		
+功能	特殊序列	row_indices = []		
+功能	特殊用例	uncached_tables={1,3}，其他参数如 num_tables=4, table_cache_size=12, num_updates=32，随机生成 table_indices 和 row_indices	对未缓存表的行索引结果使用 sentinel（max_offset），其他表计算正常，类型正确	未缓存表测试
+功能	特殊用例	pruned_ratio = 0.3，随机生成 row_indices，部分值设为 -1	被剪枝（row_indices=-1）的输出结果为 sentinel，其他正常	被剪枝的行索引
+功能	特殊用例	EDGE_CASE_PARAMS = [(1,1,1),(1,1,0),(2,10,5),(32,512,2048)]，随机生成索引，index_dtype ∈ {torch.int32, torch.int64}	输出与 reference 结果一致，类型与输入索引类型一致	边界用例
+功能	异常用例	update_table_indices 与 update_row_indices 长度不同	错误提示	
+功能	异常用例	cache_hash_size_cumsum 长度 < num_tables + 1	错误提示	
+功能	异常用例	s	错误提示	
+性能	性能用例			
+
+5.5	冒烟测试影响
+新增算子，不影响冒烟用例
+
+
+
+
+
