@@ -1,3 +1,33 @@
+调试tip:一个一个样例一个样例调试
+if __name__ == "__main__":
+    set_seed(0)
+    test_in_linear_silu_backward_large(total_seqs=2048,
+                                 dim=(192, 768),
+                                 enable_bias=True,
+                                 data_type=torch.float32,
+                                 is_diff_dim=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 1. gm初始化时，cumsumGT.SetGlobalBuffer(
             reinterpret_cast<__gm__ T*>(args.cache_hash_size_cumsum), cumsumLength);需要加上每个核分配的数据量的偏移
 2.compute计算循环处理分配到的数据块，DataCopy计算计算量需要32B对齐，注意算子内部计算，大部分场景都需要控制计算量为sizeof(T)*count 32B对齐
