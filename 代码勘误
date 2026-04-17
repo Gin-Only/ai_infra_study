@@ -1,3 +1,34 @@
+[ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
+Opc tool start working now, please wait for a moment.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
+make[4]: *** Waiting for unfinished jobs....
+Opc tool start working now, please wait for a moment.
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.json not generated!
+make[4]: *** [/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
+    kernel_builder.ascendc_build()
+  File "/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
+    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
+RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
+gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:513: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:455: op_kernel/CMakeFiles/binary.dir/rule] Error 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 调试tip:一个一个样例一个样例调试
 if __name__ == "__main__":
     set_seed(0)
