@@ -1,3 +1,29 @@
+ grep -n "tailBlockNum\|basicBlockNum\|totalBlocks" \
+  /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/op_kernel/linearize_cache_indices_from_row_idx_kernel.h
+
+62:        tailBlockNum = tilingData.tailBlockNum;
+63:        basicBlockNum = tilingData.basicBlockNum;
+64:        totalBlocks = tilingData.totalBlocks;
+72:        // 前 tailBlockNum 个核各处理 (basicBlockNum+1) 个元素，其余核处理 basicBlockNum 个
+73:        int32_t myBlockNum = (blockIdx < tailBlockNum) ? (basicBlockNum + 1) : basicBlockNum;
+74:        int64_t start = (blockIdx < tailBlockNum)
+75:            ? static_cast<int64_t>(blockIdx) * (basicBlockNum + 1)
+76:            : static_cast<int64_t>(tailBlockNum) * (basicBlockNum + 1)
+77:              + static_cast<int64_t>(blockIdx - tailBlockNum) * basicBlockNum;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bash-5.2# cat /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h
 #ifndef LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
 #define LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
