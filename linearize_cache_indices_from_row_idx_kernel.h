@@ -7,15 +7,13 @@
 using namespace AscendC;
 
 constexpr int32_t BLOCK_SIZE = 7680;
-
-// 不再使用 UB 缓存 cumsum，因此该常量仅保留兼容 tiling
 constexpr int32_t MAX_CUMSUM_UB_ELEMS = 1024;
 
 struct LinearizeArgs {
-    GM_ADDR cache_hash_size_cumsum; // [T+1]
-    GM_ADDR update_table_indices;   // [K]
-    GM_ADDR update_row_indices;     // [K]
-    GM_ADDR linear_cache_indices;   // [K] 输出
+    GM_ADDR cache_hash_size_cumsum;
+    GM_ADDR update_table_indices;
+    GM_ADDR update_row_indices;
+    GM_ADDR linear_cache_indices;
     GM_ADDR workspace;
     GM_ADDR tiling;
 };
@@ -34,16 +32,22 @@ public:
 
     __aicore__ inline void Compute()
     {
-        // 完全在 GM 上标量读取计算，不使用任何 UB 缓存
+        T sentinel = cumsumGT.GetValue(static_cast<uint32_t>(cumsumLength - 1));
+
         for (int64_t i = 0; i < blockLen; ++i) {
+
             T tableId = tableIdxGT.GetValue(static_cast<uint32_t>(i));
-            T rowId   = rowIdxGT.GetValue(static_cast<uint32_t>(i));
+            T rowId = rowIdxGT.GetValue(static_cast<uint32_t>(i));
+            T offset = cumsumGT.GetValue(static_cast<uint32_t>(tableId));
 
-            // 直接从 GM 读取 cumsum 偏移
-            T offset  = cumsumGT.GetValue(static_cast<uint32_t>(tableId));
+            T result;
+            if (offset >= 0 && rowId >= 0) {
+                result = offset + rowId;
+            } else {
+                result = sentinel;
+            }
 
-            // 计算线性索引并写回 GM
-            outputGT.SetValue(static_cast<uint32_t>(i), offset + rowId);
+            outputGT.SetValue(static_cast<uint32_t>(i), result);
         }
     }
 
@@ -51,39 +55,28 @@ private:
     __aicore__ inline void InitTilingParams(
         const LinearizeCacheIndicesFromRowIdxTilingData& tilingData)
     {
-        totalLength  = tilingData.totalLength;
+        totalLength = tilingData.totalLength;
         cumsumLength = tilingData.cumsumLength;
-        blockSize    = tilingData.blockSize;
-        numBlocks    = tilingData.numBlocks;
+        blockSize = tilingData.blockSize;
+        numBlocks = tilingData.numBlocks;
     }
 
     __aicore__ inline void InitGmParams(LinearizeArgs& args)
     {
+    //     if (GetBlockIdx() < tailBlockNum) {
+    //     totalBlockNum=basicBlockNum+1;
+    //     }
         int64_t blockIdx = static_cast<int64_t>(GetBlockIdx());
-        int64_t start    = blockIdx * static_cast<int64_t>(blockSize);
-        blockLen         = (start + blockSize <= totalLength) ? blockSize : (totalLength - start);
-
-        // 全局内存张量初始化
-        cumsumGT.SetGlobalBuffer(
-            reinterpret_cast<__gm__ T*>(args.cache_hash_size_cumsum),
-            cumsumLength);
-
-        tableIdxGT.SetGlobalBuffer(
-            reinterpret_cast<__gm__ T*>(args.update_table_indices) + start,
-            blockLen);
-
-        rowIdxGT.SetGlobalBuffer(
-            reinterpret_cast<__gm__ T*>(args.update_row_indices) + start,
-            blockLen);
-
-        outputGT.SetGlobalBuffer(
-            reinterpret_cast<__gm__ T*>(args.linear_cache_indices) + start,
-            blockLen);
+        int64_t start = blockIdx * static_cast<int64_t>(blockSize);
+        blockLen = (start + blockSize <= totalLength) ? blockSize : (totalLength - start);
+        printf("blockLen %d,  start %d \n", blockLen, start);
+        cumsumGT.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(args.cache_hash_size_cumsum), cumsumLength);
+        tableIdxGT.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(args.update_table_indices) + start, blockLen);
+        rowIdxGT.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(args.update_row_indices) + start, blockLen);
+        outputGT.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(args.linear_cache_indices) + start, blockLen);
     }
 
 private:
-    // 已删除所有 TBuf<UB>、pipe、cumsumBuf 等成员
-
     GlobalTensor<T> cumsumGT;
     GlobalTensor<T> tableIdxGT;
     GlobalTensor<T> rowIdxGT;
@@ -98,4 +91,6 @@ private:
 
 } // namespace LinearizeCacheIndicesFromRowIdx
 
-#endif // LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
+#endif
+
+
