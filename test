@@ -390,9 +390,48 @@ def test_large_scale(index_dtype):
     run_test(cumsum, table_indices, row_indices, index_dtype)
 
 if __name__ == "__main__":
-    # 边界测试示例：num_tables=1, table_cache_size=1, num_updates=1, index_dtype=torch.int64
-    test_edge_cases(num_tables=1,
-                    table_cache_size=1,
-                    num_updates=1,
-                    index_dtype=torch.int64)
-    print("Edge case test passed.")
+    import random
+    random.seed(42)
+    np.random.seed(42)
+
+    # 单用例：4张表，table_2未缓存，16条更新，int64
+    num_tables = 4
+    table_cache_size = 12
+    num_updates = 16
+    index_dtype = torch.int64
+
+    cumsum, table_indices, row_indices = generate_test_data(
+        num_tables, table_cache_size, num_updates, index_dtype,
+        uncached_tables={2}
+    )
+
+    print("=== 输入 ===")
+    print(f"cache_hash_size_cumsum: {cumsum}")
+    print(f"update_table_indices:   {table_indices}")
+    print(f"update_row_indices:     {row_indices}")
+
+    ref = linearize_cache_indices_from_row_idx_ref(cumsum, table_indices, row_indices)
+    print(f"\n=== CPU 参考输出 ===\n{ref}")
+
+    cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+    table_indices_t = torch.from_numpy(table_indices).to(index_dtype).to(DEVICE)
+    row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
+
+    npu_out = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        cumsum_t, table_indices_t, row_indices_t
+    )
+    npu_cpu = npu_out.cpu()
+    print(f"\n=== NPU 输出 ===\n{npu_cpu}")
+
+    ref_t = torch.from_numpy(ref).to(index_dtype)
+    if torch.equal(ref_t, npu_cpu):
+        print("\n✓ PASS")
+    else:
+        diff = (ref_t != npu_cpu).nonzero(as_tuple=True)[0]
+        print(f"\n✗ FAIL — {len(diff)} 个位置不一致")
+        for idx in diff[:20]:
+            i = idx.item()
+            print(f"  [i={i}] table={table_indices[i]} row={row_indices[i]} "
+                  f"cumsum[t]={cumsum[table_indices[i]]} "
+                  f"ref={ref_t[i].item()} npu={npu_cpu[i].item()}")
+
