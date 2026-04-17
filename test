@@ -1,3 +1,15 @@
+bash-5.2# export ASCEND_SLOG_PRINT_TO_STDOUT=1
+bash-5.2# python3 /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/1.py 2>&1 | grep -E "blockIdx|PASS|FAIL"           
+[DEBUG] GE(15523,python3):2026-04-17-18:48:24.558.189 [fusion_pass_registry.cc:31]15523 RegisterPass:GraphFusionPass[type=4, name=FIXPIPEFUSIONPASS, attr=7, module=TBE]: the pass type has already existed.
+[DEBUG] GE(15523,python3):2026-04-17-18:48:24.558.533 [fusion_pass_registry.cc:31]15523 RegisterPass:GraphFusionPass[type=4, name=FIXPIPEAPREQUANTFUSIONPASS, attr=4, module=TBE]: the pass type has already existed.
+[DEBUG] GE(15523,python3):2026-04-17-18:48:24.558.709 [fusion_pass_registry.cc:31]15523 RegisterPass:GraphFusionPass[type=4, name=FIXPIPEARELUQUANTFUSIONPASS, attr=0, module=TBE]: the pass type has already existed.
+✗ FAIL — 16 个位置不一致
+bash-5.2# 
+
+
+
+
+
 bash-5.2# grep -n "blockStart\|myBlocks\|end > totalLength" \
   /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/op_kernel/linearize_cache_indices_from_row_idx_kernel.h
 
