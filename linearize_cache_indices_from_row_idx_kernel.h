@@ -59,13 +59,16 @@ private:
         cumsumLength = tilingData.cumsumLength;
         blockSize = tilingData.blockSize;
         numBlocks = tilingData.numBlocks;
+        tailBlockNum = tilingData.tailBlockNum;
+        basicBlockNum = tilingData.basicBlockNum;
+        totalBlocks = tilingData.totalBlocks;
     }
 
     __aicore__ inline void InitGmParams(LinearizeArgs& args)
     {
-    //     if (GetBlockIdx() < tailBlockNum) {
-    //     totalBlockNum=basicBlockNum+1;
-    //     }
+        if (GetBlockIdx() < tailBlockNum) {
+        totalBlockNum=basicBlockNum+1;
+         }
         int64_t blockIdx = static_cast<int64_t>(GetBlockIdx());
         int64_t start = blockIdx * static_cast<int64_t>(blockSize);
         blockLen = (start + blockSize <= totalLength) ? blockSize : (totalLength - start);
