@@ -1,3 +1,31 @@
+build ops lib info: 
+build ops lib error: /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp: In function ‘ge::graphStatus optiling::TilingFunc(gert::TilingContext*)’:
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:88:12: error: ‘class optiling::LinearizeCacheIndicesFromRowIdxTilingData’ has no member named ‘set_basicBlockNum’
+   88 |     tiling.set_basicBlockNum(static_cast<int32_t>(basicBlockNum));
+      |            ^~~~~~~~~~~~~~~~~
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:89:12: error: ‘class optiling::LinearizeCacheIndicesFromRowIdxTilingData’ has no member named ‘set_tailBlockNum’
+   89 |     tiling.set_tailBlockNum(static_cast<int32_t>(tailBlockNum));
+      |            ^~~~~~~~~~~~~~~~
+/home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:90:12: error: ‘class optiling::LinearizeCacheIndicesFromRowIdxTilingData’ has no member named ‘set_totalBlocks’; did you mean ‘set_numBlocks’?
+   90 |     tiling.set_totalBlocks(static_cast<int32_t>(totalBlocks));
+      |            ^~~~~~~~~~~~~~~
+      |            set_numBlocks
+
+CMake Error at /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/func.cmake:21 (message):
+  opbuild run failed!
+Call Stack (most recent call first):
+  op_host/CMakeLists.txt:5 (opbuild)
+
+
+-- Configuring incomplete, errors occurred!
+gmake: Makefile: No such file or directory
+gmake: *** No rule to make target 'Makefile'.  Stop.
+gmake: Makefile: No such file or directory
+gmake: *** No rule to make target 'Makefile'.  Stop.
+
+
+
+
 Compile op info cfg successfully.
 [ 66%] Built target ops_info_gen_ascend950
 [100%] Linking CXX shared library libcust_opmaster_rt2.0.so
