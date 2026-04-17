@@ -1,3 +1,24 @@
+=== NPU 输出 ===
+tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+✗ FAIL — 16 个位置不一致
+  [i=0] table=2 row=3 cumsum[t]=-1 ref=36 npu=0
+  [i=1] table=3 row=7 cumsum[t]=24 ref=31 npu=0
+  [i=2] table=0 row=7 cumsum[t]=0 ref=7 npu=0
+  [i=3] table=2 row=2 cumsum[t]=-1 ref=36 npu=0
+  [i=4] table=2 row=5 cumsum[t]=-1 ref=36 npu=0
+  [i=5] table=3 row=4 cumsum[t]=24 ref=28 npu=0
+  [i=6] table=0 row=1 cumsum[t]=0 ref=1 npu=0
+  [i=7] table=0 row=7 cumsum[t]=0 ref=7 npu=0
+  [i=8] table=2 row=11 cumsum[t]=-1 ref=36 npu=0
+  [i=9] table=1 row=5 cumsum[t]=12 ref=17 npu=0
+  [i=10] table=2 row=1 cumsum[t]=-1 ref=36 npu=0
+  [i=11] table=2 row=11 cumsum[t]=-1 ref=36 npu=0
+  [i=12] table=2 row=4 cumsum[t]=-1 ref=36 npu=0
+  [i=13] table=2 row=0 cumsum[t]=-1 ref=36 npu=0
+  [i=14] table=3 row=11 cumsum[t]=24 ref=35 npu=0
+  [i=15] table=0 row=9 cumsum[t]=0 ref=9 npu=0
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
