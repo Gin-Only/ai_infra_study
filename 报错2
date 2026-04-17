@@ -1,3 +1,25 @@
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/1.py", line 11, in <module>
+    out = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_ops.py", line 1232, in __getattr__
+    raise AttributeError(
+AttributeError: '_OpNamespace' 'fbgemm' object has no attribute 'linearize_cache_indices_from_row_idx'
+[ERROR] 2026-04-17-14:33:04 (PID:6451, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
 Opc tool start working now, please wait for a moment.
 [2026-04-17 14:20:18] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:26:38: error: no template named 'LinearizeCacheIndicesScalarKernel' in namespace 'LinearizeCacheIndicesFromRowIdx'; did you mean 'LinearizeCacheIndicesFromRowIdxKernel'?
