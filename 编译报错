@@ -1,3 +1,51 @@
+Run CPack packaging tool...
+CPack: Create package using External
+CPack: Install projects
+CPack: - Run preinstall target for: opp
+CPack: - Install project: opp []
+CPack: Create package
+
+About to compress 1600 KB of data...
+Adding files to archive named "custom_opp_openEuler_aarch64.run"...
+./help.info
+./install.sh
+./packages/vendors/linearize_cache_indices_from_row_idx/framework/tensorflow/libcust_tf_parsers.so
+./packages/vendors/linearize_cache_indices_from_row_idx/framework/tensorflow/npu_supported_ops.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_api/include/aclnn_linearize_cache_indices_from_row_idx.h
+./packages/vendors/linearize_cache_indices_from_row_idx/op_api/lib/libcust_opapi.so
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/config/ascend950/aic-ascend950-ops-info.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.o
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6.o
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/config/ascend950/binary_info_config.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/kernel/config/ascend950/linearize_cache_indices_from_row_idx.json
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64/libcust_opmaster_rt2.0.so
+./packages/vendors/linearize_cache_indices_from_row_idx/op_impl/ai_core/tbe/op_tiling/liboptiling.so
+./packages/vendors/linearize_cache_indices_from_row_idx/op_proto/inc/op_proto.h
+./packages/vendors/linearize_cache_indices_from_row_idx/op_proto/lib/linux/aarch64/libcust_opsproto_rt2.0.so
+./packages/vendors/linearize_cache_indices_from_row_idx/version.info
+./upgrade.sh
+skipping crc at user request
+SHA256: 272701fc7c6e554a8265a3c09f1763cd20255ad64b604190e942c92ad5a4cf2c
+Skipping md5sum at user request
+
+Self-extractable archive "custom_opp_openEuler_aarch64.run" successfully created.
+Copy /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/_CPack_Packages/Linux/External/custom_opp_openEuler_aarch64.run/custom_opp_openEuler_aarch64.run to /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/
+CPack: - package: /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/custom_opp_openEuler_aarch64.run.json generated.
+CPack: - package: /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/custom_opp_openEuler_aarch64.run generated.
+Verifying archive integrity...  100%   SHA256 checksums are OK. All good.
+Uncompressing version:1.0  100%  
+[ops_custom] [2026-04-17 11:46:50] [ERROR] environment variable ASCEND_CUSTOM_OPP_PATH=/usr/local/Ascend/mindie/latest/mindie-rt/ops/vendors/aie_ascendc:/usr/local/Ascend/mindie/latest/mindie-rt/ops/vendors/customize: is set and has multiple path in it (colon inside), which will cause the custom op installed incorrectly. Please use the --install-path option to specify an installation path instead.
+
+
+
+
+
+
+
+
+
 输出5不确定是否编译成功
 [100%] Built target cust_op_proto
 Run CPack packaging tool...
