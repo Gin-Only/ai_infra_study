@@ -13,22 +13,160 @@ See the License for the specific language governing permissions and
         limitations under the License.
 ==============================================================================*/
 
-#ifndef LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_H
-#define LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_H
-#include "register/tilingdata_base.h"
+#include <cstdint>
+#include <cmath>
+#include <limits>
+#include "tiling/platform/platform_ascendc.h"
+#include "register/op_def_registry.h"
+#include "ops_log.h"
+#include "linearize_cache_indices_from_row_idx_tiling.h"
+
+namespace {
+    constexpr int32_t BLOCK_SIZE = 7680;
+    constexpr int32_t MAX_THREADS_PER_BLOCK = 1024;
+    constexpr int32_t MAX_ELEMENTS_PER_THREAD = 4;
+    constexpr int32_t MAX_WARPS = MAX_THREADS_PER_BLOCK / 32;
+    constexpr int DCACHE_SIZE = 128 * 1024;
+    constexpr int32_t MULTIPLIER = 2;
+    constexpr int32_t DIVISOR = 4;
+}
 
 namespace optiling {
-    BEGIN_TILING_DATA_DEF(LinearizeCacheIndicesFromRowIdxTilingData)
-    TILING_DATA_FIELD_DEF(int64_t, totalLength);
-    TILING_DATA_FIELD_DEF(int64_t, cumsumLength);
-    TILING_DATA_FIELD_DEF(int32_t, blockSize);
-    TILING_DATA_FIELD_DEF(int32_t, numBlocks);
-   
-    TILING_DATA_FIELD_DEF(int32_t, tailBlockNum);
-    TILING_DATA_FIELD_DEF(int32_t, totalBlocks);
-    TILING_DATA_FIELD_DEF(int32_t, basicBlockNum);
-    END_TILING_DATA_DEF;
 
-    REGISTER_TILING_DATA_CLASS(LinearizeCacheIndicesFromRowIdx, LinearizeCacheIndicesFromRowIdxTilingData)
+static ge::graphStatus TilingFunc(gert::TilingContext* context)
+{
+    OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
+    OPS_LOG_E_IF_NULL("cache_hash_size_cumsumShape", context->GetInputShape(0), return ge::GRAPH_FAILED);
+    OPS_LOG_E_IF_NULL("update_table_indicesShape", context->GetInputShape(1), return ge::GRAPH_FAILED);
+    OPS_LOG_E_IF_NULL("update_row_indicesTensor", context->GetInputTensor(2), return ge::GRAPH_FAILED);
+    
+    // 输入0：cache_hash_size_cumsum, 形状【T+1】
+    // 输入1：update_table_indices, 形状【N】
+    // 输入2：update_row_indices，形状【N】
+    int64_t totalLength = context->GetInputShape(2)->GetOriginShape().GetShapeSize();
+    int64_t cumsumLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+    uint32_t dimNumRow = context->GetInputShape(2)->GetOriginShape().GetDimNum();
+    OPS_LOG_E_IF(dimNumRow != 1, context, return ge::GRAPH_FAILED,
+                 "[ERROR]LinearizeCacheIndicesFromRowIdx: update_row_indices must be 1-D");
+
+    ge::DataType inputDataType = context->GetInputTensor(2)->GetDataType();
+    OPS_CHECK(inputDataType != ge::DT_INT32 && inputDataType != ge::DT_INT64,
+              OPS_LOG_E("[ERROR]Invalid data type",
+                        "LinearizeCacheIndicesFromRowIdx only supports int64 and int32."),
+              return ge::GRAPH_FAILED);
+        
+    auto ascendPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
+    size_t maxCores = ascendPlatform.GetCoreNumAiv(); // 获取AI Core可用核心数
+    int32_t elementsPerBlock = BLOCK_SIZE;
+    int64_t totalBlocks = (totalLength + elementsPerBlock - 1) / elementsPerBlock;
+    if (totalBlocks == 0) {
+        totalBlocks = 1; // 有多少个数据块
+    }
+    //
+    uint32_t basicBlockNum = totalBlocks / maxCores;
+    uint32_t tailBlockNum = totalBlocks % maxCores;
+
+    //方案二
+    //int64_t totalLenPerBlock = totalLength / maxCores;
+     
+    // size_t coreNum = (totalBlocks > maxCores) ? maxCores : totalBlocks;
+    // if (coreNum == 0) {
+    //     OPS_LOG_E(context, "[ERROR] LinearizeCacheIndicesFromRowIdx: need at least 1 AI Core");
+    //     return ge::GRAPH_FAILED;
+    // }
+
+    size_t* workspaceSize = context->GetWorkspaceSizes(1);
+    OPS_LOG_E_IF_NULL("workspaceSize", workspaceSize, return ge::GRAPH_FAILED);
+    workspaceSize[0] = ascendPlatform.GetLibApiWorkSpaceSize(); 
+
+    LinearizeCacheIndicesFromRowIdxTilingData tiling;
+    tiling.set_totalLength(totalLength);
+    tiling.set_cumsumLength(cumsumLength);
+    tiling.set_blockSize(elementsPerBlock);
+    tiling.set_numBlocks(totalBlocks);
+    
+
+
+    context->SetBlockDim(maxCores);
+    context->SetLocalMemorySize(DCACHE_SIZE);
+
+    OPS_LOG_E_IF_NULL("raw tilingData", context->GetRawTilingData(), return ge::GRAPH_FAILED);
+    tiling.SaveToBuffer(context->GetRawTilingData()->GetData(),
+                        context->GetRawTilingData()->GetCapacity());
+    context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
+
+    // OPS_LOG_INFO(context, "LinearizeCacheIndicesFromRowIdx Tiling Success: "
+    //                       "totalLength=%ld, cumsumLength=%ld, blockSize=%d, totalBlocks=%ld, coreNum=%zu",
+    //              totalLength, cumsumLength, elementsPerBlock, totalBlocks, coreNum);
+
+    return ge::GRAPH_SUCCESS;
 }
-#endif // LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_H
+
+} // namespace optiling
+
+namespace ge {
+
+static ge::graphStatus InferShape(gert::InferShapeContext* context)
+{
+    OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
+
+    const gert::Shape* rowIdxShape = context->GetInputShape(2);
+    OPS_LOG_E_IF_NULL("update_row_indices shape", rowIdxShape, return ge::GRAPH_FAILED);
+
+    gert::Shape* outShape = context->GetOutputShape(0);
+    OPS_LOG_E_IF_NULL("output shape", outShape, return ge::GRAPH_FAILED);
+
+    *outShape = *rowIdxShape;
+    return GRAPH_SUCCESS;
+}
+
+static ge::graphStatus InferDataType(gert::InferDataTypeContext* context)
+{
+    auto inputDataType = context->GetInputDataType(2);
+    if (ge::GRAPH_SUCCESS != context->SetOutputDataType(0, inputDataType)) {
+        return ge::GRAPH_FAILED;
+    }
+    return ge::GRAPH_SUCCESS;
+}
+
+} // namespace ge
+
+namespace ops {
+
+class LinearizeCacheIndicesFromRowIdx : public OpDef {
+public:
+    explicit LinearizeCacheIndicesFromRowIdx(const char* name) : OpDef(name)
+    {
+        this->Input("cache_hash_size_cumsum")
+            .ParamType(REQUIRED)
+            .DataType({ge::DT_INT64, ge::DT_INT32})
+            .FormatList({ge::FORMAT_ND})
+            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
+
+        this->Input("update_table_indices")
+            .ParamType(REQUIRED)
+            .DataType({ge::DT_INT64, ge::DT_INT32})
+            .FormatList({ge::FORMAT_ND})
+            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
+
+        this->Input("update_row_indices")
+            .ParamType(REQUIRED)
+            .DataType({ge::DT_INT64, ge::DT_INT32})
+            .FormatList({ge::FORMAT_ND})
+            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
+
+        this->Output("linear_cache_indices")
+            .ParamType(REQUIRED)
+            .DataType({ge::DT_INT64, ge::DT_INT32})
+            .FormatList({ge::FORMAT_ND})
+            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
+
+        this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
+        this->AICore().SetTiling(optiling::TilingFunc);
+        this->AICore().AddConfig("ascend950");
+    }
+};
+
+OP_ADD(LinearizeCacheIndicesFromRowIdx);
+
+} // namespace ops
