@@ -1,3 +1,20 @@
+bash-5.2# grep -n "blockStart\|myBlocks\|end > totalLength" \
+  /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/op_kernel/linearize_cache_indices_from_row_idx_kernel.h
+
+82:        int32_t myBlocks = (blockIdx < tailBlockNum) ? (basicBlockNum + 1) : basicBlockNum;
+83:        int64_t blockStart = (blockIdx < tailBlockNum)
+87:        int64_t start = blockStart * static_cast<int64_t>(blockSize);
+88:        int64_t end = start + static_cast<int64_t>(myBlocks) * static_cast<int64_t>(blockSize);
+89:        if (end > totalLength) end = totalLength;
+bash-5.2# 
+
+
+
+
+
+
+
+
 === NPU 输出 ===
 tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
