@@ -133,11 +133,14 @@ def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
     cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
     table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
     row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
-
+    print(cumsum_t)
+    print(table_indices_t)
+    print(row_indices_t)
     # 调用 NPU 算子
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
         cumsum_t, table_indices_t, row_indices_t
     )
+    print(npu_output)
 
     # 验证输出形状
     assert npu_output.shape == row_indices_t.shape, \
