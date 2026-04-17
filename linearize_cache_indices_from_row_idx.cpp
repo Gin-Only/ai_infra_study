@@ -60,14 +60,20 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     int32_t elementsPerBlock = BLOCK_SIZE;
     int64_t totalBlocks = (totalLength + elementsPerBlock - 1) / elementsPerBlock;
     if (totalBlocks == 0) {
-        totalBlocks = 1;
+        totalBlocks = 1; // 有多少个数据块
     }
+    //
+    uint32_t basicBlockNum = totalBlocks / maxCores;
+    uint32_t tailBlockNum = totalBlocks % maxCores;
 
-    size_t coreNum = (totalBlocks > maxCores) ? maxCores : totalBlocks;
-    if (coreNum == 0) {
-        OPS_LOG_E(context, "[ERROR] LinearizeCacheIndicesFromRowIdx: need at least 1 AI Core");
-        return ge::GRAPH_FAILED;
-    }
+    //方案二
+    //int64_t totalLenPerBlock = totalLength / maxCores;
+     
+    // size_t coreNum = (totalBlocks > maxCores) ? maxCores : totalBlocks;
+    // if (coreNum == 0) {
+    //     OPS_LOG_E(context, "[ERROR] LinearizeCacheIndicesFromRowIdx: need at least 1 AI Core");
+    //     return ge::GRAPH_FAILED;
+    // }
 
     size_t* workspaceSize = context->GetWorkspaceSizes(1);
     OPS_LOG_E_IF_NULL("workspaceSize", workspaceSize, return ge::GRAPH_FAILED);
@@ -79,7 +85,8 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     tiling.set_blockSize(elementsPerBlock);
     tiling.set_numBlocks(totalBlocks);
 
-    context->SetBlockDim(static_cast<uint32_t>(coreNum));
+
+    context->SetBlockDim(maxCores);
     context->SetLocalMemorySize(DCACHE_SIZE);
 
     OPS_LOG_E_IF_NULL("raw tilingData", context->GetRawTilingData(), return ge::GRAPH_FAILED);
@@ -87,14 +94,14 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
                         context->GetRawTilingData()->GetCapacity());
     context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
 
-    OPS_LOG_INFO(context, "LinearizeCacheIndicesFromRowIdx Tiling Success: "
-                          "totalLength=%ld, cumsumLength=%ld, blockSize=%d, totalBlocks=%ld, coreNum=%zu",
-                 totalLength, cumsumLength, elementsPerBlock, totalBlocks, coreNum);
+    // OPS_LOG_INFO(context, "LinearizeCacheIndicesFromRowIdx Tiling Success: "
+    //                       "totalLength=%ld, cumsumLength=%ld, blockSize=%d, totalBlocks=%ld, coreNum=%zu",
+    //              totalLength, cumsumLength, elementsPerBlock, totalBlocks, coreNum);
 
     return ge::GRAPH_SUCCESS;
 }
 
-}  // namespace optiling
+} // namespace optiling
 
 namespace ge {
 
@@ -121,7 +128,7 @@ static ge::graphStatus InferDataType(gert::InferDataTypeContext* context)
     return ge::GRAPH_SUCCESS;
 }
 
-}  // namespace ge
+} // namespace ge
 
 namespace ops {
 
@@ -158,7 +165,7 @@ public:
         this->AICore().AddConfig("ascend950");
     }
 };
-//wggai
+
 OP_ADD(LinearizeCacheIndicesFromRowIdx);
 
-}  // namespace ops
+} // namespace ops
