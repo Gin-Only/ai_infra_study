@@ -1,4 +1,408 @@
 bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+tensor([ 0, 12, -1, 24, 36], device='npu:0')
+tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
+       dtype=torch.int32)
+tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0', dtype=torch.int32)
+ERROR: Synchronize stream failed, error code is 507035, please check plog for more information.
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-0, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 16,  start 0 
+compute blockLen 16
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-1, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-2, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-3, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-4, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-5, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-6, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-7, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-8, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-9, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-10, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-11, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-12, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-13, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-14, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-15, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-16, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-17, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-18, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-19, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-20, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-21, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-22, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-23, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-24, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-25, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-26, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-27, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-28, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-29, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-30, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-31, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-32, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-33, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-34, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-35, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-36, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-37, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-38, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-39, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-40, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-41, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-42, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-43, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-44, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-45, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-46, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-47, CoreType=AIV, block dim=48, total_block_num=48, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen -7664,  start 7680 
+compute blockLen -7664
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 400, in <module>
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 143, in run_test
+    print(npu_output)
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor.py", line 568, in __repr__
+    return torch._tensor_str._str(self, tensor_contents=tensor_contents)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 704, in _str
+    return _str_intern(self, tensor_contents=tensor_contents)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 621, in _str_intern
+    tensor_str = _tensor_str(self, indent)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 353, in _tensor_str
+    formatter = _Formatter(get_summarized_data(self) if summarize else self)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 141, in __init__
+    value_str = f"{value}"
+                ^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor.py", line 1097, in __format__
+    return self.item().__format__(format_spec)
+           ^^^^^^^^^^^
+RuntimeError: operator():build/CMakeFiles/torch_npu.dir/compiler_depend.ts:26 NPU function error: c10_npu::acl::AclrtSynchronizeStreamWithTimeout(copy_stream), error code is 507035
+[ERROR] 2026-04-20-20:01:20 (PID:7232, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.969.368 (EE9999):  rtStreamSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream with timeout failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+
+[W420 20:01:20.245055070 compiler_depend.ts:526] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.975.192 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeUsedDevices)
+[W420 20:01:20.245787500 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.976.129 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.246294570 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.976.618 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.247219810 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.977.730 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.247572410 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.978.047 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.247867860 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.978.402 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.248237160 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.978.705 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.248539790 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.979.066 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.248886750 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.979.363 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.249173680 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.979.715 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.249518420 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.979.997 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.249827530 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.980.354 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.250156580 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.980.651 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.250436650 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.980.981 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.250787650 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.981.260 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:01:20.251058830 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.981.612 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:01:20.251440820 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 7232] 2026-04-20-20:01:20.981.881 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
 cumsum dtype: torch.int64
 table_indices dtype: torch.int32
 row_indices dtype: torch.int32
