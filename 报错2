@@ -1,3 +1,31 @@
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int32
+row_indices dtype: torch.int32
+output dtype: torch.int32
+output: tensor([156175456,     65534, 154317536,     65534, 154311040,     65534,
+        163479936,     65534, 156610080,     65534, 154309616,     65534,
+        156402752,     65534, 154314816,     65534], dtype=torch.int32)
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpaq5w4mjk'>
+  _warnings.warn(warn_message, ResourceWarning)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 tensor([ 0, 12, -1, 24, 36], device='npu:0')
 tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
        dtype=torch.int32)
