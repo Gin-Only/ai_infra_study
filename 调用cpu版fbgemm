@@ -1,3 +1,99 @@
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int32
+row_indices dtype: torch.int32
+
+✅ 算子调用成功！
+output dtype: torch.int32
+output: tensor([-298442256,      65533, -298394208,      65533, -298250608,      65533,
+        -298390768,      65533, -298393664,      65533, -298391328,      65533,
+        -298435824,      65533, -298250512,      65533], dtype=torch.int32)
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpellcp8s8'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int64
+row_indices dtype: torch.int32
+
+✅ 算子调用成功！
+output dtype: torch.int32
+output: tensor([          0,           0,           0,           0, -1937823456,
+              65535, -1937676784,       65535, -1937871952,       65535,
+        -1937829200,       65535,           0,           0,           0,
+                  0], dtype=torch.int32)
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmps0bh9rfb'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int64
+row_indices dtype: torch.int64
+
+✅ 算子调用成功！
+output dtype: torch.int64
+output: tensor([281466134329264, 281466134358240, 281466136306960, 281466134358000,
+        281466138818112, 281466134359040, 281466136656880, 281466136299296,
+        281466134634432, 281466134363760, 281466134634512, 281466143927776,
+        281466135223056, 281466134982912, 281466143155552, 281466135077456])
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmpyqt23vzd'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 406, in <module>
+    row_indices = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32s)
+                                                                                    ^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/numpy/__init__.py", line 333, in __getattr__
+    raise AttributeError("module {!r} has no attribute "
+AttributeError: module 'numpy' has no attribute 'int32s'. Did you mean: 'int32'?
+[ERROR] 2026-04-20-18:33:27 (PID:6964, Device:-1, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp9rzusdu9'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int32
+table_indices dtype: torch.int32
+row_indices dtype: torch.int32
+
+✅ 算子调用成功！
+output dtype: torch.int32
+output: tensor([-223667520,      65533, -226744976,      65533, -223669120,      65533,
+        -223493040,      65533, -228591696,      65533, -228457552,      65533,
+        -224047792,      65533, -228457152,      65533], dtype=torch.int32)
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmphkc1s7y2'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int32
+row_indices dtype: torch.int64
+
+✅ 算子调用成功！
+output dtype: torch.int64
+output: tensor([281465533325648, 281465533329904, 281465533325488, 281465533325984,
+        281465535143552, 281465533325184, 281465538227904, 281465538438032,
+        281465533298608, 281465533332704, 281465550973536, 281465533333104,
+        281465550874592, 281465533333424, 281465535742512, 281465535143008])
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp9kccr40e'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 昇腾（Ascend）NPU 环境 + 你现有容器 → **纯CPU编译安装 fbgemm-gpu** 终极方案
 我完全懂了：
 1. 你用的是**昇腾NPU**，不是NVIDIA GPU，**不能用CUDA**
