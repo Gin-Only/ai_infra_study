@@ -1,3 +1,211 @@
+/:${LD_LIBRARY_PATH} ] to set the environment path
+SUCCESS
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+tensor([ 0, 12, 24, 36, 48], device='npu:0')
+tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
+       dtype=torch.int32)
+tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0', dtype=torch.int32)
+ERROR: Synchronize stream failed, error code is 507035, please check plog for more information.
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-0, CoreType=AIV, block dim=1, total_block_num=1, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 16,  start 0 
+compute blockLen 16
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 400, in <module>
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 143, in run_test
+    print(npu_output)
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor.py", line 568, in __repr__
+    return torch._tensor_str._str(self, tensor_contents=tensor_contents)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 704, in _str
+    return _str_intern(self, tensor_contents=tensor_contents)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 621, in _str_intern
+    tensor_str = _tensor_str(self, indent)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 353, in _tensor_str
+    formatter = _Formatter(get_summarized_data(self) if summarize else self)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor_str.py", line 141, in __init__
+    value_str = f"{value}"
+                ^^^^^^^^^^
+  File "/usr/local/lib64/python3.11/site-packages/torch/_tensor.py", line 1097, in __format__
+    return self.item().__format__(format_spec)
+           ^^^^^^^^^^^
+RuntimeError: operator():build/CMakeFiles/torch_npu.dir/compiler_depend.ts:26 NPU function error: c10_npu::acl::AclrtSynchronizeStreamWithTimeout(copy_stream), error code is 507035
+[ERROR] 2026-04-20-20:41:32 (PID:8794, Device:0, RankID:-1) ERR00100 PTA call acl api failed
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.736.700 (EE9999):  rtStreamSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream with timeout failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+
+[W420 20:41:32.013338910 compiler_depend.ts:526] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.743.291 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeUsedDevices)
+[W420 20:41:32.014211980 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.744.380 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.014804510 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.745.045 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.015789890 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.746.229 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.016312990 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.746.615 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.016660930 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.747.147 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.017081440 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.747.484 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.017449090 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.747.921 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.017956250 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.748.273 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.018360130 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.748.787 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.018762660 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.749.184 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.019097610 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.749.600 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.019552290 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.749.922 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.019947900 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.750.377 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.020422140 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.750.770 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+[W420 20:41:32.020790900 compiler_depend.ts:508] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.751.261 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[W420 20:41:32.021172320 compiler_depend.ts:151] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 8794] 2026-04-20-20:41:32.751.614 (EE9999):  Synchronize defaultStream fail, retCode=0x715005e.[FUNC:SyncStreamsWithTimeout][FILE:context.cc][LINE:592]
+        TraceBack (most recent call last):
+       rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function empty_cache)
+
+
+
+
+
+
+
+
+
+
 size_t coreNum = (totalBlocks < static_cast<int64_t>(maxCores)) ? static_cast<size_t>(totalBlocks) : maxCores;
 if (coreNum == 0) coreNum = 1;
 context->SetBlockDim(coreNum);   // 只用实际需要的核数
