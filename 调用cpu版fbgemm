@@ -1,3 +1,10 @@
+size_t coreNum = (totalBlocks < static_cast<int64_t>(maxCores)) ? static_cast<size_t>(totalBlocks) : maxCores;
+if (coreNum == 0) coreNum = 1;
+context->SetBlockDim(coreNum);   // 只用实际需要的核数
+
+
+
+
 bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
 tensor([ 0, 12, -1, 24, 36], device='npu:0')
 tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
