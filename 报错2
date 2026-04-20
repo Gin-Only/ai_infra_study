@@ -1,3 +1,37 @@
+tensor([ 0, 12, -1, 24, 36], device='npu:0')
+tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
+       dtype=torch.int32)
+tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0', dtype=torch.int32)
+[W420 11:51:19.647301030 compiler_depend.ts:250] Warning: CAUTION: The operator 'fbgemm::linearize_cache_indices_from_row_idx' is not currently supported on the NPU backend and will fall back to run on the CPU. This may have performance implications. (function npu_cpu_fallback)
+tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], device='npu:0',
+       dtype=torch.int32)
+Traceback (most recent call last):
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 400, in <module>
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+  File "/home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py", line 156, in run_test
+    assert torch.equal(ref_t, npu_cpu), \
+AssertionError: Value mismatch:
+ref:  tensor([10,  2,  3,  7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28],
+       dtype=torch.int32)
+npu:  tensor([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype=torch.int32)
+[ERROR] 2026-04-20-11:51:20 (PID:3871, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+bash-5.2# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [100%] Built target cust_optiling
 [ascend950] Generating LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 ...
 [ascend950] Generating LinearizeCacheIndicesFromRowIdx_69ac6fc9c5be4eab3f13bb631c649bf6 ...
