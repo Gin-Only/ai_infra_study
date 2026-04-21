@@ -1,3 +1,34 @@
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17763] 2026-04-21-10:04:02.812.649 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #ifndef LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
 #define LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
 
