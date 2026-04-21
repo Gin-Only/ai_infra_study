@@ -1,3 +1,82 @@
+================================================================================================================================= FAILURES =================================================================================================================================
+____________________________________________________________________________________________________________________________ test_empty_updates ____________________________________________________________________________________________________________________________
+
+    def test_empty_updates():
+        """N=0 时算子应返回空 Tensor，不崩溃。"""
+        num_tables = 4
+        table_cache_size = 12
+        cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
+    
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.zeros(0, dtype=torch.int64).to(DEVICE)
+        row_indices_t = torch.zeros(0, dtype=torch.int64).to(DEVICE)
+    
+        npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
+        )
+        assert npu_output.numel() == 0, "Output should be empty when N=0"
+>       assert npu_output.dtype == torch.int64
+E       AssertionError: assert torch.int32 == torch.int64
+E        +  where torch.int32 = tensor([], device='npu:0', dtype=torch.int32).dtype
+E        +  and   torch.int64 = torch.int64
+
+home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py:303: AssertionError
+___________________________________________________________________________________________________________ test_output_dtype_matches_row_indices[index_dtype1] ____________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_output_dtype_matches_row_indices(index_dtype):
+        """输出 dtype 必须与 update_row_indices 的 dtype 一致。"""
+        cumsum = np.array([0, 64, 128], dtype=np.int64)
+        table_indices = np.array([0, 1, 0], dtype=np.int32)
+        row_indices = np.array([1, 2, 3], dtype=np.int32)
+    
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices).to(index_dtype).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
+    
+        npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
+        )
+>       assert npu_output.dtype == index_dtype, \
+            f"Expected dtype {index_dtype}, got {npu_output.dtype}"
+E       AssertionError: Expected dtype torch.int64, got torch.int32
+E       assert torch.int32 == torch.int64
+E        +  where torch.int32 = tensor([ 1, 66,  3], device='npu:0', dtype=torch.int32).dtype
+
+home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py:363: AssertionError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 16,  start 0 
+compute blockLen 16
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-0, CoreType=AIV, block dim=1, total_block_num=1, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 3,  start 0 
+compute blockLen 3
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-0, CoreType=AIV, block dim=1, total_block_num=1, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+========================================================================================================================= short test summary info ==========================================================================================================================
+FAILED home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py::test_empty_updates - AssertionError: assert torch.int32 == torch.int64
+FAILED home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py::test_output_dtype_matches_row_indices[index_dtype1] - AssertionError: Expected dtype torch.int64, got torch.int32
+====================================================================================================================== 2 failed, 143 passed in 15.22s ======================================================================================================================
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 160,  start 99840 
+compute blockLen 160
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py ...........................................................................................................................F...F.........FF.F.F..                          [100%]
 
 ================================================================================================================================= FAILURES =================================================================================================================================
