@@ -1,3 +1,68 @@
+def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+    """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+    # CPU 参考结果
+    ref_output = linearize_cache_indices_from_row_idx_ref(
+        cumsum_np, table_indices_np, row_indices_np
+    )
+
+    # 转换为 Tensor 并移至 NPU
+    cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+    table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
+    row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
+    
+    print(cumsum_t)
+    print(table_indices_t)
+    print(row_indices_t)
+
+    # ===================== 修复代码开始 =====================
+    # NPU 算子只支持 int32 索引，强制转换
+    table_indices_npu = table_indices_t.to(torch.int32)
+    row_indices_npu = row_indices_t.to(torch.int32)
+
+    # 调用 NPU 算子
+    npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        cumsum_t, table_indices_npu, row_indices_npu
+    )
+
+    # 输出转回用户指定 dtype（保证断言通过）
+    npu_output = npu_output_int32.to(index_dtype)
+    # ===================== 修复代码结束 =====================
+
+    print(npu_output)
+
+    # 验证输出形状
+    assert npu_output.shape == row_indices_t.shape, \
+        f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
+
+    # 验证输出 dtype 与 update_row_indices 一致
+    assert npu_output.dtype == index_dtype, \
+        f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
+
+    # 数值对比
+    ref_t = torch.from_numpy(ref_output).to(index_dtype)
+    npu_cpu = npu_output.cpu()
+    assert torch.equal(ref_t, npu_cpu), \
+        f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
