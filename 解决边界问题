@@ -1,0 +1,765 @@
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,   64,  128,  192,  256,  320,  384,  448,  512,  576,  640,  704,
+         768,  832,  896,  960, 1024], device='npu:0')
+tensor([15, 11, 10,  5,  3, 15,  2,  5,  5,  3, 14, 13, 11,  8, 11,  6,  5, 14,
+         3,  2,  1, 10,  0, 14, 14,  6, 12,  7,  0,  6, 10,  5, 10,  9,  5, 11,
+         8,  3,  8,  0, 11, 14, 13, 10, 11,  6,  6, 15,  0,  6,  0,  6,  2, 11,
+         8, 14,  0,  8,  4, 14,  9, 11, 11,  3,  0, 11,  4, 12,  4, 15,  5, 10,
+        14,  9, 11,  0, 14, 10,  2,  9,  0, 14,  5,  6, 12, 10,  5, 14,  0,  6,
+        13,  5, 11,  2, 14, 15, 15,  7,  3, 12,  2, 11, 10, 13,  9, 12,  2,  8,
+         9,  6,  6,  2,  0, 11, 14, 12,  6, 14,  6, 11,  8,  6,  5,  7,  6,  0,
+        10,  0], device='npu:0')
+tensor([33, 44, 52, 52, 15, 41, 56,  9, 12, 19,  7, 35,  2, 53, 50, 47, 31, 58,
+        32, 12, 58, 55, 54, 27, 33, 38, 36, 59, 32, 61, 38, 15, 38, 15, 38, 34,
+         0, 27, 24, 60, 51,  3, 16, 52, 37, 18, 31, 36,  8, 41, 10, 16, 26, 37,
+        52, 48, 59, 36, 49,  3, 58, 26, 14, 15, 61, 59, 36, 14, 36, 54, 25,  4,
+        28,  9, 27, 25,  1, 60, 16, 43,  8, 31, 53, 57, 61, 53, 60,  2, 48, 55,
+        18, 56, 29, 19, 54, 23, 16, 57, 23, 46, 42, 38, 61, 51, 54, 46,  9, 41,
+        13, 38, 10, 35, 11, 18, 21, 55, 10, 14, 31, 53,  1, 46, 30, 11,  7,  6,
+        12, 62], device='npu:0')
+___________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-64-1024-index_dtype109] ___________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 64, num_updates = 1024, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([   0,   64,  128,  192,  256,  320,  384,  448,  512,  576,  640,  704,
+         768,  832,  896,  960, 1024]...pu:0'), tensor([15,  0,  0,  ..., 10,  8, 15], device='npu:0'), tensor([30, 28, 44,  ...,  4,  7, 46], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:46.501.712 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,   64,  128,  192,  256,  320,  384,  448,  512,  576,  640,  704,
+         768,  832,  896,  960, 1024], device='npu:0')
+tensor([15,  0,  0,  ..., 10,  8, 15], device='npu:0')
+tensor([30, 28, 44,  ...,  4,  7, 46], device='npu:0')
+____________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-256-1-index_dtype113] ____________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 256, num_updates = 1, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096], device='npu:0'), tensor([14], device='npu:0'), tensor([34], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:46.580.157 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096], device='npu:0')
+tensor([14], device='npu:0')
+tensor([34], device='npu:0')
+___________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-256-16-index_dtype115] ____________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 256, num_updates = 16, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096]...:0'), tensor([ 27,  75, 225, 185, 130, 127, 213, 108, 139, 157,  66,  41,  98, 135,
+         43, 172], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:46.653.571 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096], device='npu:0')
+tensor([ 5, 10,  3,  2,  0, 12,  4,  8,  7,  7,  2, 10, 15,  1,  8, 11],
+       device='npu:0')
+tensor([ 27,  75, 225, 185, 130, 127, 213, 108, 139, 157,  66,  41,  98, 135,
+         43, 172], device='npu:0')
+___________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-256-128-index_dtype117] ___________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 256, num_updates = 128, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096]... 161,
+         24, 144, 225,  73,   2, 117, 223, 104,  75, 221, 167,  70, 122, 142,
+        226,  14], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:46.945.991 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096], device='npu:0')
+tensor([ 0,  5,  0, 10,  3,  4,  1,  2,  1,  2,  2,  2,  5, 10, 10,  4, 10, 15,
+         8,  3, 11,  1, 10,  7, 13,  7,  3,  2,  4,  0,  4,  2,  0,  1, 10,  6,
+         9, 14,  8,  4, 10,  1,  7, 11,  0, 15,  9,  0, 12,  7, 14,  8,  2,  7,
+        13, 15,  3,  4,  2,  1,  8, 11, 10, 11, 12, 12,  3, 15,  6,  7,  6,  0,
+        10,  2, 10,  4, 10,  4,  3, 15,  6,  6, 15,  5,  2, 14, 13, 13,  8, 10,
+         3,  0, 12,  1, 12, 10,  8,  2,  0,  2, 15, 10,  5,  8,  6,  5, 14,  9,
+        12, 10,  3, 15, 14,  6,  9,  7,  9,  6,  9, 11,  4,  2, 10, 13,  0,  2,
+         1,  7], device='npu:0')
+tensor([104, 225,  74, 220,   8, 185, 134,  50, 244, 175, 155, 139, 140, 124,
+        160, 137, 234,  96,  36,  57, 250, 242, 162, 163,   3,   8, 250, 186,
+         96, 207, 142,  55,  93, 216, 125, 232,  67, 153, 189,  88,  23, 105,
+        252,  90,  20, 155,  60,  36, 153, 241, 179,  49, 254,  38, 136, 101,
+         61, 176,  74, 224, 227,  67,  78, 149,  94, 199,  48,   7,  36, 189,
+        224, 139,  70, 188,  28,   0,  45, 175, 154,  14, 239, 102,  68, 136,
+        119, 138, 223,  49, 161,  94, 114,  59,  66,  76,  56, 172,  95,  76,
+        226, 167, 196, 231,  87,  64, 166, 157, 228,  13, 206,  69, 141, 161,
+         24, 144, 225,  73,   2, 117, 223, 104,  75, 221, 167,  70, 122, 142,
+        226,  14], device='npu:0')
+__________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype119] ___________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 256, num_updates = 1024, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:170: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096]...pu:0'), tensor([1, 6, 3,  ..., 9, 1, 4], device='npu:0'), tensor([218, 182, 229,  ..., 105,  20, 171], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.036.980 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816,
+        3072, 3328, 3584, 3840, 4096], device='npu:0')
+tensor([1, 6, 3,  ..., 9, 1, 4], device='npu:0')
+tensor([218, 182, 229,  ..., 105,  20, 171], device='npu:0')
+____________________________________________________________________________________________________________________ test_uncached_tables[index_dtype1] ____________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_uncached_tables(index_dtype):
+        """部分表未缓存（cumsum 值为 -1），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 32
+        # table_1 和 table_3 未缓存
+        uncached_tables = {1, 3}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([ 0, -1, 12, -1, 24], device='npu:0'), tensor([0, 3, 2, 0, 0, 0, 0, 1, 3, 0, 0, 0, 1, 1, 1, 2, 3, 2, 3, 0, 3, ...0,  8,  9,  2,  2, 10,  2, 11,
+        11, 11,  5,  0,  1,  5,  5,  4,  6,  6,  2,  6,  2,  7],
+       device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.113.207 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([ 0, -1, 12, -1, 24], device='npu:0')
+tensor([0, 3, 2, 0, 0, 0, 0, 1, 3, 0, 0, 0, 1, 1, 1, 2, 3, 2, 3, 0, 3, 0, 3, 1,
+        0, 3, 3, 3, 3, 0, 2, 1], device='npu:0')
+tensor([ 1,  6,  8,  5,  6,  0,  5,  1,  1,  5,  0,  8,  9,  2,  2, 10,  2, 11,
+        11, 11,  5,  0,  1,  5,  5,  4,  6,  6,  2,  6,  2,  7],
+       device='npu:0')
+__________________________________________________________________________________________________________________ test_all_tables_uncached[index_dtype1] __________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_tables_uncached(index_dtype):
+        """所有表均未缓存，所有输出应为哨兵值 0（总缓存大小为 0）。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 16
+        uncached_tables = set(range(num_tables))
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([-1, -1, -1, -1,  0], device='npu:0'), tensor([0, 2, 0, 1, 2, 2, 2, 3, 2, 0, 3, 1, 2, 1, 3, 3], device='npu:0'), tensor([ 8, 10,  7,  5,  4,  2,  4,  7,  6, 10,  3,  4,  1,  1,  4,  3],
+       device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.205.033 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([-1, -1, -1, -1,  0], device='npu:0')
+tensor([0, 2, 0, 1, 2, 2, 2, 3, 2, 0, 3, 1, 2, 1, 3, 3], device='npu:0')
+tensor([ 8, 10,  7,  5,  4,  2,  4,  7,  6, 10,  3,  4,  1,  1,  4,  3],
+       device='npu:0')
+__________________________________________________________________________________________________________________ test_pruned_row_indices[index_dtype1] ___________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_pruned_row_indices(index_dtype):
+        """部分 update_row_indices 为负（已剪枝），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 64
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            pruned_ratio=0.3
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([  0,  64, 128, 192, 256], device='npu:0'), tensor([0, 3, 2, 1, 0, 3, 1, 2, 2, 3, 2, 3, 2, 0, 2, 1, 0, 2, 2, 2..., 24, 57, 40, 22,  9, 54, 47, 49, 42, 39, 50, -1, -1,
+        41, -1, -1, -1, 27, -1, 44, 18, -1, 62], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.289.818 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([  0,  64, 128, 192, 256], device='npu:0')
+tensor([0, 3, 2, 1, 0, 3, 1, 2, 2, 3, 2, 3, 2, 0, 2, 1, 0, 2, 2, 2, 1, 3, 1, 0,
+        0, 3, 3, 1, 2, 2, 1, 1, 1, 3, 0, 0, 0, 3, 2, 3, 2, 3, 0, 0, 0, 1, 0, 2,
+        1, 0, 3, 3, 1, 3, 0, 3, 3, 2, 2, 1, 0, 1, 0, 0], device='npu:0')
+tensor([32,  6, 46, -1, -1, 61,  2,  5, 34, 14, 60, 36, 54, 28, 44, -1, -1, -1,
+        39, 25, 27, -1, -1, -1, 59, 15, -1, 40,  8, 26, -1, -1, 12, -1, 40, 21,
+        49, 44, 22, 14, 52, 24, 57, 40, 22,  9, 54, 47, 49, 42, 39, 50, -1, -1,
+        41, -1, -1, -1, 27, -1, 44, 18, -1, 62], device='npu:0')
+________________________________________________________________________________________________________________ test_all_pruned_row_indices[index_dtype1] _________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_pruned_row_indices(index_dtype):
+        """所有 update_row_indices 均为 -1，所有输出应为哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 32
+    
+        cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
+        table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
+        row_indices = np.full(num_updates, -1, dtype=np.int32)
+    
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([  0,  64, 128, 192, 256], device='npu:0'), tensor([3, 1, 3, 2, 3, 1, 0, 3, 0, 0, 1, 3, 3, 0, 1, 0, 0, 0, 2, 1...1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+       device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.387.401 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([  0,  64, 128, 192, 256], device='npu:0')
+tensor([3, 1, 3, 2, 3, 1, 0, 3, 0, 0, 1, 3, 3, 0, 1, 0, 0, 0, 2, 1, 2, 2, 1, 1,
+        1, 2, 0, 2, 0, 1, 1, 0], device='npu:0')
+tensor([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+       device='npu:0')
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-1-1-1] ____________________________________________________________________________________________________________________
+
+num_tables = 1, table_cache_size = 1, num_updates = 1, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>, args = (tensor([0, 1], device='npu:0'), tensor([0], device='npu:0'), tensor([0], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.516.484 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([0, 1], device='npu:0')
+tensor([0], device='npu:0')
+tensor([0], device='npu:0')
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-2-10-5] ___________________________________________________________________________________________________________________
+
+num_tables = 2, table_cache_size = 10, num_updates = 5, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>, args = (tensor([ 0, -1, 10], device='npu:0'), tensor([0, 1, 0, 0, 1], device='npu:0'), tensor([2, 6, 3, 9, 8], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.568.062 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([ 0, -1, 10], device='npu:0')
+tensor([0, 1, 0, 0, 1], device='npu:0')
+tensor([2, 6, 3, 9, 8], device='npu:0')
+________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-32-512-2048] _________________________________________________________________________________________________________________
+
+num_tables = 32, table_cache_size = 512, num_updates = 2048, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:140: in run_test
+    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([    0,    -1,   512,  1024,  1536,  2048,  2560,  3072,  3584,  4096,
+         4608,  5120,  5632,  6144,  66..., tensor([23,  3, 15,  ..., 12, 23, 29], device='npu:0'), tensor([126, 117, 167,  ...,  24, 270, 185], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.626.388 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stdout call ---------------------------------------------------------------------------------------------------------------------------
+tensor([    0,    -1,   512,  1024,  1536,  2048,  2560,  3072,  3584,  4096,
+         4608,  5120,  5632,  6144,  6656,  7168,  7680,  8192,  8704,  9216,
+         9728, 10240, 10752, 11264, 11776, 12288, 12800, 13312, 13824, 14336,
+        14848, 15360, 15872], device='npu:0')
+tensor([23,  3, 15,  ..., 12, 23, 29], device='npu:0')
+tensor([126, 117, 167,  ...,  24, 270, 185], device='npu:0')
+_____________________________________________________________________________________________________________________ test_single_table_single_update ______________________________________________________________________________________________________________________
+
+    def test_single_table_single_update():
+        """单表单条更新的精确数值验证。"""
+        # cache_hash_size_cumsum = [0, 100]，table_0 起始偏移 0，哨兵 100
+        cumsum = np.array([0, 100], dtype=np.int64)
+        table_indices = np.array([0], dtype=np.int32)
+        row_indices = np.array([42], dtype=np.int32)
+    
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices).to(torch.int64).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices).to(torch.int64).to(DEVICE)
+    
+>       npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_t, row_indices_t
+        )
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:306: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>, args = (tensor([  0, 100], device='npu:0'), tensor([0], device='npu:0'), tensor([42], device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.675.796 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+_____________________________________________________________________________________________________________________________ test_doc_example _____________________________________________________________________________________________________________________________
+
+    def test_doc_example():
+        """验证分析文档第 4.3 节的端到端数值示例。"""
+        # 4 张表，table_2 未缓存
+        # cache_hash_size_cumsum = [0, 12, -1, 24, 36]
+        cumsum = np.array([0, 12, -1, 24, 36], dtype=np.int64)
+        table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
+        row_indices   = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
+        expected      = np.array([10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28], dtype=np.int32)
+    
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices).to(torch.int64).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices).to(torch.int64).to(DEVICE)
+    
+>       npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_t, row_indices_t
+        )
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <OpOverloadPacket(op='fbgemm.linearize_cache_indices_from_row_idx')>
+args = (tensor([ 0, 12, -1, 24, 36], device='npu:0'), tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0'), tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0')), kwargs = {}
+
+    def __call__(self, /, *args, **kwargs):
+        # overloading __call__ to ensure torch.ops.foo.bar()
+        # is still callable from JIT
+        # We save the function ptr as the `op` attribute on
+        # OpOverloadPacket to access it here.
+    
+        # Directly calling OverloadPacket goes into C++, which will check
+        # the schema and cause an error for torchbind op when inputs consist of FakeScriptObject so we
+        # intercept it here and call TorchBindOpverload instead.
+        if self._has_torchbind_op_overload and _must_dispatch_in_python(args, kwargs):
+            return _call_overload_packet_from_python(self, args, kwargs)
+>       return self._op(*args, **(kwargs or {}))
+E       RuntimeError: call aclnnLinearizeCacheIndicesFromRowIdx failed, detail:[PID: 17177] 2026-04-21-09:52:47.715.561 AclNN_Parameter_Error(EZ1001): Io input dtype or format is not supported, get io input info is cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT64, ND) updateRowIndices(DT_INT64, ND) out(DT_INT64, ND) but supported list is:
+E               TraceBack (most recent call last):
+E               SupportInfo[0] cacheHashSizeCumsum(DT_INT64, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               SupportInfo[1] cacheHashSizeCumsum(DT_INT32, ND) updateTableIndices(DT_INT32, ND) updateRowIndices(DT_INT32, ND) out(DT_INT32, ND) 
+E               Check NnopbaseExecutorTilingAndUpdateBinInfo(executor) failed
+E               Check NnopbaseExecutorMatchCache(executor) failed
+E               Check NnopbaseRunForWorkspace(*executor, workspaceSize) failed
+
+/usr/local/lib64/python3.11/site-packages/torch/_ops.py:1123: RuntimeError
+___________________________________________________________________________________________________________ test_output_dtype_matches_row_indices[index_dtype1] ____________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_output_dtype_matches_row_indices(index_dtype):
+        """输出 dtype 必须与 update_row_indices 的 dtype 一致。"""
+        cumsum = np.array([0, 64, 128], dtype=np.int64)
+        table_indices = np.array([0, 1, 0], dtype=np.int32)
+        row_indices = np.array([1, 2, 3], dtype=np.int32)
+    
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices).to(index_dtype).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
+    
+>       npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_t, row_indices_t
+        )
+
+../../../../test/linearize_cache_indices_from_row_idx_test/2.py:349: 
