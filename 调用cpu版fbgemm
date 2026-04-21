@@ -1,3 +1,44 @@
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int32
+row_indices dtype: torch.int64
+
+✅ 算子调用成功！
+output dtype: torch.int64
+output: tensor([281466388307424, 281466388307920, 281466397956800, 281466390132304,
+        281466392811264, 281466388307680, 281466388281264, 281466388314800,
+        281466393269376, 281466388314560, 281466390125568, 281466388315600,
+        281466390622576, 281466390125024, 281466388590992, 281466388467040])
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmp86_tra3u'>
+  _warnings.warn(warn_message, ResourceWarning)
+bash-5.2# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 tensor([ 0, 12, 24, 36, 48], device='npu:0')
 tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
        dtype=torch.int32)
