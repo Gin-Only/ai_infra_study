@@ -1,3 +1,53 @@
+tensor([ 0, 12, 24, 36, 48], device='npu:0')
+tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
+       dtype=torch.int32)
+tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0', dtype=torch.int32)
+opType=LinearizeCacheIndicesFromRowIdx, DumpHead: AIV-0, CoreType=AIV, block dim=1, total_block_num=1, block_remain_len=1048344, block_initial_space=1048576, rsv=0, magic=5aa5bccd
+CANN Version: 9.0.0, TimeStamp: 202602
+blockLen 16,  start 0 
+compute blockLen 16
+tensor([10,  2,  3,  7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40],
+       device='npu:0', dtype=torch.int32)
+Single case test passed.
+bash-5.2# python /home/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/2.py
+cumsum dtype: torch.int64
+table_indices dtype: torch.int32
+row_indices dtype: torch.int64
+
+✅ 算子调用成功！
+output dtype: torch.int64
+output: tensor([281466062995200, 281466063121648, 281466065592896, 281466061217824,
+        281466061215248, 281466061219264, 281466061215088, 281466061215584,
+        281466066732096, 281466063122128, 281466064475824, 281466061215344,
+        281466061190896, 281466061222384, 281466063114992, 281466061222144])
+/usr/lib64/python3.11/tempfile.py:904: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/tmp/tmprr_semk8'>
+  _warnings.warn(warn_message, ResourceWarning)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [2026-04-20 21:11:14] [ERROR] [ascend910b] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:16:
 /home/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx_kernel.h:53:21: error: no viable conversion from 'AscendC::GlobalTensor<long>' to 'int64_t' (aka 'long')
             int64_t offset = cumsumGT[static_cast<uint64_t>(tableId)];
