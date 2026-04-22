@@ -3,22 +3,40 @@
   import scipy.sparse as sp
 /usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tvm/relay/analysis/sparse_dense.py:25: UserWarning: A NumPy version >=1.22.4 and <2.3.0 is required for this version of SciPy (detected version 2.4.4)
   import scipy.sparse as sp
-[INFO] RUNTIME(4783,python3):2026-04-22-16:09:03.592.119 [task_fail_callback_data_manager.cc:93] 4783 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.654.850 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
+[INFO] RUNTIME(5712,python3):2026-04-22-16:14:29.038.327 [task_fail_callback_data_manager.cc:93] 5712 TaskFailCallBackManager: Constructor.
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.249.984 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/
 Opc tool start working now, please wait for a moment.
-[2026-04-22 16:09:04] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
+[2026-04-22 16:14:31] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:63:20: note: in instantiation of function template specialization 'AscendC::Simt::VF_CALL<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *, __gm__ unsigned int *, __gm__ unsigned int *, __gm__ unsigned int *, long &>' requested here
+    AscendC::Simt::VF_CALL<SimtLinearizeCacheIndicesFromRowIdxMultiThread<uint32_t, uint32_t>>(
+                   ^
 1 error generated.
 
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.655.097 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.119 [opc_common.py:232][_log_error] Traceback (most recent call last):
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.250.319 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/asce
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.707 [opc_common.py:232][_log_error] Traceback (most recent call last):
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
     json_file_path = single_op_obj.op_compile()
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -27,7 +45,7 @@ Opc tool start working now, please wait for a moment.
                      ^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
     op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.131 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.718 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
@@ -35,48 +53,78 @@ Opc tool start working now, please wait for a moment.
            ^^^^^^^^^^^^^^^^^^^^^
   File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
     compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.138 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.724 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
     compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
     code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
     CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.145 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.730 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
     raise Exception("An error occurred during compile phases of {}, msg is {}".\
-Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
-
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.156 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.656.216 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.735 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/lin
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.753 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.832 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.838 [opc_common.py:525][opc_log_full] /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.251.843 [opc_common.py:525][opc_log_full] /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:63:20: note: in instantiation of function template specialization 'AscendC::Simt::VF_CALL<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *, __gm__ unsigned int *, __gm__ unsigned int *, __gm__ unsigned int *, long &>' requested here
+    AscendC::Simt::VF_CALL<SimtLinearizeCacheIndicesFromRowIdxMultiThread<uint32_t, uint32_t>>(
+                   ^
 1 error generated.
 ].
-[ERROR] TBE(4783,python3):2026-04-22-16:09:04.657.673 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(4783,python3):2026-04-22-16:09:04.826.074 [task_fail_callback_data_manager.cc:98] 4783 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(4783,python3):2026-04-22-16:09:04.898.648 [stacktrace_signal.c:194](tid:4783) unregister all signal handlers, can not capture signal.
+[ERROR] TBE(5712,python3):2026-04-22-16:14:31.253.147 [opc.py:763][main] Opc tool compile failed.
+[INFO] RUNTIME(5712,python3):2026-04-22-16:14:31.432.744 [task_fail_callback_data_manager.cc:98] 5712 ~TaskFailCallBackManager: Destructor.
+[INFO] ATRACE(5712,python3):2026-04-22-16:14:31.512.180 [stacktrace_signal.c:194](tid:5712) unregister all signal handlers, can not capture signal.
 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.json not generated!
 make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
 make[4]: *** Waiting for unfinished jobs....
-[INFO] RUNTIME(4785,python3):2026-04-22-16:09:03.628.508 [task_fail_callback_data_manager.cc:93] 4785 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.650.825 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
+[INFO] RUNTIME(5710,python3):2026-04-22-16:14:29.032.518 [task_fail_callback_data_manager.cc:93] 5710 TaskFailCallBackManager: Constructor.
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.269.471 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/
 Opc tool start working now, please wait for a moment.
-[2026-04-22 16:09:04] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
+[2026-04-22 16:14:31] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:63:20: note: in instantiation of function template specialization 'AscendC::Simt::VF_CALL<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *, __gm__ unsigned int *, __gm__ unsigned int *, __gm__ unsigned int *, long &>' requested here
+    AscendC::Simt::VF_CALL<SimtLinearizeCacheIndicesFromRowIdxMultiThread<uint32_t, uint32_t>>(
+                   ^
 1 error generated.
 
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.651.377 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.884 [opc_common.py:232][_log_error] Traceback (most recent call last):
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.269.801 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/asce
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.117 [opc_common.py:232][_log_error] Traceback (most recent call last):
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
     json_file_path = single_op_obj.op_compile()
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -85,7 +133,7 @@ Opc tool start working now, please wait for a moment.
                      ^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
     op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.896 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.127 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
@@ -93,29 +141,41 @@ Opc tool start working now, please wait for a moment.
            ^^^^^^^^^^^^^^^^^^^^^
   File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
     compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.903 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.134 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
     compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
     code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
     CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.909 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.139 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
     raise Exception("An error occurred during compile phases of {}, msg is {}".\
-Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
-1 error generated.
-
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.920 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.652.992 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:57:53: error: no member named 'indicesNum' in 'LinearizeCacheIndicesFromRowIdxTilingData'
-    int64_t index_total_length = tiling_data_struct.indicesNum;
-                                 ~~~~~~~~~~~~~~~~~~ ^
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.144 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/lin
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.159 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.236 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from <built-in>:1:
+In file included from /usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_runtime_wrapper.h:95:
+/usr/local/Ascend/cann-9.0.T501/tools/bisheng_compiler/lib/clang/15.0.5/include/__clang_cce_simt.h:411:15: error: too few arguments to function call, expected 6, have 5
+  Func(Args...);
+  ~~~~        ^
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.242 [opc_common.py:525][opc_log_full] /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/simt_api/cpp/kernel_simt_utils.h:75:10: note: in instantiation of function template specialization 'cce::async_invoke<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *&, __gm__ unsigned int *&, __gm__ unsigned int *&, __gm__ unsigned int *&, long &>' requested here
+    cce::async_invoke<funcPtr>(threadNums, args...);
+         ^
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.271.248 [opc_common.py:525][opc_log_full] /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:63:20: note: in instantiation of function template specialization 'AscendC::Simt::VF_CALL<&SimtLinearizeCacheIndicesFromRowIdxMultiThread, __gm__ long *, __gm__ unsigned int *, __gm__ unsigned int *, __gm__ unsigned int *, long &>' requested here
+    AscendC::Simt::VF_CALL<SimtLinearizeCacheIndicesFromRowIdxMultiThread<uint32_t, uint32_t>>(
+                   ^
 1 error generated.
 ].
-[ERROR] TBE(4785,python3):2026-04-22-16:09:04.654.600 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(4785,python3):2026-04-22-16:09:04.836.750 [task_fail_callback_data_manager.cc:98] 4785 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(4785,python3):2026-04-22-16:09:04.977.742 [stacktrace_signal.c:194](tid:4785) unregister all signal handlers, can not capture signal.
+[ERROR] TBE(5710,python3):2026-04-22-16:14:31.272.758 [opc.py:763][main] Opc tool compile failed.
+[INFO] RUNTIME(5710,python3):2026-04-22-16:14:31.437.967 [task_fail_callback_data_manager.cc:98] 5710 ~TaskFailCallBackManager: Destructor.
+[INFO] ATRACE(5710,python3):2026-04-22-16:14:31.568.653 [stacktrace_signal.c:194](tid:5710) unregister all signal handlers, can not capture signal.
 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
 make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
 Traceback (most recent call last):
@@ -129,14 +189,14 @@ gmake[2]: *** [CMakeFiles/Makefile2:425: op_kernel/CMakeFiles/LinearizeCacheIndi
 gmake[1]: *** [CMakeFiles/Makefile2:379: op_kernel/CMakeFiles/binary.dir/rule] Error 2
 gmake: *** [Makefile:293: binary] Error 2
 Consolidate compiler generated dependencies of target cust_optiling
+[  8%] Generating scripts/install.sh, scripts/upgrade.sh
 [ 16%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
-[ 16%] Generating scripts/install.sh, scripts/upgrade.sh
-[ 25%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
-[ 33%] Built target ops_info_gen_ascend950
-[ 41%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 50%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
-[ 58%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
-[ 75%] Built target cust_optiling
+[ 25%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
+[ 33%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 41%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
+[ 50%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
+[ 66%] Built target cust_optiling
+[ 75%] Built target ops_info_gen_ascend950
 [ 75%] Built target gen_version_info
 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
 [ 75%] Built target modify_vendor
@@ -164,7 +224,6 @@ Call Stack (most recent call first):
 
 CPack Error: Error when generating package: opp
 gmake: *** [Makefile:71: package] Error 1
-
 
 
 
