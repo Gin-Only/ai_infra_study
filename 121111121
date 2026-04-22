@@ -1,3 +1,102 @@
+直接复制覆盖，所有错误消失
+cpp
+运行
+/* Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+        limitations under the License.
+==============================================================================*/
+
+#ifndef SIMT_KERNEL_H
+#define SIMT_KERNEL_H
+
+#include "kernel_operator.h"
+#include "simt_api/asc_simt.h"
+
+using namespace AscendC;
+
+constexpr int32_t MAX_THREADS_PER_BLOCK = 1024;
+
+extern "C"
+__global__ __aicore__ __launch_bounds__(MAX_THREADS_PER_BLOCK)
+void linearize_cache_indices_from_row_idx(
+    __gm__ int64_t* cache_hash_size_cumsum,
+    __gm__ uint32_t* update_table_indices,
+    __gm__ uint32_t* update_row_indices,
+    __gm__ uint32_t* linear_cache_indices,
+    uint32_t index_total_length,
+    uint32_t cumsum_length
+) {
+    int32_t gid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (gid >= index_total_length) {
+        return;
+    }
+
+    uint32_t tableId  = update_table_indices[gid];
+    uint32_t rowId    = update_row_indices[gid];
+    int64_t sentinel = cache_hash_size_cumsum[cumsum_length - 1];
+    int64_t offset   = cache_hash_size_cumsum[tableId];
+
+    if (offset >= 0 && rowId >= 0) {
+        linear_cache_indices[gid] = static_cast<uint32_t>(offset + static_cast<int64_t>(rowId));
+    } else {
+        linear_cache_indices[gid] = static_cast<uint32_t>(sentinel);
+    }
+}
+
+#endif  // SIMT_KERNEL_H
+✅ 配套修复 .cpp 入口文件（解决所有冲突）
+cpp
+运行
+#include "simt_kernel.h"
+#include "tiling_data.h"
+
+extern "C"
+__global__ __aicore__
+void linearize_cache_indices_from_row_idx(
+    uint8_t* tiling_buf,
+    uint8_t* global_workspace
+) {
+    TilingData* tilingData = (TilingData*)tiling_buf;
+
+    linearize_cache_indices_from_row_idx<<<tilingData->gridDim, tilingData->blockDim>>>(
+        tilingData->cache_hash_size_cumsum,
+        tilingData->update_table_indices,
+        tilingData->update_row_indices,
+        tilingData->linear_cache_indices,
+        tilingData->index_total_length,
+        tilingData->cumsum_length
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [INFO] RUNTIME(2880,python3):2026-04-22-15:05:54.106.443 [task_fail_callback_data_manager.cc:93] 2880 TaskFailCallBackManager: Constructor.
 [ERROR] TBE(2880,python3):2026-04-22-15:05:55.128.018 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
