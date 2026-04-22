@@ -1,3 +1,807 @@
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+  DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:86:3: error: expected identifier
+  DT_UINT8 = ::C_DT_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:23:18: note: expanded from macro 'DT_UINT8'
+#define DT_UINT8 4            // u8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:87:3: error: expected identifier
+  DT_INT16 = ::C_DT_INT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:24:18: note: expanded from macro 'DT_INT16'
+#define DT_INT16 6            // int16
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:88:3: error: expected identifier
+  DT_UINT16 = ::C_DT_UINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:25:19: note: expanded from macro 'DT_UINT16'
+#define DT_UINT16 7           // u16
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:89:3: error: expected identifier
+  DT_UINT32 = ::C_DT_UINT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:27:19: note: expanded from macro 'DT_UINT32'
+#define DT_UINT32 8           // u32
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:90:3: error: expected identifier
+  DT_INT64 = ::C_DT_INT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:26:18: note: expanded from macro 'DT_INT64'
+#define DT_INT64 9            // int64
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:91:3: error: expected identifier
+  DT_UINT64 = ::C_DT_UINT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:28:19: note: expanded from macro 'DT_UINT64'
+#define DT_UINT64 10          // u64
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:92:3: error: expected identifier
+  DT_DOUBLE = ::C_DT_DOUBLE,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:29:19: note: expanded from macro 'DT_DOUBLE'
+#define DT_DOUBLE 11          // double
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:93:3: error: expected identifier
+  DT_BOOL = ::C_DT_BOOL,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:30:17: note: expanded from macro 'DT_BOOL'
+#define DT_BOOL 12            // bool
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:94:3: error: expected identifier
+  DT_STRING = ::C_DT_STRING,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:31:19: note: expanded from macro 'DT_STRING'
+#define DT_STRING 13          // string
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:95:3: error: expected identifier
+  DT_DUAL_SUB_INT8 = ::C_DT_DUAL_SUB_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:32:26: note: expanded from macro 'DT_DUAL_SUB_INT8'
+#define DT_DUAL_SUB_INT8 14   // dual output int8
+                         ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:96:3: error: expected identifier
+  DT_DUAL_SUB_UINT8 = ::C_DT_DUAL_SUB_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:33:27: note: expanded from macro 'DT_DUAL_SUB_UINT8'
+#define DT_DUAL_SUB_UINT8 15  // dual output u8
+                          ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:97:3: error: expected identifier
+  DT_COMPLEX64 = ::C_DT_COMPLEX64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:34:22: note: expanded from macro 'DT_COMPLEX64'
+#define DT_COMPLEX64 16       // complex64
+                     ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:98:3: error: expected identifier
+  DT_COMPLEX128 = ::C_DT_COMPLEX128,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:35:23: note: expanded from macro 'DT_COMPLEX128'
+#define DT_COMPLEX128 17      // complex128
+                      ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:99:3: error: expected identifier
+  DT_QINT8 = ::C_DT_QINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:36:18: note: expanded from macro 'DT_QINT8'
+#define DT_QINT8 18           // qint8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:100:3: error: expected identifier
+  DT_QINT16 = ::C_DT_QINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:37:19: note: expanded from macro 'DT_QINT16'
+#define DT_QINT16 19          // qint16
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.455.513 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/lo
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.650 [opc_common.py:232][_log_error] Traceback (most recent call last):
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
+    json_file_path = single_op_obj.op_compile()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
+    json_file_path = self.__call_op()
+                     ^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
+    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.659 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
+    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.664 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
+    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
+    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
+    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.668 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
+    raise Exception("An error occurred during compile phases of {}, msg is {}".\
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.672 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.685 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.801 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.807 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.812 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.817 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.822 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.827 [opc_common.py:525][opc_log_full]   DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.831 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+                 ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.835 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.840 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:86:3: error: expected identifier
+  DT_UINT8 = ::C_DT_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:23:18: note: expanded from macro 'DT_UINT8'
+#define DT_UINT8 4            // u8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.844 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:87:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.850 [opc_common.py:525][opc_log_full]   DT_INT16 = ::C_DT_INT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:24:18: note: expanded from macro 'DT_INT16'
+#define DT_INT16 6            // int16
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.854 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:88:3: error: expected identifier
+  DT_UINT16 = ::C_DT_UINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:25:19: note: expanded from macro 'DT_UINT16'
+#define DT_UINT16 7           // u16
+                  ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.858 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.864 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:89:3: error: expected identifier
+  DT_UINT32 = ::C_DT_UINT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:27:19: note: expanded from macro 'DT_UINT32'
+#define DT_UINT32 8           // u32
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.868 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:90:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.873 [opc_common.py:525][opc_log_full]   DT_INT64 = ::C_DT_INT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:26:18: note: expanded from macro 'DT_INT64'
+#define DT_INT64 9            // int64
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.877 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:91:3: error: expected identifier
+  DT_UINT64 = ::C_DT_UINT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:28:19: note: expanded from macro 'DT_UINT64'
+#define DT_UINT64 10          // u64
+                  ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.881 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.886 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:92:3: error: expected identifier
+  DT_DOUBLE = ::C_DT_DOUBLE,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:29:19: note: expanded from macro 'DT_DOUBLE'
+#define DT_DOUBLE 11          // double
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.890 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:93:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.895 [opc_common.py:525][opc_log_full]   DT_BOOL = ::C_DT_BOOL,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:30:17: note: expanded from macro 'DT_BOOL'
+#define DT_BOOL 12            // bool
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.899 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:94:3: error: expected identifier
+  DT_STRING = ::C_DT_STRING,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:31:19: note: expanded from macro 'DT_STRING'
+#define DT_STRING 13          // string
+                  ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.903 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.908 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:95:3: error: expected identifier
+  DT_DUAL_SUB_INT8 = ::C_DT_DUAL_SUB_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:32:26: note: expanded from macro 'DT_DUAL_SUB_INT8'
+#define DT_DUAL_SUB_INT8 14   // dual output int8
+                         ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.913 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:96:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.918 [opc_common.py:525][opc_log_full]   DT_DUAL_SUB_UINT8 = ::C_DT_DUAL_SUB_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:33:27: note: expanded from macro 'DT_DUAL_SUB_UINT8'
+#define DT_DUAL_SUB_UINT8 15  // dual output u8
+                          ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.922 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:97:3: error: expected identifier
+  DT_COMPLEX64 = ::C_DT_COMPLEX64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:34:22: note: expanded from macro 'DT_COMPLEX64'
+#define DT_COMPLEX64 16       // complex64
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.927 [opc_common.py:525][opc_log_full]                      ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.932 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:98:3: error: expected identifier
+  DT_COMPLEX128 = ::C_DT_COMPLEX128,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:35:23: note: expanded from macro 'DT_COMPLEX128'
+#define DT_COMPLEX128 17      // complex128
+                      ^
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.936 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.941 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:99:3: error: expected identifier
+  DT_QINT8 = ::C_DT_QINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:36:18: note: expanded from macro 'DT_QINT8'
+#define DT_QINT8 18           // qint8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.945 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:100:3: error: expected identifier
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.456.950 [opc_common.py:525][opc_log_full]   DT_QINT16 = ::C_DT_QINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:37:19: note: expanded from macro 'DT_QINT16'
+#define DT_QINT16 19          // qint16
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+].
+[ERROR] TBE(719,python3):2026-04-22-14:36:27.457.930 [opc.py:763][main] Opc tool compile failed.
+[INFO] RUNTIME(719,python3):2026-04-22-14:36:27.619.973 [task_fail_callback_data_manager.cc:98] 719 ~TaskFailCallBackManager: Destructor.
+[INFO] ATRACE(719,python3):2026-04-22-14:36:27.746.490 [stacktrace_signal.c:194](tid:719) unregister all signal handlers, can not capture signal.
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
+make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
+make[4]: *** Waiting for unfinished jobs....
+[INFO] RUNTIME(718,python3):2026-04-22-14:36:26.389.558 [task_fail_callback_data_manager.cc:93] 718 TaskFailCallBackManager: Constructor.
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.564.677 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included 
+Opc tool start working now, please wait for a moment.
+[2026-04-22 14:36:27] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+  DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:86:3: error: expected identifier
+  DT_UINT8 = ::C_DT_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:23:18: note: expanded from macro 'DT_UINT8'
+#define DT_UINT8 4            // u8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:87:3: error: expected identifier
+  DT_INT16 = ::C_DT_INT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:24:18: note: expanded from macro 'DT_INT16'
+#define DT_INT16 6            // int16
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:88:3: error: expected identifier
+  DT_UINT16 = ::C_DT_UINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:25:19: note: expanded from macro 'DT_UINT16'
+#define DT_UINT16 7           // u16
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:89:3: error: expected identifier
+  DT_UINT32 = ::C_DT_UINT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:27:19: note: expanded from macro 'DT_UINT32'
+#define DT_UINT32 8           // u32
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:90:3: error: expected identifier
+  DT_INT64 = ::C_DT_INT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:26:18: note: expanded from macro 'DT_INT64'
+#define DT_INT64 9            // int64
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:91:3: error: expected identifier
+  DT_UINT64 = ::C_DT_UINT64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:28:19: note: expanded from macro 'DT_UINT64'
+#define DT_UINT64 10          // u64
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:92:3: error: expected identifier
+  DT_DOUBLE = ::C_DT_DOUBLE,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:29:19: note: expanded from macro 'DT_DOUBLE'
+#define DT_DOUBLE 11          // double
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:93:3: error: expected identifier
+  DT_BOOL = ::C_DT_BOOL,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:30:17: note: expanded from macro 'DT_BOOL'
+#define DT_BOOL 12            // bool
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:94:3: error: expected identifier
+  DT_STRING = ::C_DT_STRING,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:31:19: note: expanded from macro 'DT_STRING'
+#define DT_STRING 13          // string
+                  ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:95:3: error: expected identifier
+  DT_DUAL_SUB_INT8 = ::C_DT_DUAL_SUB_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:32:26: note: expanded from macro 'DT_DUAL_SUB_INT8'
+#define DT_DUAL_SUB_INT8 14   // dual output int8
+                         ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:96:3: error: expected identifier
+  DT_DUAL_SUB_UINT8 = ::C_DT_DUAL_SUB_UINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:33:27: note: expanded from macro 'DT_DUAL_SUB_UINT8'
+#define DT_DUAL_SUB_UINT8 15  // dual output u8
+                          ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:97:3: error: expected identifier
+  DT_COMPLEX64 = ::C_DT_COMPLEX64,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:34:22: note: expanded from macro 'DT_COMPLEX64'
+#define DT_COMPLEX64 16       // complex64
+                     ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:98:3: error: expected identifier
+  DT_COMPLEX128 = ::C_DT_COMPLEX128,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:35:23: note: expanded from macro 'DT_COMPLEX128'
+#define DT_COMPLEX128 17      // complex128
+                      ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:99:3: error: expected identifier
+  DT_QINT8 = ::C_DT_QINT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:36:18: note: expanded from macro 'DT_QINT8'
+#define DT_QINT8 18           // qint8
+                 ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:100:3: error: expected identifier
+  DT_QINT16 = ::C_DT_QINT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:37:19: note: expanded from macro 'DT_QINT16'
+#define DT_QINT16 19          // qint16
+                  ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.565.136 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/lo
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.879 [opc_common.py:232][_log_error] Traceback (most recent call last):
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
+    json_file_path = single_op_obj.op_compile()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
+    json_file_path = self.__call_op()
+                     ^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
+    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.890 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
+    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.896 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
+    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
+    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
+    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.903 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
+    raise Exception("An error occurred during compile phases of {}, msg is {}".\
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.907 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.566.924 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.067 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.074 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:82:3: error: expected identifier
+  DT_FLOAT = ::C_DT_FLOAT,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:19:18: note: expanded from macro 'DT_FLOAT'
+#define DT_FLOAT 0            // float32
+                 ^
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.080 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.085 [opc_common.py:525][opc_log_full] In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:83:3: error: expected identifier
+  DT_FLOAT16 = ::C_DT_FLOAT16,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:20:20: note: expanded from macro 'DT_FLOAT16'
+#define DT_FLOAT16 1          // half
+                   ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.092 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:84:3: error: expected identifier
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.097 [opc_common.py:525][opc_log_full]   DT_INT8 = ::C_DT_INT8,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:21:17: note: expanded from macro 'DT_INT8'
+#define DT_INT8 2             // int8
+                ^
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
+In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:21:
+[ERROR] TBE(718,python3):2026-04-22-14:36:27.567.102 [opc_common.py:525][opc_log_full] In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_host/linearize_cache_indices_from_row_idx_tiling.h:18:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/register/tilingdata_base.h:19:
+In file included from /usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/ascend_string.h:17:
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/../../include/graph/types.h:85:3: error: expected identifier
+  DT_INT32 = ::C_DT_INT32,
+  ^
+/usr/local/Ascend/cann-9.0.T501/x86_64-linux/asc/include/basic_api/kernel_type.h:22:18: note: expanded from macro 'DT_INT32'
+#define DT_INT32 3            // int32
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 build ops lib info: 
 build ops lib error: In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/../common/ops_log.h:20,
                  from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:19:
