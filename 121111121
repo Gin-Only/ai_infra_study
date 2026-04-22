@@ -1,242 +1,4 @@
-[ascend950] Generating LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 ...
-/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tvm/relay/analysis/sparse_dense.py:25: UserWarning: A NumPy version >=1.22.4 and <2.3.0 is required for this version of SciPy (detected version 2.4.4)
-  import scipy.sparse as sp
-/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tvm/relay/analysis/sparse_dense.py:25: UserWarning: A NumPy version >=1.22.4 and <2.3.0 is required for this version of SciPy (detected version 2.4.4)
-  import scipy.sparse as sp
-[INFO] RUNTIME(3803,python3):2026-04-22-15:20:36.323.429 [task_fail_callback_data_manager.cc:93] 3803 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.372.458 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel
-Opc tool start working now, please wait for a moment.
-[2026-04-22 15:20:37] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-3 errors generated.
-
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.372.791 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_c
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.373.969 [opc_common.py:232][_log_error] Traceback (most recent call last):
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
-    json_file_path = single_op_obj.op_compile()
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
-    json_file_path = self.__call_op()
-                     ^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
-    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.373.980 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
-    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.373.986 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
-    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
-    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
-                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
-    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.373.991 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
-    raise Exception("An error occurred during compile phases of {}, msg is {}".\
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.373.994 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.374.008 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.374.080 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.374.087 [opc_common.py:525][opc_log_full] /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-3 errors generated.
-].
-[ERROR] TBE(3803,python3):2026-04-22-15:20:37.375.023 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(3803,python3):2026-04-22-15:20:37.551.347 [task_fail_callback_data_manager.cc:98] 3803 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(3803,python3):2026-04-22-15:20:37.629.658 [stacktrace_signal.c:194](tid:3803) unregister all signal handlers, can not capture signal.
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.json not generated!
-make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
-make[4]: *** Waiting for unfinished jobs....
-[INFO] RUNTIME(3805,python3):2026-04-22-15:20:36.337.121 [task_fail_callback_data_manager.cc:93] 3805 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.433.348 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel
-Opc tool start working now, please wait for a moment.
-[2026-04-22 15:20:37] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-3 errors generated.
-
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.433.644 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_c
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.681 [opc_common.py:232][_log_error] Traceback (most recent call last):
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
-    json_file_path = single_op_obj.op_compile()
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
-    json_file_path = self.__call_op()
-                     ^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
-    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.691 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
-    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.696 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
-    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
-    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
-                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
-    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.701 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
-    raise Exception("An error occurred during compile phases of {}, msg is {}".\
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.704 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.717 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.782 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/simt_kernel.h:34:6: note: previous definition is here
-void linearize_cache_indices_from_row_idx(
-     ^
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.434.789 [opc_common.py:525][opc_log_full] /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-3 errors generated.
-].
-[ERROR] TBE(3805,python3):2026-04-22-15:20:37.435.857 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(3805,python3):2026-04-22-15:20:37.609.154 [task_fail_callback_data_manager.cc:98] 3805 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(3805,python3):2026-04-22-15:20:37.735.795 [stacktrace_signal.c:194](tid:3805) unregister all signal handlers, can not capture signal.
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
-make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
-Traceback (most recent call last):
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
-    kernel_builder.ascendc_build()
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
-    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
-RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
-gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
-gmake[2]: *** [CMakeFiles/Makefile2:425: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
-gmake[1]: *** [CMakeFiles/Makefile2:379: op_kernel/CMakeFiles/binary.dir/rule] Error 2
-gmake: *** [Makefile:293: binary] Error 2
-Consolidate compiler generated dependencies of target cust_optiling
-[  8%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
-[ 16%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
-[ 25%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
-[ 41%] Built target cust_optiling
-[ 50%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 58%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
-[ 66%] Generating scripts/install.sh, scripts/upgrade.sh
-[ 75%] Built target ops_info_gen_ascend950
-[ 75%] Built target gen_version_info
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
-[ 75%] Built target optiling_compat
-[ 75%] Built target modify_vendor
-[INFO] Succed generated /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 75%] Built target npu_supported_ops
-[ 83%] Linking CXX shared library libcust_opapi.so
-[ 83%] Built target cust_opapi
-[ 91%] Linking CXX shared library libcust_tf_parsers.so
-[ 91%] Built target cust_tf_parsers
-[100%] Linking CXX shared library libcust_opsproto_rt2.0.so
-[100%] Built target cust_op_proto
-Run CPack packaging tool...
-CPack: Create package using External
-CPack: Install projects
-CPack: - Run preinstall target for: opp
-CPack: - Install project: opp []
-CMake Error at /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/cmake_install.cmake:58 (file):
-  file INSTALL cannot find
-  "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/config":
-  No such file or directory.
-Call Stack (most recent call first):
-  /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/cmake_install.cmake:57 (include)
-
-
-CPack Error: Error when generating package: opp
-gmake: *** [Makefile:71: package] Error 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-直接复制覆盖，所有错误消失
-cpp
-运行
-/* Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
+/* Copyright (c) Huawei Technologies Co., Ltd. 2025-2026. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -251,67 +13,90 @@ See the License for the specific language governing permissions and
         limitations under the License.
 ==============================================================================*/
 
-#ifndef SIMT_KERNEL_H
-#define SIMT_KERNEL_H
+#ifndef LINEARIZE_CACHE_INDICES_KERNEL_H
+#define LINEARIZE_CACHE_INDICES_KERNEL_H
 
 #include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
 
 using namespace AscendC;
 
-constexpr int32_t MAX_THREADS_PER_BLOCK = 1024;
+constexpr int64_t kMaxThreads = 1024;
 
-extern "C"
-__global__ __aicore__ __launch_bounds__(MAX_THREADS_PER_BLOCK)
-void linearize_cache_indices_from_row_idx(
-    __gm__ int64_t* cache_hash_size_cumsum,
-    __gm__ uint32_t* update_table_indices,
-    __gm__ uint32_t* update_row_indices,
-    __gm__ uint32_t* linear_cache_indices,
-    uint32_t index_total_length,
-    uint32_t cumsum_length
-) {
-    int32_t gid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (gid >= index_total_length) {
+template <typename IndiceType, typename TableOffsetsType>
+__simt_vf__ __aicore__ LAUNCH_BOUND(1024) inline void SimtLinearizeIndicesMultiThread(
+    __gm__ int64_t* cache_hash_size_cumsum, __gm__ IndiceType* indices, __gm__ TableOffsetsType* table_offsets,
+    __gm__ int64_t* linear_cache_indices, int64_t indices_num, int64_t num_tables, int64_t indices_base_offset,
+    int64_t table_offsets_size)
+{
+    int32_t blockIdx = static_cast<int32_t>(AscendC::Simt::GetBlockIdx());
+    int32_t threadIdx = static_cast<int32_t>(AscendC::Simt::GetThreadIdx<0>());
+    int32_t threadNum = static_cast<int32_t>(AscendC::Simt::GetThreadNum<0>());
+    int32_t blockNum = static_cast<int32_t>(AscendC::Simt::GetBlockNum());
+
+    int64_t perCoreIndicesNum = indices_num / blockNum;
+    int64_t remainder = indices_num % blockNum;
+
+    int64_t coreStartIdx = (blockIdx < remainder)
+                               ? (blockIdx * (perCoreIndicesNum + 1))
+                               : (remainder * (perCoreIndicesNum + 1) + (blockIdx - remainder) * perCoreIndicesNum);
+
+    int64_t coreLen = (blockIdx < remainder) ? (perCoreIndicesNum + 1) : perCoreIndicesNum;
+
+    if (coreLen <= 0) {
         return;
     }
 
-    uint32_t tableId  = update_table_indices[gid];
-    uint32_t rowId    = update_row_indices[gid];
-    int64_t sentinel = cache_hash_size_cumsum[cumsum_length - 1];
-    int64_t offset   = cache_hash_size_cumsum[tableId];
+    int64_t elementsPerThread = coreLen / threadNum;
+    int64_t remainderPerThread = coreLen % threadNum;
 
-    if (offset >= 0 && rowId >= 0) {
-        linear_cache_indices[gid] = static_cast<uint32_t>(offset + static_cast<int64_t>(rowId));
+    int64_t start, end;
+    if (threadIdx < remainderPerThread) {
+        start = coreStartIdx + threadIdx * (elementsPerThread + 1);
+        end = start + elementsPerThread + 1;
     } else {
-        linear_cache_indices[gid] = static_cast<uint32_t>(sentinel);
+        start = coreStartIdx + threadIdx * elementsPerThread + remainderPerThread;
+        end = start + elementsPerThread;
+    }
+
+    if (start >= indices_num) {
+        return;
+    }
+
+    if (end > indices_num) {
+        end = indices_num;
+    }
+
+    for (int64_t idx = start; idx < end; ++idx) {
+        int left = 0;
+        int right = table_offsets_size;
+        const auto index_with_offset = idx + indices_base_offset;
+
+        while (left != right) {
+            const int middle = left + (right - left) / 2;
+            if (table_offsets[middle] <= index_with_offset) {
+                left = middle + 1;
+            } else {
+                right = middle;
+            }
+        }
+        int table_idx = left;
+
+        const auto max_offset = cache_hash_size_cumsum[num_tables];
+
+        if (table_idx >= 0 && table_idx < num_tables) {
+            const auto curr_offset = cache_hash_size_cumsum[table_idx];
+            if (curr_offset >= 0 && indices[idx] >= 0) {
+                linear_cache_indices[idx] = indices[idx] + curr_offset;
+            } else {
+                linear_cache_indices[idx] = max_offset;
+            }
+        } else {
+            linear_cache_indices[idx] = max_offset;
+        }
     }
 }
 
-#endif  // SIMT_KERNEL_H
-✅ 配套修复 .cpp 入口文件（解决所有冲突）
-cpp
-运行
-#include "simt_kernel.h"
-#include "tiling_data.h"
-
-extern "C"
-__global__ __aicore__
-void linearize_cache_indices_from_row_idx(
-    uint8_t* tiling_buf,
-    uint8_t* global_workspace
-) {
-    TilingData* tilingData = (TilingData*)tiling_buf;
-
-    linearize_cache_indices_from_row_idx<<<tilingData->gridDim, tilingData->blockDim>>>(
-        tilingData->cache_hash_size_cumsum,
-        tilingData->update_table_indices,
-        tilingData->update_row_indices,
-        tilingData->linear_cache_indices,
-        tilingData->index_total_length,
-        tilingData->cumsum_length
-    );
-}
+#endif  // LINEARIZE_CACHE_INDICES_KERNEL_H
 
 
 
@@ -332,223 +117,6 @@ void linearize_cache_indices_from_row_idx(
 
 
 
-[INFO] RUNTIME(2880,python3):2026-04-22-15:05:54.106.443 [task_fail_callback_data_manager.cc:93] 2880 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.128.018 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_in
-Opc tool start working now, please wait for a moment.
-[2026-04-22 15:05:55] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: note: previous definition is here
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-                                                         ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-4 errors generated.
-
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.128.346 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_r
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.583 [opc_common.py:232][_log_error] Traceback (most recent call last):
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
-    json_file_path = single_op_obj.op_compile()
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
-    json_file_path = self.__call_op()
-                     ^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
-    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.593 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
-    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.598 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
-    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
-    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
-                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
-    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.603 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
-    raise Exception("An error occurred during compile phases of {}, msg is {}".\
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.607 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.620 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.689 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.695 [opc_common.py:525][opc_log_full] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: note: previous definition is here
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.701 [opc_common.py:525][opc_log_full] __global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-                                                         ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.129.705 [opc_common.py:525][opc_log_full]     linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-4 errors generated.
-].
-[ERROR] TBE(2880,python3):2026-04-22-15:05:55.130.731 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(2880,python3):2026-04-22-15:05:55.310.572 [task_fail_callback_data_manager.cc:98] 2880 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(2880,python3):2026-04-22-15:05:55.384.227 [stacktrace_signal.c:194](tid:2880) unregister all signal handlers, can not capture signal.
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_6ccc85511d7d3c0995f1fdc174042f58.json not generated!
-make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:3: linearize_cache_indices_from_row_idx0] Error 1
-make[4]: *** Waiting for unfinished jobs....
-[INFO] RUNTIME(2882,python3):2026-04-22-15:05:54.179.022 [task_fail_callback_data_manager.cc:93] 2882 TaskFailCallBackManager: Constructor.
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.204.626 [repository_manager_log.py:30][log] [log_utils.py:183][repository_manager] [ascend950]  LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_in
-Opc tool start working now, please wait for a moment.
-[2026-04-22 15:05:55] [ERROR] [ascend950] LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88 In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: note: previous definition is here
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-                                                         ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-    linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-4 errors generated.
-
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.204.875 [op_compilation.py:344][__single_op_compile] Exception occured, An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_r
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.883 [opc_common.py:232][_log_error] Traceback (most recent call last):
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/op_compilation.py", line 336, in __single_op_compile
-    json_file_path = single_op_obj.op_compile()
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 255, in op_compile
-    json_file_path = self.__call_op()
-                     ^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/opc_tool/single_op_compile.py", line 151, in __call_op
-    op_func(*inputs, *outputs, *new_attrs, self.__op_info.get(OpcOptions.KERNEL_NAME), **kwargs)
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.895 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/register/operation_func_mgr.py", line 214, in wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/common/utils/para_check.py", line 548, in _in_wrapper
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/dynamic/LinearizeCacheIndicesFromRowIdx.py", line 223, in linearize_cache_indices_from_row_idx
-    compile_op(src, origin_func_name, op_info, options, code_channel, '{}', {'valueDepend': {}})
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.900 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1312, in compile_op
-    compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/compile_op.py", line 1077, in compile_op_common_part
-    code_channel, hardware_sync_in_asm = get_code_channel_v220_by_first_tiling_key(
-                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_compile_v220.py", line 648, in get_code_channel_v220_by_first_tiling_key
-    CommonUtility.dump_build_log(out.decode(), compile_cmd, CompileStage.INFERCHANNEL, proc.returncode)
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.906 [opc_common.py:232][_log_error]   File "/usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tikcpp/ascendc_common_utility.py", line 616, in dump_build_log
-    raise Exception("An error occurred during compile phases of {}, msg is {}".\
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.910 [opc_common.py:232][_log_error] Exception: An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.924 [op_compilation.py:214][record_compile_error_info] Op[LinearizeCacheIndicesFromRowIdx] of index[0] compile failed, kernelName: LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.205.996 [opc_common.py:525][opc_log_full] [op_compilation.py:216][record_compile_error_info] reason is:[An error occurred during compile phases of CompileStage.INFERCHANNEL, msg is In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:18:
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: error: expecting global function linearize_cache_indices_from_row_idx requires the [aicore] or __aicpu__ qualifier
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.206.003 [opc_common.py:525][opc_log_full] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:20:39: error: conflicting types for 'linearize_cache_indices_from_row_idx'
-extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
-                                      ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/../op_kernel/simt_kernel.h:33:58: note: previous definition is here
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.206.009 [opc_common.py:525][opc_log_full] __global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-                                                         ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:23:5: error: unknown type name 'LinearizeArgs'
-    LinearizeArgs args{
-    ^
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp:33:5: error: use of undeclared identifier 'linearize_cache_indices_custom'
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.206.014 [opc_common.py:525][opc_log_full]     linearize_cache_indices_custom<DTYPE_UPDATE_ROW_INDICES><<<tilingData.gridDim, tilingData.blockDim>>>(
-    ^
-4 errors generated.
-].
-[ERROR] TBE(2882,python3):2026-04-22-15:05:55.206.944 [opc.py:763][main] Opc tool compile failed.
-[INFO] RUNTIME(2882,python3):2026-04-22-15:05:55.372.444 [task_fail_callback_data_manager.cc:98] 2882 ~TaskFailCallBackManager: Destructor.
-[INFO] ATRACE(2882,python3):2026-04-22-15:05:55.506.578 [stacktrace_signal.c:194](tid:2882) unregister all signal handlers, can not capture signal.
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/ascend950/linearize_cache_indices_from_row_idx/LinearizeCacheIndicesFromRowIdx_0acdeffe38fed08083f46ae63d0d9b88.json not generated!
-make[4]: *** [/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/LinearizeCacheIndicesFromRowIdx_ascend950/linearize_cache_indices_from_row_idx.make:5: linearize_cache_indices_from_row_idx1] Error 1
-Traceback (most recent call last):
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 219, in <module>
-    kernel_builder.ascendc_build()
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 162, in ascendc_build
-    raise RuntimeError('Kernel Compilation Error: OpType {} Kernel File {}!'.format(
-RuntimeError: Kernel Compilation Error: OpType LinearizeCacheIndicesFromRowIdx Kernel File /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_kernel/linearize_cache_indices_from_row_idx.cpp!
-gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
-gmake[2]: *** [CMakeFiles/Makefile2:425: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
-gmake[1]: *** [CMakeFiles/Makefile2:379: op_kernel/CMakeFiles/binary.dir/rule] Error 2
-gmake: *** [Makefile:293: binary] Error 2
-Consolidate compiler generated dependencies of target cust_optiling
-[  8%] Generating scripts/install.sh, scripts/upgrade.sh
-[ 16%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
-[ 25%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
-[ 41%] Built target cust_optiling
-[ 50%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 58%] Built target ops_info_gen_ascend950
-[ 66%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
-[ 66%] Built target gen_version_info
-[ 75%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
-[ 75%] Built target modify_vendor
-[ 75%] Built target optiling_compat
-[INFO] Succed generated /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 75%] Built target npu_supported_ops
-[ 83%] Linking CXX shared library libcust_opapi.so
-[ 83%] Built target cust_opapi
-[ 91%] Linking CXX shared library libcust_tf_parsers.so
-[ 91%] Built target cust_tf_parsers
-[100%] Linking CXX shared library libcust_opsproto_rt2.0.so
-[100%] Built target cust_op_proto
-Run CPack packaging tool...
-CPack: Create package using External
-CPack: Install projects
-CPack: - Run preinstall target for: opp
-CPack: - Install project: opp []
-CMake Error at /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/cmake_install.cmake:58 (file):
-  file INSTALL cannot find
-  "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/binary/config":
-  No such file or directory.
-Call Stack (most recent call first):
-  /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/cmake_install.cmake:57 (include)
-
-
-CPack Error: Error when generating package: opp
-gmake: *** [Makefile:71: package] Error 1
 
 
 
@@ -558,16 +126,7 @@ gmake: *** [Makefile:71: package] Error 1
 
 
 
-
-
-
-
-
-
-
-
-
-/* Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
+/* Copyright (c) Huawei Technologies Co., Ltd. 2025-2026. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -582,47 +141,27 @@ See the License for the specific language governing permissions and
         limitations under the License.
 ==============================================================================*/
 
-#ifndef SIMT_KERNEL_H
-#define SIMT_KERNEL_H
-
-#include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
-// #include "../op_host/linearize_cache_indices_from_row_idx_tiling.h"
+#include "linearize_cache_indices_kernel.h"
 #include "kernel_operator.h"
 
 using namespace AscendC;
 
-constexpr int32_t MAX_THREADS_PER_BLOCK = 1024;
-// constexpr int32_t WARP_SIZE = 32;
-// constexpr int32_t MAX_ELEMENTS_PER_THREAD = 4;
-// constexpr int32_t MAX_WARPS = MAX_THREADS_PER_BLOCK / WARP_SIZE;
-// constexpr int32_t DATA_ALIGN_BYTES = 32;
+extern "C" __global__ __aicore__ void linearize_cache_indices(GM_ADDR cache_hash_size_cumsum, GM_ADDR indices,
+                                                              GM_ADDR table_offsets, GM_ADDR linearized_indices,
+                                                              GM_ADDR workspace, GM_ADDR tiling_data)
+{
+    GET_TILING_DATA(tiling_data_struct, tiling_data);
 
+    int64_t indices_num = tiling_data_struct.numIndices;
+    int64_t num_tables = tiling_data_struct.numTables;
+    int64_t indices_base_offset = tiling_data_struct.indicesBaseOffset;
+    int64_t table_offsets_size = tiling_data_struct.tableOffsetsSize;
 
-extern "C"
-__global__ __launch_bounds__(MAX_THREADS_PER_BLOCK) void linearize_cache_indices_from_row_idx(
-    __gm__ int64_t* cache_hash_size_cumsum;
-    __gm__ uint32_t* update_table_indices;
-    __gm__ uint32_t* update_row_indices;
-    __gm__ uint32_t* linear_cache_indices;
-    uint32_t index_total_length;
-    uint32_t cumsum_length;
-){
-    int32_t gid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (gid >= index_total_length) {
-        return;
-    }
-
-    int32_t tableId  = update_table_indices[gid];
-    T       rowId    = update_row_indices[gid];
-    int64_t sentinel = cache_hash_size_cumsum[cumsum_length - 1];
-    int64_t offset   = cache_hash_size_cumsum[tableId];
-
-    if (offset >= 0 && rowId >= static_cast<T>(0)) {
-        linear_cache_indices[gid] = static_cast<T>(offset + static_cast<int64_t>(rowId));
-    } else {
-        linear_cache_indices[gid] = static_cast<T>(sentinel);
-    }
-
+    int64_t perCoreIndicesNum = indices_num / GetBlockNum();
+    int64_t blockDim = (perCoreIndicesNum > kMaxThreads) ? kMaxThreads : perCoreIndicesNum;
+    AscendC::Simt::Dim3 simtDim{static_cast<uint32_t>(blockDim), 1, 1};
+    AscendC::Simt::VF_CALL<SimtLinearizeIndicesMultiThread<DTYPE_INDICES, DTYPE_TABLE_OFFSETS>>(
+        simtDim, (__gm__ int64_t*)cache_hash_size_cumsum, (__gm__ DTYPE_INDICES*)indices,
+        (__gm__ DTYPE_TABLE_OFFSETS*)table_offsets, (__gm__ int64_t*)linearized_indices, indices_num, num_tables,
+        indices_base_offset, table_offsets_size);
 }
-#endif  // SIMT_KERNEL_H
