@@ -1,0 +1,35 @@
+build ops lib info: 
+build ops lib error: In file included from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/../common/ops_log.h:20,
+                 from /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:19:
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp: In function 'ge::graphStatus optiling::TilingFunc(gert::TilingContext*)':
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/../common/log_base.h:131:77: error: static assertion failed: condition should be bool
+  131 |         static_assert(std::is_same<bool, std::decay<decltype(COND)>::type>::value, "condition should be bool"); \
+      |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/../common/ops_log.h:32:48: note: in expansion of macro 'OPS_LOG_STUB_IF'
+   32 | #define OPS_LOG_I_IF(COND, OP_DESC, EXPR, ...) OPS_LOG_STUB_IF(COND, OPS_LOG_I(OP_DESC, __VA_ARGS__), EXPR)
+      |                                                ^~~~~~~~~~~~~~~
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:80:5: note: in expansion of macro 'OPS_LOG_I_IF'
+   80 |     OPS_LOG_I_IF(context,
+      |     ^~~~~~~~~~~~
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:80:18: error: invalid conversion from 'gert::TilingContext*' to 'long int' [-fpermissive]
+   80 |     OPS_LOG_I_IF(context,
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/../common/log_base.h:132:31: note: in definition of macro 'OPS_LOG_STUB_IF'
+  132 |         if (__builtin_expect((COND), 0)) {                                                                      \
+      |                               ^~~~
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/op_host/linearize_cache_indices_from_row_idx.cpp:80:5: note: in expansion of macro 'OPS_LOG_I_IF'
+   80 |     OPS_LOG_I_IF(context,
+      |     ^~~~~~~~~~~~
+<built-in>: note:   initializing argument 1 of 'long int __builtin_expect(long int, long int)'
+
+CMake Error at /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/cmake/func.cmake:21 (message):
+  opbuild run failed!
+Call Stack (most recent call first):
+  op_host/CMakeLists.txt:5 (opbuild)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/CMakeFiles/CMakeOutput.log".
+gmake: Makefile: No such file or directory
+gmake: *** No rule to make target 'Makefile'.  Stop.
+gmake: Makefile: No such file or directory
+gmake: *** No rule to make target 'Makefile'.  Stop.
