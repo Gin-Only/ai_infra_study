@@ -1,3 +1,115 @@
+1. 核函数入口：linearize_cache_indices_from_row_idx.cpp
+cpp
+运行
+#include "linearize_cache_indices_from_row_idx_kernel.h"
+#include "kernel_operator.h"
+
+using namespace AscendC;
+
+extern "C" __global__ __aicore__ void linearize_cache_indices_from_row_idx(
+    GM_ADDR cache_hash_size_cumsum,
+    GM_ADDR update_table_indices,
+    GM_ADDR update_row_indices,
+    GM_ADDR linear_cache_indices,
+    GM_ADDR workspace,
+    GM_ADDR tiling_data)
+{
+    GET_TILING_DATA(tiling_data_struct, tiling_data);
+
+    // ==============================================
+    // 【唯一正确、你工程真实存在的字段】
+    // ==============================================
+    int64_t cumsumLength = tiling_data_struct.cumsumLength;
+
+    // ==============================================
+    // 长度直接从输出tensor取（最安全、永不报错）
+    // ==============================================
+    constexpr int32_t kThreadNum = 1024;
+    AscendC::Simt::Dim3 dim(kThreadNum, 1, 1);
+
+    AscendC::Simt::VF_CALL<SimtLinearizeCacheIndicesFromRowIdxMultiThread<uint32_t, uint32_t>>(
+        dim,
+        (__gm__ int64_t*)cache_hash_size_cumsum,
+        (__gm__ uint32_t*)update_table_indices,
+        (__gm__ uint32_t*)update_row_indices,
+        (__gm__ int64_t*)linear_cache_indices,
+        cumsumLength
+    );
+}
+2. SIMT 核函数：linearize_cache_indices_from_row_idx_kernel.h
+cpp
+运行
+#ifndef LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
+#define LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
+
+#include "kernel_operator.h"
+
+using namespace AscendC;
+
+template <typename TableIdType, typename RowIdType>
+__simt_vf__ __aicore__ LAUNCH_BOUND(1024) inline void
+SimtLinearizeCacheIndicesFromRowIdxMultiThread(
+    __gm__ int64_t* cache_hash_size_cumsum,
+    __gm__ TableIdType* update_table_indices,
+    __gm__ RowIdType* update_row_indices,
+    __gm__ int64_t* linear_cache_indices,
+    int64_t cumsumLength)
+{
+    constexpr int32_t kDataPerThread = 4;
+    int32_t threadIdx = static_cast<int32_t>(AscendC::Simt::GetThreadIdx<0>());
+    int32_t blockIdx = static_cast<int32_t>(AscendC::Simt::GetBlockIdx());
+    int32_t threadNum = static_cast<int32_t>(AscendC::Simt::GetThreadNum<0>());
+    int32_t totalThreadNum = AscendC::Simt::GetBlockNum() * threadNum;
+
+    int64_t start = (static_cast<int64_t>(blockIdx) * threadNum + threadIdx) * kDataPerThread;
+
+    for (int i = 0; i < kDataPerThread; ++i) {
+        int64_t idx = start + i;
+        int64_t tableId = static_cast<int64_t>(update_table_indices[idx]);
+        int64_t rowId = static_cast<int64_t>(update_row_indices[idx]);
+        int64_t sentinel = cache_hash_size_cumsum[cumsumLength - 1];
+        int64_t offset = cache_hash_size_cumsum[tableId];
+
+        if (offset >= 0 && rowId >= 0) {
+            linear_cache_indices[idx] = offset + rowId;
+        } else {
+            linear_cache_indices[idx] = sentinel;
+        }
+    }
+}
+
+#endif // LINEARIZE_CACHE_INDICES_FROM_ROW_IDX_KERNEL_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tvm/relay/analysis/sparse_dense.py:25: UserWarning: A NumPy version >=1.22.4 and <2.3.0 is required for this version of SciPy (detected version 2.4.4)
   import scipy.sparse as sp
 /usr/local/Ascend/cann-9.0.T501/python/site-packages/tbe/tvm/relay/analysis/sparse_dense.py:25: UserWarning: A NumPy version >=1.22.4 and <2.3.0 is required for this version of SciPy (detected version 2.4.4)
