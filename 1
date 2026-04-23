@@ -14,21 +14,14 @@ See the License for the specific language governing permissions and
 ==============================================================================*/
 
 #include <cstdint>
-#include <cmath>
-#include <limits>
 #include "tiling/platform/platform_ascendc.h"
 #include "register/op_def_registry.h"
 #include "ops_log.h"
 #include "linearize_cache_indices_from_row_idx_tiling.h"
 
 namespace {
-    constexpr int32_t BLOCK_SIZE = 7680;
-    constexpr int32_t MAX_THREADS_PER_BLOCK = 1024;
-    constexpr int32_t MAX_ELEMENTS_PER_THREAD = 4;
-    constexpr int32_t MAX_WARPS = MAX_THREADS_PER_BLOCK / 32;
-    constexpr int DCACHE_SIZE = 128 * 1024;
-    constexpr int32_t MULTIPLIER = 2;
-    constexpr int32_t DIVISOR = 4;
+    constexpr uint32_t MAX_THREAD_COUNT = 2048;
+    constexpr uint32_t MAX_BLOCK_COUNT  = 65535;
 }
 
 namespace optiling {
@@ -37,14 +30,12 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
 {
     OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
     OPS_LOG_E_IF_NULL("cache_hash_size_cumsumShape", context->GetInputShape(0), return ge::GRAPH_FAILED);
-    OPS_LOG_E_IF_NULL("update_table_indicesShape", context->GetInputShape(1), return ge::GRAPH_FAILED);
-    OPS_LOG_E_IF_NULL("update_row_indicesTensor", context->GetInputTensor(2), return ge::GRAPH_FAILED);
-    
-    // 输入0：cache_hash_size_cumsum, 形状【T+1】
-    // 输入1：update_table_indices, 形状【N】
-    // 输入2：update_row_indices，形状【N】
-    int64_t totalLength = context->GetInputShape(2)->GetOriginShape().GetShapeSize();
+    OPS_LOG_E_IF_NULL("update_table_indicesShape",   context->GetInputShape(1), return ge::GRAPH_FAILED);
+    OPS_LOG_E_IF_NULL("update_row_indicesTensor",    context->GetInputTensor(2), return ge::GRAPH_FAILED);
+
+    int64_t totalLength  = context->GetInputShape(2)->GetOriginShape().GetShapeSize();
     int64_t cumsumLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+
     uint32_t dimNumRow = context->GetInputShape(2)->GetOriginShape().GetDimNum();
     OPS_LOG_E_IF(dimNumRow != 1, context, return ge::GRAPH_FAILED,
                  "[ERROR]LinearizeCacheIndicesFromRowIdx: update_row_indices must be 1-D");
@@ -54,50 +45,46 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
               OPS_LOG_E("[ERROR]Invalid data type",
                         "LinearizeCacheIndicesFromRowIdx only supports int64 and int32."),
               return ge::GRAPH_FAILED);
-        
-    auto ascendPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    size_t maxCores = ascendPlatform.GetCoreNumAiv(); // 获取AI Core可用核心数
-    int32_t elementsPerBlock = BLOCK_SIZE;
-    int64_t totalBlocks = (totalLength + elementsPerBlock - 1) / elementsPerBlock;
-    if (totalBlocks == 0) {
-        totalBlocks = 1; // 有多少个数据块
-    }
-    //
-    uint32_t basicBlockNum = totalBlocks / maxCores;
-    uint32_t tailBlockNum = totalBlocks % maxCores;
 
-    //方案二
-    //int64_t totalLenPerBlock = totalLength / maxCores;
-     
-    // size_t coreNum = (totalBlocks > maxCores) ? maxCores : totalBlocks;
-    // if (coreNum == 0) {
-    //     OPS_LOG_E(context, "[ERROR] LinearizeCacheIndicesFromRowIdx: need at least 1 AI Core");
-    //     return ge::GRAPH_FAILED;
-    // }
+    auto ascendPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
+    uint32_t realCoreNum = static_cast<uint32_t>(ascendPlatform.GetCoreNumAiv());
+
+    // Step 1: 固定用满线程
+    uint32_t blockDim = MAX_THREAD_COUNT;
+
+    // Step 2: 动态计算每个 thread 处理的元素数，确保覆盖所有元素
+    int64_t dataPerThread = (totalLength + (int64_t)blockDim * MAX_BLOCK_COUNT - 1)
+                            / ((int64_t)blockDim * MAX_BLOCK_COUNT);
+    if (dataPerThread < 1) dataPerThread = 1;
+
+    // Step 3: 反推实际需要的 gridDim
+    uint32_t gridDim = (uint32_t)((totalLength + (int64_t)blockDim * dataPerThread - 1)
+                                  / ((int64_t)blockDim * dataPerThread));
+    if (gridDim == 0) gridDim = 1;
 
     size_t* workspaceSize = context->GetWorkspaceSizes(1);
     OPS_LOG_E_IF_NULL("workspaceSize", workspaceSize, return ge::GRAPH_FAILED);
-    workspaceSize[0] = ascendPlatform.GetLibApiWorkSpaceSize(); 
+    workspaceSize[0] = ascendPlatform.GetLibApiWorkSpaceSize();
 
     LinearizeCacheIndicesFromRowIdxTilingData tiling;
     tiling.set_totalLength(totalLength);
     tiling.set_cumsumLength(cumsumLength);
-    tiling.set_blockSize(elementsPerBlock);
-    tiling.set_numBlocks(totalBlocks);
-    
+    tiling.set_dataPerThread(dataPerThread);
+    tiling.set_gridDim(gridDim);
+    tiling.set_blockDim(blockDim);
 
+    // 框架将 gridDim 个线程块分发到各 AI Core，用满所有核
+    context->SetBlockDim(realCoreNum);
 
-    context->SetBlockDim(maxCores);
-    context->SetLocalMemorySize(DCACHE_SIZE);
+    OPS_LOG_INFO(context,
+                 "LinearizeCacheIndicesFromRowIdx SIMT tiling: totalLength=%ld cumsumLength=%ld "
+                 "dataPerThread=%ld gridDim=%u blockDim=%u realCoreNum=%u",
+                 totalLength, cumsumLength, dataPerThread, gridDim, blockDim, realCoreNum);
 
     OPS_LOG_E_IF_NULL("raw tilingData", context->GetRawTilingData(), return ge::GRAPH_FAILED);
     tiling.SaveToBuffer(context->GetRawTilingData()->GetData(),
                         context->GetRawTilingData()->GetCapacity());
     context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
-
-    // OPS_LOG_INFO(context, "LinearizeCacheIndicesFromRowIdx Tiling Success: "
-    //                       "totalLength=%ld, cumsumLength=%ld, blockSize=%d, totalBlocks=%ld, coreNum=%zu",
-    //              totalLength, cumsumLength, elementsPerBlock, totalBlocks, coreNum);
 
     return ge::GRAPH_SUCCESS;
 }
@@ -109,13 +96,10 @@ namespace ge {
 static ge::graphStatus InferShape(gert::InferShapeContext* context)
 {
     OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
-
     const gert::Shape* rowIdxShape = context->GetInputShape(2);
     OPS_LOG_E_IF_NULL("update_row_indices shape", rowIdxShape, return ge::GRAPH_FAILED);
-
     gert::Shape* outShape = context->GetOutputShape(0);
     OPS_LOG_E_IF_NULL("output shape", outShape, return ge::GRAPH_FAILED);
-
     *outShape = *rowIdxShape;
     return GRAPH_SUCCESS;
 }
@@ -139,26 +123,26 @@ public:
     {
         this->Input("cache_hash_size_cumsum")
             .ParamType(REQUIRED)
-            .DataType({ge::DT_INT64, ge::DT_INT32})
+            .DataType({ge::DT_INT64})
             .FormatList({ge::FORMAT_ND})
-            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
+            .UnknownShapeFormat({ge::FORMAT_ND});
 
         this->Input("update_table_indices")
             .ParamType(REQUIRED)
-            .DataType({ge::DT_INT64, ge::DT_INT32})
-            .FormatList({ge::FORMAT_ND})
+            .DataType({ge::DT_INT32, ge::DT_INT64})
+            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
             .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->Input("update_row_indices")
             .ParamType(REQUIRED)
-            .DataType({ge::DT_INT64, ge::DT_INT32})
-            .FormatList({ge::FORMAT_ND})
+            .DataType({ge::DT_INT32, ge::DT_INT64})
+            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
             .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->Output("linear_cache_indices")
             .ParamType(REQUIRED)
-            .DataType({ge::DT_INT64, ge::DT_INT32})
-            .FormatList({ge::FORMAT_ND})
+            .DataType({ge::DT_INT32, ge::DT_INT64})
+            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
             .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
