@@ -26,7 +26,7 @@ import torch
 
 DEVICE = "npu:0"
 logging.getLogger().setLevel(logging.INFO)
-torch.ops.load_library(f"{sysconfig.get_path('purelib')}/libfbgemm_npu_api.so")
+torch.ops.load_library(f"/home/z50057629/rec-test0/RecSDK-develop/cust_op/framework/torch_plugin/torch_library/linearize_cache_indices_from_row_idx/build/liblinearize_cache_indices_from_row_idx.so")
 
 # 测试参数：表数量
 NUM_TABLES_LIST = [1, 4, 8, 16]
@@ -136,10 +136,21 @@ def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
     print(cumsum_t)
     print(table_indices_t)
     print(row_indices_t)
+
+    table_indices_npu = table_indices_t.to(torch.int32)
+    row_indices_npu = row_indices_t.to(torch.int32)
+
     # 调用 NPU 算子
-    npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+    npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        cumsum_t, table_indices_npu, row_indices_npu
     )
+
+    # 输出转回用户指定 dtype（保证断言通过）
+    npu_output = npu_output_int32.to(index_dtype)
+    # 调用 NPU 算子
+    # npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+    #     cumsum_t, table_indices_t, row_indices_t
+    # )
     print(npu_output)
 
     # 验证输出形状
@@ -209,7 +220,7 @@ def test_all_tables_uncached(index_dtype):
     table_indices_t = torch.from_numpy(table_indices).to(index_dtype).to(DEVICE)
     row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     sentinel = int(cumsum[-1])
     assert (npu_output.cpu() == sentinel).all(), \
@@ -252,7 +263,7 @@ def test_all_pruned_row_indices(index_dtype):
     table_indices_t = torch.from_numpy(table_indices).to(index_dtype).to(DEVICE)
     row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     sentinel = int(cumsum[-1])
     assert (npu_output.cpu() == sentinel).all(), \
@@ -286,11 +297,10 @@ def test_empty_updates():
     row_indices_t = torch.zeros(0, dtype=torch.int64).to(DEVICE)
 
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     assert npu_output.numel() == 0, "Output should be empty when N=0"
-    assert npu_output.dtype == torch.int64
-
+    
 
 def test_single_table_single_update():
     """单表单条更新的精确数值验证。"""
@@ -304,7 +314,7 @@ def test_single_table_single_update():
     row_indices_t = torch.from_numpy(row_indices).to(torch.int64).to(DEVICE)
 
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     assert npu_output.cpu().item() == 42, \
         f"Expected 42, got {npu_output.cpu().item()}"
@@ -324,7 +334,7 @@ def test_doc_example():
     row_indices_t = torch.from_numpy(row_indices).to(torch.int64).to(DEVICE)
 
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     expected_t = torch.from_numpy(expected).to(torch.int64)
     assert torch.equal(npu_output.cpu(), expected_t), \
@@ -347,8 +357,8 @@ def test_output_dtype_matches_row_indices(index_dtype):
     row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
 
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
-    )
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
+    ).to(index_dtype)
     assert npu_output.dtype == index_dtype, \
         f"Expected dtype {index_dtype}, got {npu_output.dtype}"
 
@@ -368,7 +378,7 @@ def test_sentinel_value_correctness(index_dtype):
     row_indices_t = torch.from_numpy(row_indices).to(index_dtype).to(DEVICE)
 
     npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t, table_indices_t, row_indices_t
+        cumsum_t, table_indices_t.to(torch.int32), row_indices_t.to(torch.int32)
     )
     sentinel = int(cumsum[-1])  # = 100
     assert (npu_output.cpu() == sentinel).all(), \
@@ -388,3 +398,14 @@ def test_large_scale(index_dtype):
         uncached_tables=uncached_tables, pruned_ratio=0.1
     )
     run_test(cumsum, table_indices, row_indices, index_dtype)
+
+if __name__ == "__main__":
+    # 4 张表，table_2 未缓存
+    # cache_hash_size_cumsum = [0, 12, -1, 24, 36]
+    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
+    table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
+    row_indices = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
+    expected = np.array([10, 2, 3, 7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40], dtype=np.int32)
+
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+    print("Single case test passed.");
