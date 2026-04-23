@@ -1,3 +1,42 @@
+root@localhost:/# python /home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py
+tensor([ 0, 12, 24, 36, 48], device='npu:0')
+tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
+       dtype=torch.int32)
+tensor([10,  2,  3,  7,  1,  4,  5,  9,  2,  7,  6,  8,  5,  1,  0,  4],
+       device='npu:0', dtype=torch.int32)
+tensor([10,  0,  2,  0,  3,  0,  7,  0, 13,  0, 16,  0, 17,  0, 21,  0],
+       device='npu:0', dtype=torch.int32)
+Traceback (most recent call last):
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py", line 410, in <module>
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py", line 167, in run_test
+    assert torch.equal(ref_t, npu_cpu), \
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Value mismatch:
+ref:  tensor([10,  2,  3,  7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40],
+       dtype=torch.int32)
+npu:  tensor([10,  0,  2,  0,  3,  0,  7,  0, 13,  0, 16,  0, 17,  0, 21,  0],
+       dtype=torch.int32)
+[ERROR] 2026-04-23-10:18:21 (PID:8530, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Copyright (c) Huawei Technologies Co., Ltd. 2026. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
