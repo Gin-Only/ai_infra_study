@@ -1,3 +1,61 @@
+Compile op info cfg successfully.
+[ 66%] Built target ops_info_gen_ascend950
+[100%] Linking CXX shared library libcust_opmaster_rt2.0.so
+[100%] Built target cust_optiling
+Traceback (most recent call last):
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 216, in <module>
+    kernel_builder.ascendc_gen_param()
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 87, in ascendc_gen_param
+    ascendc_bin_param_build.gen_bin_param_file(
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_bin_param_build.py", line 530, in gen_bin_param_file
+    op_desc.gen_input_json(auto_gen_path_dir)
+  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_bin_param_build.py", line 229, in gen_input_json
+    count = len(self.output_dtype[0].split(','))
+                ~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:425: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:379: op_kernel/CMakeFiles/binary.dir/rule] Error 2
+gmake: *** [Makefile:293: binary] Error 2
+Consolidate compiler generated dependencies of target cust_optiling
+[  8%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
+[ 16%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
+[ 25%] Generating scripts/install.sh, scripts/upgrade.sh
+[ 33%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 41%] Built target ops_info_gen_ascend950
+[ 41%] Built target gen_version_info
+[ 50%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
+[ 58%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
+[ 75%] Built target cust_optiling
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
+[ 75%] Built target modify_vendor
+[ 75%] Built target optiling_compat
+[INFO] Succed generated /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
+[ 75%] Built target npu_supported_ops
+/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:55:41: error: 'socSupportInfo0' was not declared in this scope; did you mean 'OpSocSupportInfo'?
+   55 | OpSocSupportInfo opSocSupportList[1] = {socSupportInfo0};
+      |                                         ^~~~~~~~~~~~~~~
+      |                                         OpSocSupportInfo
+gmake[2]: *** [op_host/CMakeFiles/cust_opapi.dir/build.make:76: op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:294: op_host/CMakeFiles/cust_opapi.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+[ 83%] Linking CXX shared library libcust_tf_parsers.so
+[ 83%] Built target cust_tf_parsers
+[ 91%] Linking CXX shared library libcust_opsproto_rt2.0.so
+[ 91%] Built target cust_op_proto
+gmake: *** [Makefile:156: all] Error 2
+
+
+
+
+
+
+
+
+
+
+
+
 /* Copyright (c) Huawei Technologies Co., Ltd. 2025-2026. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
