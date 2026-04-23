@@ -1,3 +1,92 @@
+platform linux -- Python 3.11.13, pytest-8.3.2, pluggy-1.6.0
+rootdir: /home/z50057629/rec-test0/RecSDK-develop
+plugins: xdist-3.6.1
+collected 74 items                                                                                                                                                                                                                                                         
+
+home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py ..............................................................FFFFFFFFFFFF                                               [100%]Traceback (most recent call last):
+  File "/root/python3.11.13/bin/pytest", line 8, in <module>
+    sys.exit(console_main())
+             ^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/config/__init__.py", line 201, in console_main
+    code = main()
+           ^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/config/__init__.py", line 175, in main
+    ret: ExitCode | int = config.hook.pytest_cmdline_main(config=config)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 167, in _multicall
+    raise exception
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/main.py", line 330, in pytest_cmdline_main
+    return wrap_session(config, _main)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/main.py", line 318, in wrap_session
+    config.hook.pytest_sessionfinish(
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_hooks.py", line 512, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 167, in _multicall
+    raise exception
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/logging.py", line 870, in pytest_sessionfinish
+    return (yield)
+            ^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/terminal.py", line 893, in pytest_sessionfinish
+    result = yield
+             ^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 139, in _multicall
+    teardown.throw(exception)
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/warnings.py", line 141, in pytest_sessionfinish
+    return (yield)
+            ^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/pluggy/_callers.py", line 121, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/cacheprovider.py", line 477, in pytest_sessionfinish
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+  File "/root/python3.11.13/lib/python3.11/site-packages/_pytest/cacheprovider.py", line 201, in set
+    f.write(data)
+OSError: [Errno 28] No space left on device
+[W423 14:52:57.139613007 NPUStream.cpp:595] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 108] 2026-04-23-14:52:57.376.528 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeUsedDevices)
+[W423 14:52:57.139920218 NPUStream.cpp:577] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 108] 2026-04-23-14:52:57.376.877 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeDevice)
+[ERROR] 2026-04-23-14:52:58 (PID:108, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception
+
+
+
+
+
+
+
+
+
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
