@@ -1,3 +1,1041 @@
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.464290733 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.601.806 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+__________________________________________________________________________________________________ test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype119] ___________________________________________________________________________________________________
+
+num_tables = 16, table_cache_size = 256, num_updates = 1024, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates,index_dtype", PARAM_LIST)
+    def test_linearize_cache_indices_from_row_idx(num_tables, table_cache_size, num_updates, index_dtype):
+        """基本功能测试：全部表均已缓存，无剪枝行。"""
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([   0,  256,  512,  768, 1024, 1280, 1536, 1792, 2048, 2304, 2560,
+       2816, 3072, 3328, 3584, 3840, 4096]), table_indices_np = array([14,  7, 15, ..., 15, 10, 14], shape=(1024,), dtype=int32)
+row_indices_np = array([  8, 200, 159, ...,  85, 213, 125], shape=(1024,), dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.469178286 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.606.692 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+____________________________________________________________________________________________________________________ test_uncached_tables[index_dtype0] ____________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_uncached_tables(index_dtype):
+        """部分表未缓存（cumsum 值为 -1），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 32
+        # table_1 和 table_3 未缓存
+        uncached_tables = {1, 3}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([ 0, -1, 12, -1, 24]), table_indices_np = array([0, 0, 2, 1, 2, 1, 3, 0, 1, 3, 1, 1, 0, 0, 1, 1, 2, 2, 3, 1, 0, 0,
+       2, 0, 2, 1, 3, 3, 0, 0, 1, 2], dtype=int32)
+row_indices_np = array([ 1, 10,  9,  7,  2,  7,  3,  7,  3,  1, 11,  1,  8,  8,  8,  4, 11,
+        8,  6,  3, 11,  8,  1,  1,  8,  4,  1,  6,  8,  8,  1,  2],
+      dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.473726419 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.611.239 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+____________________________________________________________________________________________________________________ test_uncached_tables[index_dtype1] ____________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_uncached_tables(index_dtype):
+        """部分表未缓存（cumsum 值为 -1），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 32
+        # table_1 和 table_3 未缓存
+        uncached_tables = {1, 3}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([ 0, -1, 12, -1, 24]), table_indices_np = array([0, 0, 1, 1, 2, 0, 3, 0, 0, 1, 1, 2, 2, 3, 3, 1, 1, 2, 1, 2, 3, 3,
+       3, 1, 2, 1, 2, 1, 3, 0, 2, 0], dtype=int32)
+row_indices_np = array([ 7, 11,  6,  8,  7,  4,  5,  4,  1,  5,  4,  3,  5,  3, 10,  8, 10,
+        5,  4,  5,  3,  0,  0,  0,  2,  1,  9,  6,  1,  9,  2,  2],
+      dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.478352761 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.615.867 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+__________________________________________________________________________________________________________________ test_all_tables_uncached[index_dtype0] __________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_tables_uncached(index_dtype):
+        """所有表均未缓存，所有输出应为哨兵值 0（总缓存大小为 0）。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 16
+        uncached_tables = set(range(num_tables))
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([-1, -1, -1, -1,  0]), table_indices_np = array([3, 0, 0, 1, 1, 1, 2, 2, 1, 1, 2, 0, 3, 2, 3, 0], dtype=int32), row_indices_np = array([ 4, 11, 10, 10,  8,  2,  6, 10,  6,  2,  9,  3, 10, 11,  6,  8],
+      dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.482853193 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.620.370 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+__________________________________________________________________________________________________________________ test_all_tables_uncached[index_dtype1] __________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_tables_uncached(index_dtype):
+        """所有表均未缓存，所有输出应为哨兵值 0（总缓存大小为 0）。"""
+        num_tables = 4
+        table_cache_size = 12
+        num_updates = 16
+        uncached_tables = set(range(num_tables))
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:216: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([-1, -1, -1, -1,  0]), table_indices_np = array([3, 3, 1, 1, 0, 1, 1, 1, 2, 2, 1, 0, 3, 2, 3, 2], dtype=int32), row_indices_np = array([ 4, 10,  1,  3,  1,  4,  3,  5,  9,  1, 11,  1,  3,  7,  7,  9],
+      dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.487433665 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.624.947 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+__________________________________________________________________________________________________________________ test_pruned_row_indices[index_dtype0] ___________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_pruned_row_indices(index_dtype):
+        """部分 update_row_indices 为负（已剪枝），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 64
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            pruned_ratio=0.3
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([  0,  64, 128, 192, 256])
+table_indices_np = array([2, 1, 3, 1, 1, 1, 1, 0, 3, 1, 0, 3, 0, 0, 2, 3, 1, 2, 1, 2, 0, 1,
+       0, 3, 3, 2, 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 1, 0, 2, 1, 1, 0, 2, 1,
+       1, 1, 3, 3, 0, 1, 3, 2, 1, 1, 2, 1, 3, 3, 0, 0, 2, 2, 2, 1],
+      dtype=int32)
+row_indices_np = array([62, -1, 11, -1, -1, 60, 32, 24, -1,  0, 54, 55, 13, 39, 19, -1, 29,
+        5, 34, 11, 40, 54, -1, 37, 14, 31, ...1, 20, 61, 11,  3, -1, -1, -1, 16, 54, 44, -1,
+       -1, 28, -1,  5, 47, 54, 50, 54, -1,  0, 57, 21, 10], dtype=int32)
+index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.491974458 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.629.489 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+__________________________________________________________________________________________________________________ test_pruned_row_indices[index_dtype1] ___________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_pruned_row_indices(index_dtype):
+        """部分 update_row_indices 为负（已剪枝），对应记录应输出哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 64
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            pruned_ratio=0.3
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([  0,  64, 128, 192, 256])
+table_indices_np = array([1, 0, 1, 1, 1, 2, 1, 2, 1, 0, 0, 2, 3, 0, 3, 2, 1, 1, 0, 0, 2, 2,
+       1, 1, 3, 3, 2, 2, 0, 0, 2, 2, 0, 0, 1, 0, 2, 3, 0, 1, 0, 3, 3, 2,
+       3, 0, 2, 0, 0, 1, 0, 0, 0, 0, 3, 3, 1, 3, 0, 3, 3, 1, 2, 1],
+      dtype=int32)
+row_indices_np = array([ 8, 19, 11,  3, -1, 52,  9, 35, 17, 50, -1, -1, -1, -1, -1, 45, -1,
+       -1, -1, 23, -1, 19, -1, 15, 62, 12, ...3, 57, -1, 39, 53, -1, 57, 23, 46, 51, 23,  2,
+       50, -1, -1, 61, 24, 37, -1, 50, -1, 61,  3, 53, -1], dtype=int32)
+index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.496660909 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.634.178 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+________________________________________________________________________________________________________________ test_all_pruned_row_indices[index_dtype0] _________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_pruned_row_indices(index_dtype):
+        """所有 update_row_indices 均为 -1，所有输出应为哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 32
+    
+        cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
+        table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
+        row_indices = np.full(num_updates, -1, dtype=np.int32)
+    
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([  0,  64, 128, 192, 256]), table_indices_np = array([2, 1, 2, 0, 0, 0, 2, 3, 3, 2, 3, 1, 3, 3, 1, 2, 0, 3, 3, 1, 1, 3,
+       2, 2, 0, 0, 3, 0, 0, 2, 3, 0], dtype=int32)
+row_indices_np = array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+      dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.501220139 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.638.733 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+________________________________________________________________________________________________________________ test_all_pruned_row_indices[index_dtype1] _________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_all_pruned_row_indices(index_dtype):
+        """所有 update_row_indices 均为 -1，所有输出应为哨兵值。"""
+        num_tables = 4
+        table_cache_size = 64
+        num_updates = 32
+    
+        cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
+        table_indices = np.random.randint(0, num_tables, size=num_updates).astype(np.int32)
+        row_indices = np.full(num_updates, -1, dtype=np.int32)
+    
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([  0,  64, 128, 192, 256]), table_indices_np = array([0, 3, 3, 2, 1, 1, 0, 3, 3, 0, 3, 2, 2, 2, 2, 2, 1, 3, 3, 2, 2, 2,
+       2, 2, 3, 1, 0, 0, 1, 3, 1, 3], dtype=int32)
+row_indices_np = array([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+      dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.505846440 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.643.361 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype0-1-1-1] ____________________________________________________________________________________________________________________
+
+num_tables = 1, table_cache_size = 1, num_updates = 1, index_dtype = torch.int32
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([0, 1]), table_indices_np = array([0], dtype=int32), row_indices_np = array([0], dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.510379982 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.647.896 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype0-1-1-0] ____________________________________________________________________________________________________________________
+
+num_tables = 1, table_cache_size = 1, num_updates = 0, index_dtype = torch.int32
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([0, 1]), table_indices_np = array([], dtype=int32), row_indices_np = array([], dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.514945512 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.652.461 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype0-2-10-5] ___________________________________________________________________________________________________________________
+
+num_tables = 2, table_cache_size = 10, num_updates = 5, index_dtype = torch.int32
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([ 0, -1, 10]), table_indices_np = array([0, 1, 1, 1, 1], dtype=int32), row_indices_np = array([3, 1, 5, 5, 0], dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.519466725 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.656.919 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+________________________________________________________________________________________________________________ test_edge_cases[index_dtype0-32-512-2048] _________________________________________________________________________________________________________________
+
+num_tables = 32, table_cache_size = 512, num_updates = 2048, index_dtype = torch.int32
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,    -1,   512,  1024,  1536,  2048,  2560,  3072,  3584,
+        4096,  4608,  5120,  5632,  6144,  6656,...        8704,  9216,  9728, 10240, 10752, 11264, 11776, 12288, 12800,
+       13312, 13824, 14336, 14848, 15360, 15872])
+table_indices_np = array([ 9, 20,  7, ...,  6, 16, 30], shape=(2048,), dtype=int32), row_indices_np = array([465, 259, 336, ..., 179,   1,  74], shape=(2048,), dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.524594559 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.662.100 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-1-1-1] ____________________________________________________________________________________________________________________
+
+num_tables = 1, table_cache_size = 1, num_updates = 1, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([0, 1]), table_indices_np = array([0], dtype=int32), row_indices_np = array([0], dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.529136603 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.666.644 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-1-1-0] ____________________________________________________________________________________________________________________
+
+num_tables = 1, table_cache_size = 1, num_updates = 0, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([0, 1]), table_indices_np = array([], dtype=int32), row_indices_np = array([], dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.533740460 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.671.253 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-2-10-5] ___________________________________________________________________________________________________________________
+
+num_tables = 2, table_cache_size = 10, num_updates = 5, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([ 0, -1, 10]), table_indices_np = array([0, 0, 0, 1, 1], dtype=int32), row_indices_np = array([1, 2, 1, 4, 2], dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.538224167 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.675.736 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+________________________________________________________________________________________________________________ test_edge_cases[index_dtype1-32-512-2048] _________________________________________________________________________________________________________________
+
+num_tables = 32, table_cache_size = 512, num_updates = 2048, index_dtype = torch.int64
+
+    @pytest.mark.parametrize("num_tables,table_cache_size,num_updates", EDGE_CASE_PARAMS)
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_edge_cases(num_tables, table_cache_size, num_updates, index_dtype):
+        """边界情况测试：极小规模、空更新、含未缓存表等。"""
+        uncached_tables = {1} if num_tables >= 2 else None
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,    -1,   512,  1024,  1536,  2048,  2560,  3072,  3584,
+        4096,  4608,  5120,  5632,  6144,  6656,...        8704,  9216,  9728, 10240, 10752, 11264, 11776, 12288, 12800,
+       13312, 13824, 14336, 14848, 15360, 15872])
+table_indices_np = array([ 0, 10, 20, ..., 31, 21, 13], shape=(2048,), dtype=int32), row_indices_np = array([126,  27, 338, ..., 131, 420,   7], shape=(2048,), dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.543315206 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.680.830 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+____________________________________________________________________________________________________________________________ test_empty_updates ____________________________________________________________________________________________________________________________
+
+    def test_empty_updates():
+        """N=0 时算子应返回空 Tensor，不崩溃。"""
+        num_tables = 4
+        table_cache_size = 12
+        cumsum = build_cache_hash_size_cumsum(num_tables, table_cache_size)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:295: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.547807466 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.685.320 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+_____________________________________________________________________________________________________________________ test_single_table_single_update ______________________________________________________________________________________________________________________
+
+    def test_single_table_single_update():
+        """单表单条更新的精确数值验证。"""
+        # cache_hash_size_cumsum = [0, 100]，table_0 起始偏移 0，哨兵 100
+        cumsum = np.array([0, 100], dtype=np.int64)
+        table_indices = np.array([0], dtype=np.int32)
+        row_indices = np.array([42], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:312: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.551189720 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.688.694 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+_____________________________________________________________________________________________________________________________ test_doc_example _____________________________________________________________________________________________________________________________
+
+    def test_doc_example():
+        """验证分析文档第 4.3 节的端到端数值示例。"""
+        # 4 张表，table_2 未缓存
+        # cache_hash_size_cumsum = [0, 12, -1, 24, 36]
+        cumsum = np.array([0, 12, -1, 24, 36], dtype=np.int64)
+        table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
+        row_indices   = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
+        expected      = np.array([10, 2, 3, 7, 13, 16, 17, 21, 36, 36, 36, 36, 29, 25, 24, 28], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:332: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.554472125 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.691.983 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________ test_output_dtype_matches_row_indices[index_dtype0] ____________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_output_dtype_matches_row_indices(index_dtype):
+        """输出 dtype 必须与 update_row_indices 的 dtype 一致。"""
+        cumsum = np.array([0, 64, 128], dtype=np.int64)
+        table_indices = np.array([0, 1, 0], dtype=np.int32)
+        row_indices = np.array([1, 2, 3], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:355: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.557890263 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.695.408 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+___________________________________________________________________________________________________________ test_output_dtype_matches_row_indices[index_dtype1] ____________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_output_dtype_matches_row_indices(index_dtype):
+        """输出 dtype 必须与 update_row_indices 的 dtype 一致。"""
+        cumsum = np.array([0, 64, 128], dtype=np.int64)
+        table_indices = np.array([0, 1, 0], dtype=np.int32)
+        row_indices = np.array([1, 2, 3], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:355: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.561219849 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.698.731 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+______________________________________________________________________________________________________________ test_sentinel_value_correctness[index_dtype0] _______________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_sentinel_value_correctness(index_dtype):
+        """哨兵值必须等于 cache_hash_size_cumsum 的最后一个元素。"""
+        num_tables = 3
+        table_cache_size = 50
+        # table_1 未缓存
+        cumsum = np.array([0, -1, 50, 100], dtype=np.int64)  # 哨兵 = 100
+        table_indices = np.array([1, 1, 1], dtype=np.int32)  # 全部指向未缓存表
+        row_indices = np.array([0, 10, 20], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:376: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.564601412 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.702.116 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+______________________________________________________________________________________________________________ test_sentinel_value_correctness[index_dtype1] _______________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_sentinel_value_correctness(index_dtype):
+        """哨兵值必须等于 cache_hash_size_cumsum 的最后一个元素。"""
+        num_tables = 3
+        table_cache_size = 50
+        # table_1 未缓存
+        cumsum = np.array([0, -1, 50, 100], dtype=np.int64)  # 哨兵 = 100
+        table_indices = np.array([1, 1, 1], dtype=np.int32)  # 全部指向未缓存表
+        row_indices = np.array([0, 10, 20], dtype=np.int32)
+    
+>       cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:376: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.567947893 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.705.458 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+______________________________________________________________________________________________________________________ test_large_scale[index_dtype0] ______________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_large_scale(index_dtype):
+        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
+        num_tables = 32
+        table_cache_size = 1024
+        num_updates = 100000
+        uncached_tables = {5, 10, 20}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables, pruned_ratio=0.1
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
+        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
+       24576, 25600, 26624, 27648, 28672, 29696])
+table_indices_np = array([25,  7,  4, ...,  4, 16, 13], shape=(100000,), dtype=int32), row_indices_np = array([696, 531,  50, ..., 479, 979, 691], shape=(100000,), dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.594686620 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.732.194 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+______________________________________________________________________________________________________________________ test_large_scale[index_dtype1] ______________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_large_scale(index_dtype):
+        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
+        num_tables = 32
+        table_cache_size = 1024
+        num_updates = 100000
+        uncached_tables = {5, 10, 20}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables, pruned_ratio=0.1
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
+        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
+       24576, 25600, 26624, 27648, 28672, 29696])
+table_indices_np = array([12,  0, 22, ..., 11, 24,  8], shape=(100000,), dtype=int32), row_indices_np = array([120,  -1, 393, ..., 172,  -1, 462], shape=(100000,), dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+>       cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+E       RuntimeError: ACL stream synchronize failed, error code:507035
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:133: RuntimeError
+--------------------------------------------------------------------------------------------------------------------------- Captured stderr call ---------------------------------------------------------------------------------------------------------------------------
+[W423 14:24:01.623330365 CopyKernelOpApi.cpp:58] Warning: EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.760.837 (EE9999):  rtStreamSynchronize execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       synchronize stream failed, runtime result = 507035[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function copy_between_host_and_device_opapi)
+========================================================================================================================= short test summary info ==========================================================================================================================
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-16-index_dtype85] - RuntimeError: operator():torch_npu/csrc/aten/common/LocalScalarDenseNpu.cpp:23 NPU function error: c10_npu::acl::AclrtSynchronizeStreamWithTimeout(copy_stream), error code is 507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-128-index_dtype86] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-128-index_dtype87] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1024-index_dtype88] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1024-index_dtype89] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-0-index_dtype90] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-0-index_dtype91] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1-index_dtype92] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1-index_dtype93] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-16-index_dtype94] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-16-index_dtype95] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-128-index_dtype96] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-128-index_dtype97] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1024-index_dtype98] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1024-index_dtype99] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-0-index_dtype100] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-0-index_dtype101] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1-index_dtype102] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1-index_dtype103] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-16-index_dtype104] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-16-index_dtype105] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-128-index_dtype106] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-128-index_dtype107] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1024-index_dtype108] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1024-index_dtype109] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-0-index_dtype110] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-0-index_dtype111] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1-index_dtype112] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1-index_dtype113] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-16-index_dtype114] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-16-index_dtype115] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-128-index_dtype116] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-128-index_dtype117] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype118] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype119] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_uncached_tables[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_uncached_tables[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_tables_uncached[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_tables_uncached[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_pruned_row_indices[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_pruned_row_indices[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-1-1-1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-1-1-0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-2-10-5] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-32-512-2048] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-1-1-1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-1-1-0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-2-10-5] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-32-512-2048] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_empty_updates - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_single_table_single_update - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_doc_example - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_output_dtype_matches_row_indices[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_output_dtype_matches_row_indices[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype0] - RuntimeError: ACL stream synchronize failed, error code:507035
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype1] - RuntimeError: ACL stream synchronize failed, error code:507035
+====================================================================================================================== 60 failed, 85 passed in 8.61s =======================================================================================================================
+[W423 14:24:01.699935949 NPUStream.cpp:595] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.837.446 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+ (function npuSynchronizeUsedDevices)
+[W423 14:24:01.700131843 NPUStream.cpp:577] Warning: NPU warning, error code is 507035[Error]: 
+[Error]: The vector core execution is abnormal. 
+        Rectify the fault based on the error information in the ascend log.
+EE9999: Inner Error!
+EE9999[PID: 1558] 2026-04-23-14:24:01.837.690 (EE9999):  rtDeviceSynchronizeWithTimeout execution failed, reason=vector core exception[FUNC:FuncErrorReason][FILE:error_message_manage.cc][LINE:65]
+        TraceBack (most recent call last):
+       wait for compute device to finish failed, runtime result = 507035.[FUNC:ReportCallError][FILE:log_inner.cpp][LINE:148]
+
+
+
+
+
+
+
+
+
+
+
+
 root@localhost:/# python /home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py
 tensor([ 0, 12, 24, 36, 48], device='npu:0')
 tensor([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], device='npu:0',
