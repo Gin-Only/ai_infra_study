@@ -1,3 +1,192 @@
+========================================================================================================================================== FAILURES ==========================================================================================================================================
+_______________________________________________________________________________________________________________________________ test_large_scale[index_dtype0] _______________________________________________________________________________________________________________________________
+
+index_dtype = torch.int32
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_large_scale(index_dtype):
+        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
+        num_tables = 32
+        table_cache_size = 1024
+        num_updates = 100000
+        uncached_tables = {5, 10, 20}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables, pruned_ratio=0.1
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
+        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
+       24576, 25600, 26624, 27648, 28672, 29696])
+table_indices_np = array([17, 18, 10, ...,  7, 30, 31], shape=(100000,), dtype=int32), row_indices_np = array([333, 797, 627, ..., 808, 301, 265], shape=(100000,), dtype=int32), index_dtype = torch.int32
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+        cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
+        print(cumsum_t)
+        print(table_indices_t)
+        print(row_indices_t)
+    
+        table_indices_npu = table_indices_t.to(torch.int32)
+        row_indices_npu = row_indices_t.to(torch.int32)
+    
+        # 调用 NPU 算子
+        npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_npu, row_indices_npu
+        )
+    
+        # 输出转回用户指定 dtype（保证断言通过）
+        npu_output = npu_output_int32.to(index_dtype)
+        # 调用 NPU 算子
+        # npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        #     cumsum_t, table_indices_t, row_indices_t
+        # )
+        print(npu_output)
+    
+        # 验证输出形状
+        assert npu_output.shape == row_indices_t.shape, \
+            f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
+    
+        # 验证输出 dtype 与 update_row_indices 一致
+        assert npu_output.dtype == index_dtype, \
+            f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
+    
+        # 数值对比
+        ref_t = torch.from_numpy(ref_output).to(index_dtype)
+        npu_cpu = npu_output.cpu()
+>       assert torch.equal(ref_t, npu_cpu), \
+            f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
+E       AssertionError: Value mismatch:
+E         ref:  tensor([15693, 17181, 29696,  ...,  6952, 27949, 28937], dtype=torch.int32)
+E         npu:  tensor([15693, 17181, 29696,  ...,     0,     0,     0], dtype=torch.int32)
+E       assert False
+E        +  where False = <built-in method equal of type object at 0x7f8743deac20>(tensor([15693, 17181, 29696,  ...,  6952, 27949, 28937], dtype=torch.int32), tensor([15693, 17181, 29696,  ...,     0,     0,     0], dtype=torch.int32))
+E        +    where <built-in method equal of type object at 0x7f8743deac20> = torch.equal
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:167: AssertionError
+------------------------------------------------------------------------------------------------------------------------------------ Captured stdout call ------------------------------------------------------------------------------------------------------------------------------------
+tensor([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,  8192,
+           -1,  9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408,
+           -1, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624,
+        27648, 28672, 29696], device='npu:0')
+tensor([17, 18, 10,  ...,  7, 30, 31], device='npu:0', dtype=torch.int32)
+tensor([333, 797, 627,  ..., 808, 301, 265], device='npu:0', dtype=torch.int32)
+tensor([15693, 17181, 29696,  ...,     0,     0,     0], device='npu:0',
+       dtype=torch.int32)
+_______________________________________________________________________________________________________________________________ test_large_scale[index_dtype1] _______________________________________________________________________________________________________________________________
+
+index_dtype = torch.int64
+
+    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
+    def test_large_scale(index_dtype):
+        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
+        num_tables = 32
+        table_cache_size = 1024
+        num_updates = 100000
+        uncached_tables = {5, 10, 20}
+    
+        cumsum, table_indices, row_indices = generate_test_data(
+            num_tables, table_cache_size, num_updates, index_dtype,
+            uncached_tables=uncached_tables, pruned_ratio=0.1
+        )
+>       run_test(cumsum, table_indices, row_indices, index_dtype)
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
+        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
+       24576, 25600, 26624, 27648, 28672, 29696])
+table_indices_np = array([21,  2, 25, ...,  7,  3,  7], shape=(100000,), dtype=int32), row_indices_np = array([135, 421,  34, ..., 447,  19, 594], shape=(100000,), dtype=int32), index_dtype = torch.int64
+
+    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
+        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
+        # CPU 参考结果
+        ref_output = linearize_cache_indices_from_row_idx_ref(
+            cumsum_np, table_indices_np, row_indices_np
+        )
+    
+        # 转换为 Tensor 并移至 NPU
+        cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
+        table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
+        row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
+        print(cumsum_t)
+        print(table_indices_t)
+        print(row_indices_t)
+    
+        table_indices_npu = table_indices_t.to(torch.int32)
+        row_indices_npu = row_indices_t.to(torch.int32)
+    
+        # 调用 NPU 算子
+        npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t, table_indices_npu, row_indices_npu
+        )
+    
+        # 输出转回用户指定 dtype（保证断言通过）
+        npu_output = npu_output_int32.to(index_dtype)
+        # 调用 NPU 算子
+        # npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        #     cumsum_t, table_indices_t, row_indices_t
+        # )
+        print(npu_output)
+    
+        # 验证输出形状
+        assert npu_output.shape == row_indices_t.shape, \
+            f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
+    
+        # 验证输出 dtype 与 update_row_indices 一致
+        assert npu_output.dtype == index_dtype, \
+            f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
+    
+        # 数值对比
+        ref_t = torch.from_numpy(ref_output).to(index_dtype)
+        npu_cpu = npu_output.cpu()
+>       assert torch.equal(ref_t, npu_cpu), \
+            f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
+E       AssertionError: Value mismatch:
+E         ref:  tensor([18567,  2469, 22562,  ...,  6591,  3091,  6738])
+E         npu:  tensor([18567,  2469, 22562,  ...,     0,     0,     0])
+E       assert False
+E        +  where False = <built-in method equal of type object at 0x7f8743deac20>(tensor([18567,  2469, 22562,  ...,  6591,  3091,  6738]), tensor([18567,  2469, 22562,  ...,     0,     0,     0]))
+E        +    where <built-in method equal of type object at 0x7f8743deac20> = torch.equal
+
+../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:167: AssertionError
+------------------------------------------------------------------------------------------------------------------------------------ Captured stdout call ------------------------------------------------------------------------------------------------------------------------------------
+tensor([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,  8192,
+           -1,  9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408,
+           -1, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624,
+        27648, 28672, 29696], device='npu:0')
+tensor([21,  2, 25,  ...,  7,  3,  7], device='npu:0')
+tensor([135, 421,  34,  ..., 447,  19, 594], device='npu:0')
+tensor([18567,  2469, 22562,  ...,     0,     0,     0], device='npu:0')
+================================================================================================================================== short test summary info ===================================================================================================================================
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype0] - AssertionError: Value mismatch:
+FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype1] - AssertionError: Value mismatch:
+=============================================================================================================================== 2 failed, 143 passed in 25.25s =======================
+
+
+
+
+
+
+
+
+
+
+
 Compile op info cfg successfully.
 [ 66%] Built target ops_info_gen_ascend950
 [100%] Linking CXX shared library libcust_opmaster_rt2.0.so
