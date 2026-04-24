@@ -3,6 +3,104 @@ import numpy as np
 import fbgemm_gpu
 
 
+def ref_impl(cumsum, table_indices, row_indices):
+    return cumsum[table_indices] + row_indices
+
+
+def debug_env():
+    print("=== 环境信息 ===")
+    print("torch version:", torch.__version__)
+    print("cuda available:", torch.cuda.is_available())
+    print("fbgemm loaded:", "fbgemm" in dir(torch.ops))
+    print("has op:",
+          hasattr(torch.ops.fbgemm, "linearize_cache_indices_from_row_idx"))
+
+    if hasattr(torch.ops.fbgemm, "linearize_cache_indices_from_row_idx"):
+        print("op handle:", torch.ops.fbgemm.linearize_cache_indices_from_row_idx)
+    print()
+
+
+def run_once(device):
+    print(f"\n=== 在 {device} 上测试 ===")
+
+    # ---- 构造数据 ----
+    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
+    table_indices = np.array([0, 1, 2, 3], dtype=np.int32)
+    row_indices = np.array([10, 2, 3, 7], dtype=np.int32)
+
+    # ---- tensor ----
+    cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(device).contiguous()
+    table_indices_t = torch.from_numpy(table_indices).to(torch.int32).to(device).contiguous()
+    row_indices_t = torch.from_numpy(row_indices).to(torch.int32).to(device).contiguous()
+
+    print("cumsum:", cumsum_t)
+    print("table_indices:", table_indices_t)
+    print("row_indices:", row_indices_t)
+
+    # ---- reference ----
+    ref = ref_impl(cumsum, table_indices, row_indices)
+    print("reference:", ref)
+
+    # ---- 调用算子 ----
+    try:
+        out = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t,
+            table_indices_t,
+            row_indices_t
+        )
+
+        print("output:", out.cpu().numpy())
+        print("output dtype:", out.dtype)
+
+        ok = np.array_equal(out.cpu().numpy(), ref)
+        print("是否正确:", ok)
+
+    except Exception as e:
+        print("❌ 调用失败:", e)
+
+
+if __name__ == "__main__":
+    debug_env()
+
+    # CPU 测
+    run_once("cpu")
+
+    # CUDA 测（如果有）
+    if torch.cuda.is_available():
+        run_once("cuda")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import torch
+import numpy as np
+import fbgemm_gpu
+
+
 def reference_impl(cumsum, table_indices, row_indices):
     """
     Python 参考实现（绝对正确）
