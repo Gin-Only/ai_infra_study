@@ -1,3 +1,111 @@
+import torch
+import numpy as np
+import fbgemm_gpu
+
+def run_test(cumsum, table_indices, row_indices, dtype):
+    """
+    直接调用 torch.ops.fbgemm 算子测试
+    """
+    # 转 torch 张量
+    cumsum_t = torch.from_numpy(cumsum).to(torch.int64)  # 算子要求 cumsum 必须是 int64
+    table_indices_t = torch.from_numpy(table_indices).to(dtype)
+    row_indices_t = torch.from_numpy(row_indices).to(dtype)
+
+    # 核心：直接调用 fbgemm 算子
+    # 算子功能：根据 table 偏移 + row index 计算全局 offset
+    output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+        cumsum_t,
+        table_indices_t,
+        row_indices_t
+    )
+
+    # 打印输出对比
+    print(f"\n测试 dtype = {dtype}")
+    print("算子输出:", output.numpy())
+    print("期望输出:", expected)
+    print("是否一致:", np.allclose(output.numpy(), expected))
+
+    return output
+
+
+if __name__ == "__main__":
+    # 4 张表，table_2 未缓存
+    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
+    table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
+    row_indices = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
+    expected = np.array([10, 2, 3, 7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40], dtype=np.int32)
+
+    # ------------------- 测试 int32 -------------------
+    run_test(cumsum, table_indices, row_indices, torch.int32)
+    
+    # ------------------- 测试 int64 -------------------
+    run_test(cumsum, table_indices, row_indices, torch.int64)
+
+    print("\n✅ 全部测试完成")
+root@localhost:/# python /home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py
+
+测试 dtype = torch.int32
+算子输出: [  15732481 -670105301 1284247820   19596272  302899215   99638412
+ -267452117  319684614  133192844 -267452117  319684616  166747276
+ -267452117  370212874  200281236 -267452117]
+期望输出: [10  2  3  7 13 16 17 21 26 31 30 32 41 37 36 40]
+是否一致: False
+
+测试 dtype = torch.int64
+算子输出: [     140509258316544      140509258316544                    0
+                    0    67555463308119024    80502874153812254
+    96265670411419990 -2881935420658990352    94295259725435661
+  5692842424591386080 -1152553163748741119   720839828790381056
+  2386063510451867393  5836964218328917464 -2881933221535092735
+    94858235448660749]
+期望输出: [10  2  3  7 13 16 17 21 26 31 30 32 41 37 36 40]
+是否一致: False
+
+✅ 全部测试完成
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ========================================================================================================================================== FAILURES ==========================================================================================================================================
 _______________________________________________________________________________________________________________________________ test_large_scale[index_dtype0] _______________________________________________________________________________________________________________________________
 
