@@ -2,6 +2,106 @@ import torch
 import numpy as np
 import fbgemm_gpu
 
+
+def reference_impl(cumsum, table_indices, row_indices):
+    """
+    Python 参考实现（绝对正确）
+    """
+    return cumsum[table_indices] + row_indices
+
+
+def run_single_test(cumsum, table_indices, row_indices, idx_dtype):
+    """
+    测试单个 dtype 情况
+    """
+    print("\n" + "=" * 60)
+    print(f"测试 row_indices dtype = {idx_dtype}")
+
+    try:
+        # ---- 构造 tensor（严格控制 dtype + contiguous）----
+        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).contiguous()
+        table_indices_t = torch.from_numpy(table_indices).to(torch.int32).contiguous()
+        row_indices_t = torch.from_numpy(row_indices).to(idx_dtype).contiguous()
+
+        # ---- 调用算子 ----
+        output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
+            cumsum_t,
+            table_indices_t,
+            row_indices_t
+        )
+
+        # ---- 参考结果 ----
+        ref = reference_impl(cumsum, table_indices, row_indices)
+
+        # ---- 打印信息 ----
+        print("output dtype:", output.dtype)
+        print("output:", output.cpu().numpy())
+        print("expected:", ref)
+
+        # ---- 正确性校验 ----
+        correct = np.array_equal(output.cpu().numpy(), ref)
+        print("是否正确:", correct)
+
+    except Exception as e:
+        print("❌ 运行失败")
+        print("错误信息:", e)
+
+
+def main():
+    # ---- 测试数据 ----
+    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
+
+    table_indices = np.array(
+        [0, 0, 0, 0,
+         1, 1, 1, 1,
+         2, 2, 2, 2,
+         3, 3, 3, 3],
+        dtype=np.int32
+    )
+
+    row_indices = np.array(
+        [10, 2, 3, 7,
+         1, 4, 5, 9,
+         2, 7, 6, 8,
+         5, 1, 0, 4],
+        dtype=np.int32
+    )
+
+    # ---- 打印 schema（方便确认签名）----
+    print("算子 schema：")
+    try:
+        print(torch.ops.fbgemm.linearize_cache_indices_from_row_idx.schema)
+    except Exception:
+        print("（无法获取 schema）")
+
+    # ---- 测试不同 dtype ----
+    test_dtypes = [
+        torch.int8,
+        torch.int16,
+        torch.int32,
+        torch.int64,
+    ]
+
+    for dtype in test_dtypes:
+        run_single_test(cumsum, table_indices, row_indices, dtype)
+
+    print("\n✅ 全部测试完成")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+import torch
+import numpy as np
+import fbgemm_gpu
+
 def run_test(cumsum, table_indices, row_indices, dtype):
     """
     直接调用 torch.ops.fbgemm 算子测试
