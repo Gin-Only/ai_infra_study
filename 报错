@@ -1,11 +1,9 @@
-bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:437: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
 cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
         8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
        24576, 25600, 26624, 27648, 28672, 29696])
-table_indices_np = array([23, 26, 22, ..., 28, 19, 12], shape=(100000,), dtype=int32)
-row_indices_np = array([182, 632, 231, ..., 347, 146, 476], shape=(100000,), dtype=int32)
+table_indices_np = array([11,  4, 15, ...,  1,  4, 24], shape=(100000,), dtype=int32)
+row_indices_np = array([287, 680, 640, ..., 678,  -1, 867], shape=(100000,), dtype=int32)
 index_dtype = torch.int64
 
     def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
@@ -48,11 +46,11 @@ index_dtype = torch.int64
             ref_t, npu_cpu
         ), f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
 E       AssertionError: Value mismatch:
-E         ref:  tensor([20662, 24184, 19687,  ..., 25947, 17554, 10716])
-E         npu:  tensor([0, 0, 0,  ..., 0, 0, 0])
+E         ref:  tensor([ 9503,  4776, 13952,  ...,  1702, 29696, 22371])
+E         npu:  tensor([875,   0,  -1,  ...,   0,   0,   0])
 E       assert False
-E        +  where False = <built-in method equal of type object at 0x7f63021bdc20>(tensor([20662, 24184, 19687,  ..., 25947, 17554, 10716]), tensor([0, 0, 0,  ..., 0, 0, 0]))
-E        +    where <built-in method equal of type object at 0x7f63021bdc20> = torch.equal
+E        +  where False = <built-in method equal of type object at 0x7fb15a4c6c20>(tensor([ 9503,  4776, 13952,  ...,  1702, 29696, 22371]), tensor([875,   0,  -1,  ...,   0,   0,   0]))
+E        +    where <built-in method equal of type object at 0x7fb15a4c6c20> = torch.equal
 
 bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:172: AssertionError
 ======================================= short test summary info ========================================
@@ -72,6 +70,7 @@ FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/te
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-128-index_dtype17] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1024-index_dtype18] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1024-index_dtype19] - AssertionError: Value mismatch:
+FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1-index_dtype22] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1-index_dtype23] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-16-index_dtype24] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-16-index_dtype25] - AssertionError: Value mismatch:
@@ -159,16 +158,15 @@ FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/te
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_pruned_row_indices[index_dtype1] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype0] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype1] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-1-1-1] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-2-10-5] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-32-512-2048] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-1-1-1] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-2-10-5] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-32-512-2048] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_single_table_single_update - AssertionError: Expected 42, got 0
+FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_single_table_single_update - AssertionError: Expected 42, got 938378032
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_doc_example - AssertionError: Doc example mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype0] - AssertionError: All outputs should be sentinel 100, got tensor([   214894,         0, 879849808], d...
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype1] - AssertionError: All outputs should be sentinel 100, got tensor([  56248448,      32611, -144996512]...
+FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype0] - AssertionError: All outputs should be sentinel 100, got tensor([1541356432,      32689,  938386912]...
+FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype1] - AssertionError: All outputs should be sentinel 100, got tensor([1541356288,      32689, 1541356288]...
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype0] - AssertionError: Value mismatch:
 FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype1] - AssertionError: Value mismatch:
-==================================== 115 failed, 30 passed in 7.30s ===
+=================================== 114 failed, 31 passed in 25.30s ====================================
+root@localhost:/home/z50057629/fbgemm-ascend_4812# 
