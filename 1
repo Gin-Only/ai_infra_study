@@ -4,6 +4,32 @@ lrwxrwxrwx. 1 root root 55 Apr 23 09:35 /usr/local/Ascend/cann-9.0.0/x86_64-linu
 /usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen: symbolic link to /usr/local/Ascend/cann/python/site-packages/bin/msopgen
 [root@localhost c310]# uname -a
 Linux localhost.localdomain 6.6.110-42.13.tl4.x86_64 #1 SMP Mon Jan 19 17:02:39 CST 2026 x86_64 x86_64 x86_64 GNU/Linux
+[root@localhost c310]# ls -l /usr/local/Ascend/cann/python/site-packages/bin/msopgen
+-rwxr-xr-x. 1 root root 2260 Apr 23 09:35 /usr/local/Ascend/cann/python/site-packages/bin/msopgen
+[root@localhost c310]# export ASCEND_ROOT=/usr/local/Ascend
+export ASCEND_PATH=$ASCEND_ROOT/cann-9.0.0
+source $ASCEND_PATH/set_env.sh
+export PATH=$ASCEND_PATH/x86_64-linux/bin:$ASCEND_PATH/python/site-packages/bin:$PATH
+[root@localhost c310]# msopgen --help
+bash: /usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen: cannot execute: required file not found
+[root@localhost c310]# python3 /usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen --help
+usage: msopgen [-h] {gen,compile,sim} ...
+
+positional arguments:
+  {gen,compile,sim}  commands
+    gen              Generator operator project.
+    compile          Compile operator project.
+    sim              Simulator-related operations.
+
+options:
+  -h, --help         show this help message and exit
+
+[root@localhost c310]# ls -l /usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+lrwxrwxrwx. 1 root root 55 Apr 23 09:35 /usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen -> /usr/local/Ascend/cann/python/site-packages/bin/msopgen
+[root@localhost c310]# file /usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen: symbolic link to /usr/local/Ascend/cann/python/site-packages/bin/msopgen
+[root@localhost c310]# uname -a
+Linux localhost.localdomain 6.6.110-42.13.tl4.x86_64 #1 SMP Mon Jan 19 17:02:39 CST 2026 x86_64 x86_64 x86_64 GNU/Linux
 
 
 
