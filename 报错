@@ -1,180 +1,426 @@
-
-root@huawei:/home/z50057629# git clone https://gitcode.com/Zhz_Bey/fbgemm-ascend_4812.git
-Cloning into 'fbgemm-ascend_4812'...
-fatal: unable to access 'https://gitcode.com/Zhz_Bey/fbgemm-ascend_4812.git/': Failed to connect to 90.253.82.115 port 6688 after 7 ms: Connection refused
-
-
-
-
-
-cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
-        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
-       24576, 25600, 26624, 27648, 28672, 29696])
-table_indices_np = array([11,  4, 15, ...,  1,  4, 24], shape=(100000,), dtype=int32)
-row_indices_np = array([287, 680, 640, ..., 678,  -1, 867], shape=(100000,), dtype=int32)
-index_dtype = torch.int64
-
-    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
-        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
-        # CPU 参考结果
-        ref_output = linearize_cache_indices_from_row_idx_ref(
-            cumsum_np, table_indices_np, row_indices_np
-        )
-    
-        # 转换为 Tensor 并移至 NPU
-        cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
-        table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
-        row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
-    
-        table_indices_npu = table_indices_t.to(torch.int32)
-        row_indices_npu = row_indices_t.to(torch.int32)
-    
-        # 调用 NPU 算子
-        npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_npu, row_indices_npu
-        )
-    
-        # 输出转回用户指定 dtype（保证断言通过）
-        npu_output = npu_output_int32.to(index_dtype)
-    
-        # 验证输出形状
-        assert (
-            npu_output.shape == row_indices_t.shape
-        ), f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
-    
-        # 验证输出 dtype 与 update_row_indices 一致
-        assert (
-            npu_output.dtype == index_dtype
-        ), f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
-    
-        # 数值对比
-        ref_t = torch.from_numpy(ref_output).to(index_dtype)
-        npu_cpu = npu_output.cpu()
->       assert torch.equal(
-            ref_t, npu_cpu
-        ), f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
-E       AssertionError: Value mismatch:
-E         ref:  tensor([ 9503,  4776, 13952,  ...,  1702, 29696, 22371])
-E         npu:  tensor([875,   0,  -1,  ...,   0,   0,   0])
-E       assert False
-E        +  where False = <built-in method equal of type object at 0x7fb15a4c6c20>(tensor([ 9503,  4776, 13952,  ...,  1702, 29696, 22371]), tensor([875,   0,  -1,  ...,   0,   0,   0]))
-E        +    where <built-in method equal of type object at 0x7fb15a4c6c20> = torch.equal
-
-bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:172: AssertionError
-======================================= short test summary info ========================================
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-1-index_dtype2] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-1-index_dtype3] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-16-index_dtype4] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-16-index_dtype5] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-128-index_dtype6] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-128-index_dtype7] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-1024-index_dtype8] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-12-1024-index_dtype9] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1-index_dtype12] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1-index_dtype13] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-16-index_dtype14] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-16-index_dtype15] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-128-index_dtype16] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-128-index_dtype17] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1024-index_dtype18] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-64-1024-index_dtype19] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1-index_dtype22] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1-index_dtype23] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-16-index_dtype24] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-16-index_dtype25] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-128-index_dtype26] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-128-index_dtype27] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1024-index_dtype28] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[1-256-1024-index_dtype29] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-1-index_dtype32] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-1-index_dtype33] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-16-index_dtype34] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-16-index_dtype35] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-128-index_dtype36] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-128-index_dtype37] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-1024-index_dtype38] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-12-1024-index_dtype39] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-1-index_dtype42] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-1-index_dtype43] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-16-index_dtype44] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-16-index_dtype45] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-128-index_dtype46] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-128-index_dtype47] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-1024-index_dtype48] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-64-1024-index_dtype49] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-1-index_dtype52] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-1-index_dtype53] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-16-index_dtype54] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-16-index_dtype55] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-128-index_dtype56] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-128-index_dtype57] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-1024-index_dtype58] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[4-256-1024-index_dtype59] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-1-index_dtype62] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-1-index_dtype63] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-16-index_dtype64] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-16-index_dtype65] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-128-index_dtype66] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-128-index_dtype67] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-1024-index_dtype68] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-12-1024-index_dtype69] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-1-index_dtype72] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-1-index_dtype73] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-16-index_dtype74] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-16-index_dtype75] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-128-index_dtype76] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-128-index_dtype77] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-1024-index_dtype78] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-64-1024-index_dtype79] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1-index_dtype82] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1-index_dtype83] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-16-index_dtype84] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-16-index_dtype85] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-128-index_dtype86] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-128-index_dtype87] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1024-index_dtype88] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[8-256-1024-index_dtype89] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1-index_dtype92] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1-index_dtype93] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-16-index_dtype94] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-16-index_dtype95] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-128-index_dtype96] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-128-index_dtype97] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1024-index_dtype98] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-12-1024-index_dtype99] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1-index_dtype102] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1-index_dtype103] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-16-index_dtype104] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-16-index_dtype105] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-128-index_dtype106] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-128-index_dtype107] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1024-index_dtype108] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-64-1024-index_dtype109] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1-index_dtype112] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1-index_dtype113] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-16-index_dtype114] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-16-index_dtype115] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-128-index_dtype116] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-128-index_dtype117] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype118] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_linearize_cache_indices_from_row_idx[16-256-1024-index_dtype119] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_uncached_tables[index_dtype0] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_uncached_tables[index_dtype1] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_tables_uncached[index_dtype0] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_tables_uncached[index_dtype1] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_pruned_row_indices[index_dtype0] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_pruned_row_indices[index_dtype1] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype0] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_all_pruned_row_indices[index_dtype1] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-2-10-5] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype0-32-512-2048] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-2-10-5] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_edge_cases[index_dtype1-32-512-2048] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_single_table_single_update - AssertionError: Expected 42, got 938378032
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_doc_example - AssertionError: Doc example mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype0] - AssertionError: All outputs should be sentinel 100, got tensor([1541356432,      32689,  938386912]...
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_sentinel_value_correctness[index_dtype1] - AssertionError: All outputs should be sentinel 100, got tensor([1541356288,      32689, 1541356288]...
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype0] - AssertionError: Value mismatch:
-FAILED bench/split_embeddings_cache/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype1] - AssertionError: Value mismatch:
-=================================== 114 failed, 31 passed in 25.30s ====================================
-root@localhost:/home/z50057629/fbgemm-ascend_4812# 
+[root@localhost z50057629]# cd /home/z50057629/fbgemm-ascend_4812
+[root@localhost fbgemm-ascend_4812]# bash build_whl.sh
+Looking in indexes: http://mirrors.tools.huawei.com/pypi/simple
+Processing ./.
+  Preparing metadata (pyproject.toml) ... done
+Building wheels for collected packages: fbgemm_ascend
+  Building wheel for fbgemm_ascend (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+  
+  × Building wheel for fbgemm_ascend (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [408 lines of output]
+      
+      
+      --------------------------------------------------------------------------------
+      -- Trying 'Ninja' generator
+      --------------------------------
+      ---------------------------
+      ----------------------
+      -----------------
+      ------------
+      -------
+      --
+      Not searching for unused variables given on the command line.
+      -- The C compiler identification is GNU 12.3.1
+      -- Detecting C compiler ABI info
+      -- Detecting C compiler ABI info - done
+      -- Check for working C compiler: /usr/bin/cc - skipped
+      -- Detecting C compile features
+      -- Detecting C compile features - done
+      -- The CXX compiler identification is GNU 12.3.1
+      -- Detecting CXX compiler ABI info
+      -- Detecting CXX compiler ABI info - done
+      -- Check for working CXX compiler: /usr/bin/c++ - skipped
+      -- Detecting CXX compile features
+      -- Detecting CXX compile features - done
+      -- Configuring done (0.3s)
+      -- Generating done (0.0s)
+      -- Build files have been written to: /home/z50057629/fbgemm-ascend_4812/_cmake_test_compile/build
+      --
+      -------
+      ------------
+      -----------------
+      ----------------------
+      ---------------------------
+      --------------------------------
+      -- Trying 'Ninja' generator - success
+      --------------------------------------------------------------------------------
+      
+      Configuring Project
+        Working directory:
+          /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build
+        Command:
+          /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake /home/z50057629/fbgemm-ascend_4812 -G Ninja --no-warn-unused-cli -DCMAKE_INSTALL_PREFIX:PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-install/fbgemm_ascend -DPYTHON_VERSION_STRING:STRING=3.11.6 -DSKBUILD:INTERNAL=TRUE -DCMAKE_MODULE_PATH:PATH=/usr/local/lib/python3.11/site-packages/skbuild/resources/cmake -DPYTHON_EXECUTABLE:PATH=/usr/bin/python3 -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.11 -DPYTHON_LIBRARY:PATH=/usr/lib64/libpython3.11.so -DPython_EXECUTABLE:PATH=/usr/bin/python3 -DPython_ROOT_DIR:PATH=/usr -DPython_FIND_REGISTRY:STRING=NEVER -DPython_INCLUDE_DIR:PATH=/usr/include/python3.11 -DPython_NumPy_INCLUDE_DIRS:PATH=/usr/local/lib64/python3.11/site-packages/numpy/core/include -DPython3_EXECUTABLE:PATH=/usr/bin/python3 -DPython3_ROOT_DIR:PATH=/usr -DPython3_FIND_REGISTRY:STRING=NEVER -DPython3_INCLUDE_DIR:PATH=/usr/include/python3.11 -DPython3_NumPy_INCLUDE_DIRS:PATH=/usr/local/lib64/python3.11/site-packages/numpy/core/include -DCMAKE_PREFIX_PATH=/usr/local/lib64/python3.11/site-packages/torch -D_GLIBCXX_USE_CXX11_ABI=1 -DFBGEMM_ASCEND_BUILD_VERS=A5,A2,A3 -DCMAKE_BUILD_TYPE:STRING=Release
+      
+      Not searching for unused variables given on the command line.
+      -- The CXX compiler identification is GNU 12.3.1
+      -- Detecting CXX compiler ABI info
+      -- Detecting CXX compiler ABI info - done
+      -- Check for working CXX compiler: /usr/bin/c++ - skipped
+      -- Detecting CXX compile features
+      -- Detecting CXX compile features - done
+      -- Found Python3: /usr/bin/python3 (found version "3.11.6") found components: Interpreter Development Development.Module Development.Embed
+      -- CANN include (securec.h etc.): /usr/local/Ascend/cann-9.0.0/x86_64-linux/include
+      -- TORCH_CXX11_ABI=1 (must match torch lib for torch::Library symbol)
+      -- Skipping linearize_cache_indices (A2); run.sh not found
+      -- Skipping select_dim1_to_permute (A2); run.sh not found
+      -- Linking fbgemm_ascend_py_a5 with torch_python: /usr/local/lib64/python3.11/site-packages/torch/lib/libtorch_python.so
+      -- Linking fbgemm_ascend_py_a2a3 with torch_python: /usr/local/lib64/python3.11/site-packages/torch/lib/libtorch_python.so
+      -- Configuring done (5.0s)
+      -- Generating done (0.0s)
+      -- Build files have been written to: /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build
+      Change Dir: '/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build'
+      
+      Run Build Command(s): /usr/bin/ninja-build -v -j 128 install
+      [1/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/asynchronous_complete_cumsum/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/asynchronous_complete_cumsum_A5.stamp
+      FAILED: asynchronous_complete_cumsum_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/asynchronous_complete_cumsum_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/asynchronous_complete_cumsum/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/asynchronous_complete_cumsum_A5.stamp
+      ==========================================
+      Start Building Operator: asynchronous_complete_cumsum
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/asynchronous_complete_cumsum/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/asynchronous_complete_cumsum/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/asynchronous_complete_cumsum/c310/asynchronous_complete_cumsum
+      [2/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/block_bucketize_sparse_features/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/block_bucketize_sparse_features_A5.stamp
+      FAILED: block_bucketize_sparse_features_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/block_bucketize_sparse_features_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/block_bucketize_sparse_features/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/block_bucketize_sparse_features_A5.stamp
+      ==========================================
+      Start Building Operator: block_bucketize_sparse_features
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/block_bucketize_sparse_features/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      ./run.sh: line 56: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      [3/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/invert_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/invert_permute_A5.stamp
+      FAILED: invert_permute_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/invert_permute_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/invert_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/invert_permute_A5.stamp
+      ==========================================
+      Start Building Operator: invert_permute
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/invert_permute/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/invert_permute/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/invert_permute/c310/invert_permute
+      [4/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/expand_into_jagged_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/expand_into_jagged_permute_A5.stamp
+      FAILED: expand_into_jagged_permute_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/expand_into_jagged_permute_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/expand_into_jagged_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/expand_into_jagged_permute_A5.stamp
+      ==========================================
+      Start Building Operator: expand_into_jagged_permute
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/expand_into_jagged_permute/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/expand_into_jagged_permute/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/expand_into_jagged_permute/c310/expand_into_jagged_permute
+      [5/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function_grad/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_grad_A5.stamp
+      FAILED: dense_embedding_codegen_lookup_function_grad_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_grad_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function_grad/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_grad_A5.stamp
+      ==========================================
+      Start Building Operator: dense_embedding_codegen_lookup_function_grad
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function_grad/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function_grad/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function_grad/c310/dense_embedding_codegen_lookup_function_grad
+      [6/113] cd /home/z50057629/fbgemm-ascend_4812/src/intraining_embedding_pruning_ops/init_address_lookup/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/init_address_lookup_A5.stamp
+      FAILED: init_address_lookup_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/init_address_lookup_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/intraining_embedding_pruning_ops/init_address_lookup/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/init_address_lookup_A5.stamp
+      ==========================================
+      Start Building Operator: init_address_lookup
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/intraining_embedding_pruning_ops/init_address_lookup/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/intraining_embedding_pruning_ops/init_address_lookup/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/intraining_embedding_pruning_ops/init_address_lookup/c310/init_address_lookup
+      [7/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/split_embedding_codegen_forward_unweighted/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/split_embedding_codegen_forward_unweighted_A5.stamp
+      FAILED: split_embedding_codegen_forward_unweighted_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/split_embedding_codegen_forward_unweighted_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/split_embedding_codegen_forward_unweighted/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/split_embedding_codegen_forward_unweighted_A5.stamp
+      ==========================================
+      Start Building Operator: split_embedding_codegen_forward_unweighted
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_training/split_embedding_codegen_forward_unweighted/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_training/split_embedding_codegen_forward_unweighted/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_training/split_embedding_codegen_forward_unweighted/c310/split_embedding_codegen_forward_unweighted
+      [8/113] cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/dense_to_jagged/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_to_jagged_A5.stamp
+      FAILED: dense_to_jagged_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_to_jagged_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/dense_to_jagged/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_to_jagged_A5.stamp
+      ==========================================
+      Start Building Operator: dense_to_jagged
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/dense_to_jagged/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/dense_to_jagged/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/dense_to_jagged/c310/dense_to_jagged
+      [9/113] cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/get_unique_indices/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/run_length_encode_A5.stamp
+      FAILED: run_length_encode_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/run_length_encode_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/get_unique_indices/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/run_length_encode_A5.stamp
+      ==========================================
+      Start Building Operator: run_length_encode
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/get_unique_indices/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/get_unique_indices/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/get_unique_indices/c310/run_length_encode
+      [10/113] cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_A5.stamp
+      FAILED: linearize_cache_indices_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_A5.stamp
+      ==========================================
+      Start Building Operator: linearize_cache_indices
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices/c310/linearize_cache_indices
+      [11/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/backward_codegen_adagrad_unweighted_exact/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/backward_codegen_adagrad_unweighted_exact_A5.stamp
+      FAILED: backward_codegen_adagrad_unweighted_exact_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/backward_codegen_adagrad_unweighted_exact_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/backward_codegen_adagrad_unweighted_exact/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/backward_codegen_adagrad_unweighted_exact_A5.stamp
+      ==========================================
+      Start Building Operator: backward_codegen_adagrad_unweighted_exact
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_training/backward_codegen_adagrad_unweighted_exact/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_training/backward_codegen_adagrad_unweighted_exact/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_training/backward_codegen_adagrad_unweighted_exact/c310/backward_codegen_adagrad_unweighted_exact
+      [12/113] cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense_v2/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_v2_A5.stamp
+      FAILED: jagged_to_padded_dense_v2_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_v2_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense_v2/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_v2_A5.stamp
+      ==========================================
+      Start Building Operator: jagged_to_padded_dense_v2
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense_v2/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense_v2/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense_v2/c310/jagged_to_padded_dense_v2
+      [13/113] cd /home/z50057629/fbgemm-ascend_4812/src/pooled_embedding_ops/permute_pooled_embs/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute_pooled_embs_A5.stamp
+      FAILED: permute_pooled_embs_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute_pooled_embs_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/pooled_embedding_ops/permute_pooled_embs/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute_pooled_embs_A5.stamp
+      ==========================================
+      Start Building Operator: permute_pooled_embs
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/pooled_embedding_ops/permute_pooled_embs/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/pooled_embedding_ops/permute_pooled_embs/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/pooled_embedding_ops/permute_pooled_embs/c310/permute_pooled_embs
+      [14/113] cd /home/z50057629/fbgemm-ascend_4812/src/quantize_ops/float_or_half_to_fused_nbit_rowwise/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/float_or_half_to_fused_nbit_rowwise_A5.stamp
+      FAILED: float_or_half_to_fused_nbit_rowwise_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/float_or_half_to_fused_nbit_rowwise_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/quantize_ops/float_or_half_to_fused_nbit_rowwise/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/float_or_half_to_fused_nbit_rowwise_A5.stamp
+      ==========================================
+      Start Building Operator: float_or_half_to_fused_nbit_rowwise
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/quantize_ops/float_or_half_to_fused_nbit_rowwise/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/quantize_ops/float_or_half_to_fused_nbit_rowwise/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/quantize_ops/float_or_half_to_fused_nbit_rowwise/c310/float_or_half_to_fused_nbit_rowwise
+      [15/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/pruned_hashmap_lookup/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/pruned_hashmap_lookup_A5.stamp
+      FAILED: pruned_hashmap_lookup_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/pruned_hashmap_lookup_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/pruned_hashmap_lookup/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/pruned_hashmap_lookup_A5.stamp
+      ==========================================
+      Start Building Operator: pruned_hashmap_lookup
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/pruned_hashmap_lookup/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/pruned_hashmap_lookup/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/pruned_hashmap_lookup/c310/pruned_hashmap_lookup
+      [16/113] cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/select_dim1_to_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/select_dim1_to_permute_A5.stamp
+      FAILED: select_dim1_to_permute_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/select_dim1_to_permute_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/select_dim1_to_permute/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/select_dim1_to_permute_A5.stamp
+      ==========================================
+      Start Building Operator: select_dim1_to_permute
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/select_dim1_to_permute/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/select_dim1_to_permute/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/select_dim1_to_permute/c310/select_dim1_to_permute
+      [17/113] cd /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0_backward/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_backward_A5.stamp
+      FAILED: group_index_select_dim0_backward_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_backward_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0_backward/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_backward_A5.stamp
+      ==========================================
+      Start Building Operator: group_index_select_dim0_backward
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0_backward/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0_backward/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0_backward/c310/group_index_select_dim0_backward
+      [18/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/segment_sum_csr/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/segment_sum_csr_A5.stamp
+      FAILED: segment_sum_csr_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/segment_sum_csr_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/segment_sum_csr/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/segment_sum_csr_A5.stamp
+      ==========================================
+      Start Building Operator: segment_sum_csr
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/segment_sum_csr/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/segment_sum_csr/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/segment_sum_csr/c310/segment_sum_csr
+      [19/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_A5.stamp
+      FAILED: dense_embedding_codegen_lookup_function_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/dense_embedding_codegen_lookup_function_A5.stamp
+      ==========================================
+      Start Building Operator: dense_embedding_codegen_lookup_function
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_training/dense_embedding_codegen_lookup_function/c310/dense_embedding_codegen_lookup_function
+      [20/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/offsets_range/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/offsets_range_A5.stamp
+      FAILED: offsets_range_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/offsets_range_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/offsets_range/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/offsets_range_A5.stamp
+      ==========================================
+      Start Building Operator: offsets_range
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/offsets_range/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/offsets_range/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/offsets_range/c310/offsets_range
+      [21/113] cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_A5.stamp
+      FAILED: jagged_to_padded_dense_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/jagged_to_padded_dense_A5.stamp
+      ==========================================
+      Start Building Operator: jagged_to_padded_dense
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/jagged_tensor_ops/jagged_to_padded_dense/c310/jagged_to_padded_dense
+      [22/113] cd /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/int_nbit_split_embedding_codegen_lookup_function/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/int_nbit_split_embedding_codegen_lookup_function_A5.stamp
+      FAILED: int_nbit_split_embedding_codegen_lookup_function_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/int_nbit_split_embedding_codegen_lookup_function_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/int_nbit_split_embedding_codegen_lookup_function/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/int_nbit_split_embedding_codegen_lookup_function_A5.stamp
+      ==========================================
+      Start Building Operator: int_nbit_split_embedding_codegen_lookup_function
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/int_nbit_split_embedding_codegen_lookup_function/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/int_nbit_split_embedding_codegen_lookup_function/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/tbe_inference/int_nbit_split_embedding_codegen_lookup_function/c310/int_nbit_split_embedding_codegen_lookup_function
+      [23/113] cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices_from_row_idx/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_from_row_idx_A5.stamp
+      FAILED: linearize_cache_indices_from_row_idx_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_from_row_idx_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices_from_row_idx/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/linearize_cache_indices_from_row_idx_A5.stamp
+      ==========================================
+      Start Building Operator: linearize_cache_indices_from_row_idx
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices_from_row_idx/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices_from_row_idx/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/split_embeddings_cache/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx
+      [24/113] cd /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_A5.stamp
+      FAILED: group_index_select_dim0_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/group_index_select_dim0_A5.stamp
+      ==========================================
+      Start Building Operator: group_index_select_dim0
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/group_index_select/group_index_select_dim0/c310/group_index_select_dim0
+      [25/113] cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/permute2d_sparse_data/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute2d_sparse_data_A5.stamp
+      FAILED: permute2d_sparse_data_A5.stamp /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute2d_sparse_data_A5.stamp
+      cd /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/permute2d_sparse_data/c310 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E make_directory /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E env FBGEMM_ASCEND_INSTALL_PATH=/home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/ascendc_opp/A5 bash ./run.sh ai_core-Ascend950 && /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake -E touch /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build/permute2d_sparse_data_A5.stamp
+      ==========================================
+      Start Building Operator: permute2d_sparse_data
+      Target AI Core: ai_core-Ascend950
+      Work Directory : /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/permute2d_sparse_data/c310
+      ==========================================
+      ai_core ai_core-Ascend950
+      cann version: 9.0.0
+      cann major version: 9
+      /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/permute2d_sparse_data/c310/../../../scripts/op_builder_utils.sh: line 279: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+      ERROR: Source directory not found: /home/z50057629/fbgemm-ascend_4812/src/sparse_ops/permute2d_sparse_data/c310/permute2d_sparse_data
+      ninja: build stopped: subcommand failed.
+      
+      Traceback (most recent call last):
+        File "/usr/local/lib/python3.11/site-packages/skbuild/setuptools_wrap.py", line 669, in setup
+          cmkr.make(make_args, install_target=cmake_install_target, env=env)
+        File "/usr/local/lib/python3.11/site-packages/skbuild/cmaker.py", line 697, in make
+          self.make_impl(clargs=clargs, config=config, source_dir=source_dir, install_target=install_target, env=env)
+        File "/usr/local/lib/python3.11/site-packages/skbuild/cmaker.py", line 742, in make_impl
+          raise SKBuildError(msg)
+      
+      An error occurred while building with CMake.
+        Command:
+          /usr/local/lib64/python3.11/site-packages/cmake/data/bin/cmake --build . --target install --config Release --
+        Install target:
+          install
+        Source directory:
+          /home/z50057629/fbgemm-ascend_4812
+        Working directory:
+          /home/z50057629/fbgemm-ascend_4812/_skbuild/linux-x86_64-3.11/cmake-build
+      Please check the install target is valid and see CMake's output for more information.
+      
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for fbgemm_ascend
+Failed to build fbgemm_ascend
+ERROR: Failed to build one or more wheels
