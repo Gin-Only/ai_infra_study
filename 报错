@@ -1,3 +1,17 @@
+[root@localhost c310]# bash run.sh
+run.sh: line 48: /usr/local/Ascend/cann-9.0.0/bin/msopgen: cannot execute: required file not found
+
+
+
+
+
+
+
+
+
+
+
+
 [root@localhost z50057629]# cd /home/z50057629/fbgemm-ascend_4812
 [root@localhost fbgemm-ascend_4812]# bash build_whl.sh
 Looking in indexes: http://mirrors.tools.huawei.com/pypi/simple
