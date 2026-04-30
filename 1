@@ -1,812 +1,588 @@
-/**
- * Copyright (C) 2025. Huawei Technologies Co., Ltd. All rights reserved.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
-#include <torch/csrc/autograd/custom_function.h>
-#include <torch/library.h>
-
-#include "../common/pytorch_npu_helper.hpp"
-#include "../common/common_utils.h"
-
-at::Tensor linearize_cache_indices_from_row_idx_npu(
-    at::Tensor cache_hash_size_cumsum,
-    at::Tensor update_table_indices,
-    at::Tensor update_row_indices)
-{
-    const at::OptionalDeviceGuard guard(device_of(update_row_indices));
-
-    // 检查所有输入张量均在 NPU 设备上
-    std::vector<at::Tensor> tensors = {
-        cache_hash_size_cumsum,
-        update_table_indices,
-        update_row_indices
-    };
-    std::vector<std::string> names = {
-        "cache_hash_size_cumsum",
-        "update_table_indices",
-        "update_row_indices"
-    };
-    check_tensor_npu_device(tensors, names);
-
-    // 输入校验：update_row_indices 必须是 1D
-    int64_t total_length = update_row_indices.size(0);
-    TORCH_CHECK(update_row_indices.dim() == 1,
-                "update_row_indices must be 1-D, but got dim=",
-                update_row_indices.dim(), "\n");
-    TORCH_CHECK(update_table_indices.dim() == 1,
-                "update_table_indices must be 1-D, but got dim=",
-                update_table_indices.dim(), "\n");
-    TORCH_CHECK(update_table_indices.size(0) == total_length,
-                "update_table_indices and update_row_indices must have the same length, ",
-                "got ", update_table_indices.size(0), " vs ", total_length, "\n");
-
-
-    if (total_length == 0) {
-        return at::empty_like(update_row_indices);
-    }
-
-    // 保证内存连续
-    auto cache_hash_size_cumsum_contin = cache_hash_size_cumsum.contiguous();
-    auto update_table_indices_contin   = update_table_indices.contiguous();
-    auto update_row_indices_contin     = update_row_indices.contiguous();
-
-    // 输出张量：shape [K]，类型与 update_row_indices 一致
-    auto output = at::empty({total_length}, update_row_indices.options());
-
-    // 调用 NPU 算子
-    EXEC_NPU_CMD(aclnnLinearizeCacheIndicesFromRowIdx,
-                 cache_hash_size_cumsum_contin,
-                 update_table_indices_contin,
-                 update_row_indices_contin,
-                 output);
-
-    return output;
-}
-//算子注册
-TORCH_LIBRARY_FRAGMENT(mxrec, m)
-{
-    m.def("linearize_cache_indices_from_row_idx("
-          "Tensor cache_hash_size_cumsum, "
-          "Tensor update_table_indices, "
-          "Tensor update_row_indices) -> Tensor");
-}
-
-TORCH_LIBRARY_IMPL(mxrec, PrivateUse1, m)
-{
-    m.impl("linearize_cache_indices_from_row_idx",
-           &linearize_cache_indices_from_row_idx_npu);
-}
-
-TORCH_LIBRARY_IMPL(fbgemm, PrivateUse1, m)
-{
-    m.impl("linearize_cache_indices_from_row_idx",
-           &linearize_cache_indices_from_row_idx_npu);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import torch
-import numpy as np
-import fbgemm_gpu
-
-
-def ref_impl(cumsum, table_indices, row_indices):
-    return cumsum[table_indices] + row_indices
-
-
-def debug_env():
-    print("=== 环境信息 ===")
-    print("torch version:", torch.__version__)
-    print("cuda available:", torch.cuda.is_available())
-    print("fbgemm loaded:", "fbgemm" in dir(torch.ops))
-    print("has op:",
-          hasattr(torch.ops.fbgemm, "linearize_cache_indices_from_row_idx"))
-
-    if hasattr(torch.ops.fbgemm, "linearize_cache_indices_from_row_idx"):
-        print("op handle:", torch.ops.fbgemm.linearize_cache_indices_from_row_idx)
-    print()
-
-
-def run_once(device):
-    print(f"\n=== 在 {device} 上测试 ===")
-
-    # ---- 构造数据 ----
-    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
-    table_indices = np.array([0, 1, 2, 3], dtype=np.int32)
-    row_indices = np.array([10, 2, 3, 7], dtype=np.int32)
-
-    # ---- tensor ----
-    cumsum_t = torch.from_numpy(cumsum).to(torch.int64).to(device).contiguous()
-    table_indices_t = torch.from_numpy(table_indices).to(torch.int32).to(device).contiguous()
-    row_indices_t = torch.from_numpy(row_indices).to(torch.int32).to(device).contiguous()
-
-    print("cumsum:", cumsum_t)
-    print("table_indices:", table_indices_t)
-    print("row_indices:", row_indices_t)
-
-    # ---- reference ----
-    ref = ref_impl(cumsum, table_indices, row_indices)
-    print("reference:", ref)
-
-    # ---- 调用算子 ----
-    try:
-        out = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t,
-            table_indices_t,
-            row_indices_t
-        )
-
-        print("output:", out.cpu().numpy())
-        print("output dtype:", out.dtype)
-
-        ok = np.array_equal(out.cpu().numpy(), ref)
-        print("是否正确:", ok)
-
-    except Exception as e:
-        print("❌ 调用失败:", e)
-
-
-if __name__ == "__main__":
-    debug_env()
-
-    # CPU 测
-    run_once("cpu")
-
-    # CUDA 测（如果有）
-    if torch.cuda.is_available():
-        run_once("cuda")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import torch
-import numpy as np
-import fbgemm_gpu
-
-
-def reference_impl(cumsum, table_indices, row_indices):
-    """
-    Python 参考实现（绝对正确）
-    """
-    return cumsum[table_indices] + row_indices
-
-
-def run_single_test(cumsum, table_indices, row_indices, idx_dtype):
-    """
-    测试单个 dtype 情况
-    """
-    print("\n" + "=" * 60)
-    print(f"测试 row_indices dtype = {idx_dtype}")
-
-    try:
-        # ---- 构造 tensor（严格控制 dtype + contiguous）----
-        cumsum_t = torch.from_numpy(cumsum).to(torch.int64).contiguous()
-        table_indices_t = torch.from_numpy(table_indices).to(torch.int32).contiguous()
-        row_indices_t = torch.from_numpy(row_indices).to(idx_dtype).contiguous()
-
-        # ---- 调用算子 ----
-        output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t,
-            table_indices_t,
-            row_indices_t
-        )
-
-        # ---- 参考结果 ----
-        ref = reference_impl(cumsum, table_indices, row_indices)
-
-        # ---- 打印信息 ----
-        print("output dtype:", output.dtype)
-        print("output:", output.cpu().numpy())
-        print("expected:", ref)
-
-        # ---- 正确性校验 ----
-        correct = np.array_equal(output.cpu().numpy(), ref)
-        print("是否正确:", correct)
-
-    except Exception as e:
-        print("❌ 运行失败")
-        print("错误信息:", e)
-
-
-def main():
-    # ---- 测试数据 ----
-    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
-
-    table_indices = np.array(
-        [0, 0, 0, 0,
-         1, 1, 1, 1,
-         2, 2, 2, 2,
-         3, 3, 3, 3],
-        dtype=np.int32
-    )
-
-    row_indices = np.array(
-        [10, 2, 3, 7,
-         1, 4, 5, 9,
-         2, 7, 6, 8,
-         5, 1, 0, 4],
-        dtype=np.int32
-    )
-
-    # ---- 打印 schema（方便确认签名）----
-    print("算子 schema：")
-    try:
-        print(torch.ops.fbgemm.linearize_cache_indices_from_row_idx.schema)
-    except Exception:
-        print("（无法获取 schema）")
-
-    # ---- 测试不同 dtype ----
-    test_dtypes = [
-        torch.int8,
-        torch.int16,
-        torch.int32,
-        torch.int64,
-    ]
-
-    for dtype in test_dtypes:
-        run_single_test(cumsum, table_indices, row_indices, dtype)
-
-    print("\n✅ 全部测试完成")
-
-
-if __name__ == "__main__":
-    main()
-
-
-
-
-
-
-
-
-import torch
-import numpy as np
-import fbgemm_gpu
-
-def run_test(cumsum, table_indices, row_indices, dtype):
-    """
-    直接调用 torch.ops.fbgemm 算子测试
-    """
-    # 转 torch 张量
-    cumsum_t = torch.from_numpy(cumsum).to(torch.int64)  # 算子要求 cumsum 必须是 int64
-    table_indices_t = torch.from_numpy(table_indices).to(dtype)
-    row_indices_t = torch.from_numpy(row_indices).to(dtype)
-
-    # 核心：直接调用 fbgemm 算子
-    # 算子功能：根据 table 偏移 + row index 计算全局 offset
-    output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        cumsum_t,
-        table_indices_t,
-        row_indices_t
-    )
-
-    # 打印输出对比
-    print(f"\n测试 dtype = {dtype}")
-    print("算子输出:", output.numpy())
-    print("期望输出:", expected)
-    print("是否一致:", np.allclose(output.numpy(), expected))
-
-    return output
-
-
-if __name__ == "__main__":
-    # 4 张表，table_2 未缓存
-    cumsum = np.array([0, 12, 24, 36, 48], dtype=np.int64)
-    table_indices = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3], dtype=np.int32)
-    row_indices = np.array([10, 2, 3, 7, 1, 4, 5, 9, 2, 7, 6, 8, 5, 1, 0, 4], dtype=np.int32)
-    expected = np.array([10, 2, 3, 7, 13, 16, 17, 21, 26, 31, 30, 32, 41, 37, 36, 40], dtype=np.int32)
-
-    # ------------------- 测试 int32 -------------------
-    run_test(cumsum, table_indices, row_indices, torch.int32)
-    
-    # ------------------- 测试 int64 -------------------
-    run_test(cumsum, table_indices, row_indices, torch.int64)
-
-    print("\n✅ 全部测试完成")
-root@localhost:/# python /home/z50057629/rec-test0/RecSDK-develop/cust_op/test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py
-
-测试 dtype = torch.int32
-算子输出: [  15732481 -670105301 1284247820   19596272  302899215   99638412
- -267452117  319684614  133192844 -267452117  319684616  166747276
- -267452117  370212874  200281236 -267452117]
-期望输出: [10  2  3  7 13 16 17 21 26 31 30 32 41 37 36 40]
-是否一致: False
-
-测试 dtype = torch.int64
-算子输出: [     140509258316544      140509258316544                    0
-                    0    67555463308119024    80502874153812254
-    96265670411419990 -2881935420658990352    94295259725435661
-  5692842424591386080 -1152553163748741119   720839828790381056
-  2386063510451867393  5836964218328917464 -2881933221535092735
-    94858235448660749]
-期望输出: [10  2  3  7 13 16 17 21 26 31 30 32 41 37 36 40]
-是否一致: False
-
-✅ 全部测试完成
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-========================================================================================================================================== FAILURES ==========================================================================================================================================
-_______________________________________________________________________________________________________________________________ test_large_scale[index_dtype0] _______________________________________________________________________________________________________________________________
-
-index_dtype = torch.int32
-
-    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-    def test_large_scale(index_dtype):
-        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
-        num_tables = 32
-        table_cache_size = 1024
-        num_updates = 100000
-        uncached_tables = {5, 10, 20}
-    
-        cumsum, table_indices, row_indices = generate_test_data(
-            num_tables, table_cache_size, num_updates, index_dtype,
-            uncached_tables=uncached_tables, pruned_ratio=0.1
-        )
->       run_test(cumsum, table_indices, row_indices, index_dtype)
-
-../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
-        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
-       24576, 25600, 26624, 27648, 28672, 29696])
-table_indices_np = array([17, 18, 10, ...,  7, 30, 31], shape=(100000,), dtype=int32), row_indices_np = array([333, 797, 627, ..., 808, 301, 265], shape=(100000,), dtype=int32), index_dtype = torch.int32
-
-    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
-        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
-        # CPU 参考结果
-        ref_output = linearize_cache_indices_from_row_idx_ref(
-            cumsum_np, table_indices_np, row_indices_np
-        )
-    
-        # 转换为 Tensor 并移至 NPU
-        cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
-        table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
-        row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
-        print(cumsum_t)
-        print(table_indices_t)
-        print(row_indices_t)
-    
-        table_indices_npu = table_indices_t.to(torch.int32)
-        row_indices_npu = row_indices_t.to(torch.int32)
-    
-        # 调用 NPU 算子
-        npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_npu, row_indices_npu
-        )
-    
-        # 输出转回用户指定 dtype（保证断言通过）
-        npu_output = npu_output_int32.to(index_dtype)
-        # 调用 NPU 算子
-        # npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        #     cumsum_t, table_indices_t, row_indices_t
-        # )
-        print(npu_output)
-    
-        # 验证输出形状
-        assert npu_output.shape == row_indices_t.shape, \
-            f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
-    
-        # 验证输出 dtype 与 update_row_indices 一致
-        assert npu_output.dtype == index_dtype, \
-            f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
-    
-        # 数值对比
-        ref_t = torch.from_numpy(ref_output).to(index_dtype)
-        npu_cpu = npu_output.cpu()
->       assert torch.equal(ref_t, npu_cpu), \
-            f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
-E       AssertionError: Value mismatch:
-E         ref:  tensor([15693, 17181, 29696,  ...,  6952, 27949, 28937], dtype=torch.int32)
-E         npu:  tensor([15693, 17181, 29696,  ...,     0,     0,     0], dtype=torch.int32)
-E       assert False
-E        +  where False = <built-in method equal of type object at 0x7f8743deac20>(tensor([15693, 17181, 29696,  ...,  6952, 27949, 28937], dtype=torch.int32), tensor([15693, 17181, 29696,  ...,     0,     0,     0], dtype=torch.int32))
-E        +    where <built-in method equal of type object at 0x7f8743deac20> = torch.equal
-
-../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:167: AssertionError
------------------------------------------------------------------------------------------------------------------------------------- Captured stdout call ------------------------------------------------------------------------------------------------------------------------------------
-tensor([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,  8192,
-           -1,  9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408,
-           -1, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624,
-        27648, 28672, 29696], device='npu:0')
-tensor([17, 18, 10,  ...,  7, 30, 31], device='npu:0', dtype=torch.int32)
-tensor([333, 797, 627,  ..., 808, 301, 265], device='npu:0', dtype=torch.int32)
-tensor([15693, 17181, 29696,  ...,     0,     0,     0], device='npu:0',
-       dtype=torch.int32)
-_______________________________________________________________________________________________________________________________ test_large_scale[index_dtype1] _______________________________________________________________________________________________________________________________
-
-index_dtype = torch.int64
-
-    @pytest.mark.parametrize("index_dtype", INDEX_DTYPE_LIST)
-    def test_large_scale(index_dtype):
-        """大规模测试：N=100000，验证 NPU 与参考实现一致。"""
-        num_tables = 32
-        table_cache_size = 1024
-        num_updates = 100000
-        uncached_tables = {5, 10, 20}
-    
-        cumsum, table_indices, row_indices = generate_test_data(
-            num_tables, table_cache_size, num_updates, index_dtype,
-            uncached_tables=uncached_tables, pruned_ratio=0.1
-        )
->       run_test(cumsum, table_indices, row_indices, index_dtype)
-
-../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:400: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-cumsum_np = array([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,
-        8192,    -1,  9216, 10240, 11264, 12288,...       16384, 17408,    -1, 18432, 19456, 20480, 21504, 22528, 23552,
-       24576, 25600, 26624, 27648, 28672, 29696])
-table_indices_np = array([21,  2, 25, ...,  7,  3,  7], shape=(100000,), dtype=int32), row_indices_np = array([135, 421,  34, ..., 447,  19, 594], shape=(100000,), dtype=int32), index_dtype = torch.int64
-
-    def run_test(cumsum_np, table_indices_np, row_indices_np, index_dtype):
-        """核心测试逻辑：对比 CPU 参考实现与 NPU 算子输出。"""
-        # CPU 参考结果
-        ref_output = linearize_cache_indices_from_row_idx_ref(
-            cumsum_np, table_indices_np, row_indices_np
-        )
-    
-        # 转换为 Tensor 并移至 NPU
-        cumsum_t = torch.from_numpy(cumsum_np).to(torch.int64).to(DEVICE)
-        table_indices_t = torch.from_numpy(table_indices_np).to(index_dtype).to(DEVICE)
-        row_indices_t = torch.from_numpy(row_indices_np).to(index_dtype).to(DEVICE)
-        print(cumsum_t)
-        print(table_indices_t)
-        print(row_indices_t)
-    
-        table_indices_npu = table_indices_t.to(torch.int32)
-        row_indices_npu = row_indices_t.to(torch.int32)
-    
-        # 调用 NPU 算子
-        npu_output_int32 = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-            cumsum_t, table_indices_npu, row_indices_npu
-        )
-    
-        # 输出转回用户指定 dtype（保证断言通过）
-        npu_output = npu_output_int32.to(index_dtype)
-        # 调用 NPU 算子
-        # npu_output = torch.ops.fbgemm.linearize_cache_indices_from_row_idx(
-        #     cumsum_t, table_indices_t, row_indices_t
-        # )
-        print(npu_output)
-    
-        # 验证输出形状
-        assert npu_output.shape == row_indices_t.shape, \
-            f"Shape mismatch: expected {row_indices_t.shape}, got {npu_output.shape}"
-    
-        # 验证输出 dtype 与 update_row_indices 一致
-        assert npu_output.dtype == index_dtype, \
-            f"dtype mismatch: expected {index_dtype}, got {npu_output.dtype}"
-    
-        # 数值对比
-        ref_t = torch.from_numpy(ref_output).to(index_dtype)
-        npu_cpu = npu_output.cpu()
->       assert torch.equal(ref_t, npu_cpu), \
-            f"Value mismatch:\nref:  {ref_t}\nnpu:  {npu_cpu}"
-E       AssertionError: Value mismatch:
-E         ref:  tensor([18567,  2469, 22562,  ...,  6591,  3091,  6738])
-E         npu:  tensor([18567,  2469, 22562,  ...,     0,     0,     0])
-E       assert False
-E        +  where False = <built-in method equal of type object at 0x7f8743deac20>(tensor([18567,  2469, 22562,  ...,  6591,  3091,  6738]), tensor([18567,  2469, 22562,  ...,     0,     0,     0]))
-E        +    where <built-in method equal of type object at 0x7f8743deac20> = torch.equal
-
-../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py:167: AssertionError
------------------------------------------------------------------------------------------------------------------------------------- Captured stdout call ------------------------------------------------------------------------------------------------------------------------------------
-tensor([    0,  1024,  2048,  3072,  4096,    -1,  5120,  6144,  7168,  8192,
-           -1,  9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408,
-           -1, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624,
-        27648, 28672, 29696], device='npu:0')
-tensor([21,  2, 25,  ...,  7,  3,  7], device='npu:0')
-tensor([135, 421,  34,  ..., 447,  19, 594], device='npu:0')
-tensor([18567,  2469, 22562,  ...,     0,     0,     0], device='npu:0')
-================================================================================================================================== short test summary info ===================================================================================================================================
-FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype0] - AssertionError: Value mismatch:
-FAILED ../../../../test/linearize_cache_indices_from_row_idx_test/test_linearize_cache_indices_from_row_idx.py::test_large_scale[index_dtype1] - AssertionError: Value mismatch:
-=============================================================================================================================== 2 failed, 143 passed in 25.25s =======================
-
-
-
-
-
-
-
-
-
-
-
-Compile op info cfg successfully.
-[ 66%] Built target ops_info_gen_ascend950
-[100%] Linking CXX shared library libcust_opmaster_rt2.0.so
-[100%] Built target cust_optiling
-Traceback (most recent call last):
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 216, in <module>
-    kernel_builder.ascendc_gen_param()
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_compile_kernel.py", line 87, in ascendc_gen_param
-    ascendc_bin_param_build.gen_bin_param_file(
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_bin_param_build.py", line 530, in gen_bin_param_file
-    op_desc.gen_input_json(auto_gen_path_dir)
-  File "/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/cmake/util/ascendc_bin_param_build.py", line 229, in gen_input_json
-    count = len(self.output_dtype[0].split(','))
-                ~~~~~~~~~~~~~~~~~^^^
-IndexError: list index out of range
-gmake[3]: *** [op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/build.make:70: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950] Error 1
-gmake[2]: *** [CMakeFiles/Makefile2:425: op_kernel/CMakeFiles/LinearizeCacheIndicesFromRowIdx_ascend950.dir/all] Error 2
-gmake[1]: *** [CMakeFiles/Makefile2:379: op_kernel/CMakeFiles/binary.dir/rule] Error 2
-gmake: *** [Makefile:293: binary] Error 2
-Consolidate compiler generated dependencies of target cust_optiling
-[  8%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/__/autogen/op_proto.cc.o
-[ 16%] Building CXX object op_host/CMakeFiles/cust_op_proto.dir/linearize_cache_indices_from_row_idx.cpp.o
-[ 25%] Generating scripts/install.sh, scripts/upgrade.sh
-[ 33%] Generating tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 41%] Built target ops_info_gen_ascend950
-[ 41%] Built target gen_version_info
-[ 50%] Building CXX object framework/tf_plugin/CMakeFiles/cust_tf_parsers.dir/tensorflow_linearize_cache_indices_from_row_idx_plugin.cc.o
-[ 58%] Building CXX object op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o
-[ 75%] Built target cust_optiling
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core
-[ 75%] Built target modify_vendor
-[ 75%] Built target optiling_compat
-[INFO] Succed generated /home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/op_kernel/tbe/op_info_cfg/ai_core/npu_supported_ops.json
-[ 75%] Built target npu_supported_ops
-/home/z50057629/rec-test0/RecSDK-develop/cust_op/ascendc_op/ai_core_op/linearize_cache_indices_from_row_idx/c310/linearize_cache_indices_from_row_idx/build_out/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp:55:41: error: 'socSupportInfo0' was not declared in this scope; did you mean 'OpSocSupportInfo'?
-   55 | OpSocSupportInfo opSocSupportList[1] = {socSupportInfo0};
-      |                                         ^~~~~~~~~~~~~~~
-      |                                         OpSocSupportInfo
-gmake[2]: *** [op_host/CMakeFiles/cust_opapi.dir/build.make:76: op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_linearize_cache_indices_from_row_idx.cpp.o] Error 1
-gmake[1]: *** [CMakeFiles/Makefile2:294: op_host/CMakeFiles/cust_opapi.dir/all] Error 2
-gmake[1]: *** Waiting for unfinished jobs....
-[ 83%] Linking CXX shared library libcust_tf_parsers.so
-[ 83%] Built target cust_tf_parsers
-[ 91%] Linking CXX shared library libcust_opsproto_rt2.0.so
-[ 91%] Built target cust_op_proto
-gmake: *** [Makefile:156: all] Error 2
-
-
-
-
-
-
-
-
-
-
-
-
-/* Copyright (c) Huawei Technologies Co., Ltd. 2025-2026. All rights reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-        limitations under the License.
-==============================================================================*/
-
-#include <cstdint>
-#include "tiling/platform/platform_ascendc.h"
-#include "register/op_def_registry.h"
-#include "ops_log.h"
-#include "linearize_cache_indices_from_row_idx_tiling.h"
-
-namespace {
-    constexpr uint32_t MAX_THREAD_COUNT = 2048;
-    constexpr uint32_t MAX_BLOCK_COUNT  = 65535;
-}
-
-namespace optiling {
-
-static ge::graphStatus TilingFunc(gert::TilingContext* context)
-{
-    OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
-    OPS_LOG_E_IF_NULL("cache_hash_size_cumsumShape", context->GetInputShape(0), return ge::GRAPH_FAILED);
-    OPS_LOG_E_IF_NULL("update_table_indicesShape",   context->GetInputShape(1), return ge::GRAPH_FAILED);
-    OPS_LOG_E_IF_NULL("update_row_indicesTensor",    context->GetInputTensor(2), return ge::GRAPH_FAILED);
-
-    int64_t totalLength  = context->GetInputShape(2)->GetOriginShape().GetShapeSize();
-    int64_t cumsumLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
-
-    uint32_t dimNumRow = context->GetInputShape(2)->GetOriginShape().GetDimNum();
-    OPS_LOG_E_IF(dimNumRow != 1, context, return ge::GRAPH_FAILED,
-                 "[ERROR]LinearizeCacheIndicesFromRowIdx: update_row_indices must be 1-D");
-
-    ge::DataType inputDataType = context->GetInputTensor(2)->GetDataType();
-    OPS_CHECK(inputDataType != ge::DT_INT32 && inputDataType != ge::DT_INT64,
-              OPS_LOG_E("[ERROR]Invalid data type",
-                        "LinearizeCacheIndicesFromRowIdx only supports int64 and int32."),
-              return ge::GRAPH_FAILED);
-
-    auto ascendPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-    uint32_t realCoreNum = static_cast<uint32_t>(ascendPlatform.GetCoreNumAiv());
-
-    // Step 1: 固定用满线程
-    uint32_t blockDim = MAX_THREAD_COUNT;
-
-    // Step 2: 动态计算每个 thread 处理的元素数，确保覆盖所有元素
-    int64_t dataPerThread = (totalLength + (int64_t)blockDim * MAX_BLOCK_COUNT - 1)
-                            / ((int64_t)blockDim * MAX_BLOCK_COUNT);
-    if (dataPerThread < 1) dataPerThread = 1;
-
-    // Step 3: 反推实际需要的 gridDim
-    uint32_t gridDim = (uint32_t)((totalLength + (int64_t)blockDim * dataPerThread - 1)
-                                  / ((int64_t)blockDim * dataPerThread));
-    if (gridDim == 0) gridDim = 1;
-
-    size_t* workspaceSize = context->GetWorkspaceSizes(1);
-    OPS_LOG_E_IF_NULL("workspaceSize", workspaceSize, return ge::GRAPH_FAILED);
-    workspaceSize[0] = ascendPlatform.GetLibApiWorkSpaceSize();
-
-    LinearizeCacheIndicesFromRowIdxTilingData tiling;
-    tiling.set_totalLength(totalLength);
-    tiling.set_cumsumLength(cumsumLength);
-    tiling.set_dataPerThread(dataPerThread);
-    tiling.set_gridDim(gridDim);
-    tiling.set_blockDim(blockDim);
-
-    // 框架将 gridDim 个线程块分发到各 AI Core，用满所有核
-    context->SetBlockDim(realCoreNum);
-
-    OPS_LOG_INFO(context,
-                 "LinearizeCacheIndicesFromRowIdx SIMT tiling: totalLength=%ld cumsumLength=%ld "
-                 "dataPerThread=%ld gridDim=%u blockDim=%u realCoreNum=%u",
-                 totalLength, cumsumLength, dataPerThread, gridDim, blockDim, realCoreNum);
-
-    OPS_LOG_E_IF_NULL("raw tilingData", context->GetRawTilingData(), return ge::GRAPH_FAILED);
-    tiling.SaveToBuffer(context->GetRawTilingData()->GetData(),
-                        context->GetRawTilingData()->GetCapacity());
-    context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
-
-    return ge::GRAPH_SUCCESS;
-}
-
-} // namespace optiling
-
-namespace ge {
-
-static ge::graphStatus InferShape(gert::InferShapeContext* context)
-{
-    OPS_LOG_E_IF_NULL("context", context, return ge::GRAPH_FAILED);
-    const gert::Shape* rowIdxShape = context->GetInputShape(2);
-    OPS_LOG_E_IF_NULL("update_row_indices shape", rowIdxShape, return ge::GRAPH_FAILED);
-    gert::Shape* outShape = context->GetOutputShape(0);
-    OPS_LOG_E_IF_NULL("output shape", outShape, return ge::GRAPH_FAILED);
-    *outShape = *rowIdxShape;
-    return GRAPH_SUCCESS;
-}
-
-static ge::graphStatus InferDataType(gert::InferDataTypeContext* context)
-{
-    auto inputDataType = context->GetInputDataType(2);
-    if (ge::GRAPH_SUCCESS != context->SetOutputDataType(0, inputDataType)) {
-        return ge::GRAPH_FAILED;
-    }
-    return ge::GRAPH_SUCCESS;
-}
-
-} // namespace ge
-
-namespace ops {
-
-class LinearizeCacheIndicesFromRowIdx : public OpDef {
-public:
-    explicit LinearizeCacheIndicesFromRowIdx(const char* name) : OpDef(name)
-    {
-        this->Input("cache_hash_size_cumsum")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_INT64})
-            .FormatList({ge::FORMAT_ND})
-            .UnknownShapeFormat({ge::FORMAT_ND});
-
-        this->Input("update_table_indices")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_INT32, ge::DT_INT64})
-            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
-            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
-
-        this->Input("update_row_indices")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_INT32, ge::DT_INT64})
-            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
-            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
-
-        this->Output("linear_cache_indices")
-            .ParamType(REQUIRED)
-            .DataType({ge::DT_INT32, ge::DT_INT64})
-            .FormatList({ge::FORMAT_ND, ge::FORMAT_ND})
-            .UnknownShapeFormat({ge::FORMAT_ND, ge::FORMAT_ND});
-
-        this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-        this->AICore().SetTiling(optiling::TilingFunc);
-        this->AICore().AddConfig("ascend950");
-    }
-};
-
-OP_ADD(LinearizeCacheIndicesFromRowIdx);
-
-} // namespace ops
+root@localhost c310]# ls /usr/local/Ascend/
+add-ons         cann        cann-9.0.T500  cann_uninstall.sh  firmware  host_servers_remove.sh  host_services_exit.sh   host_sys_init.sh  share    tools         x86_64-linux
+ascend-toolkit  cann-9.0.0  cann-9.0.T501  driver             home      host_servers_setup.sh   host_services_setup.sh  nnal              toolbox  version.info
+[root@localhost c310]# find / -name "msopgen" 2>/dev/null
+/root/openeuler/data/f00619941/cann/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/data/f00619941/cann/cann-9.0.T501/tools/msopgen
+/root/openeuler/data/f00619941/cann/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/data/f00619941/cann/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/data/z00603376/cann-9.0.T501_copy/x86_64-linux/bin/msopgen
+/root/openeuler/data/z00603376/cann-9.0.T501_copy/tools/msopgen
+/root/openeuler/data/z00603376/cann-9.0.T501_copy/python/site-packages/bin/msopgen
+/root/openeuler/data/z00603376/cann-9.0.T501_copy/python/site-packages/msopgen
+/root/openeuler/data/m00836041/0401/CANN/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/data/m00836041/0401/CANN/cann-9.0.T501/tools/msopgen
+/root/openeuler/data/m00836041/0401/CANN/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/data/m00836041/0401/CANN/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/data/m00836041/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/data/m00836041/cann/cann-9.0.0/tools/msopgen
+/root/openeuler/data/m00836041/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/data/m00836041/cann/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/data/y00833227/tools/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/data/y00833227/tools/cann/cann-9.0.0/tools/msopgen
+/root/openeuler/data/y00833227/tools/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/data/y00833227/tools/cann/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/data/l00945983/CANN/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/data/l00945983/CANN/cann-9.0.T501/tools/msopgen
+/root/openeuler/data/l00945983/CANN/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/data/l00945983/CANN/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/data/w00590050/cann/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/data/w00590050/cann/cann-9.0.T501/tools/msopgen
+/root/openeuler/data/w00590050/cann/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/data/w00590050/cann/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/data/cann_b103/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/data/cann_b103/cann-9.0.0/tools/msopgen
+/root/openeuler/data/cann_b103/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/data/cann_b103/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/data/z00573109/cann_0415/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/data/z00573109/cann_0415/cann-9.0.0/tools/msopgen
+/root/openeuler/data/z00573109/cann_0415/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/data/z00573109/cann_0415/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/data/tqy/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/data/tqy/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/data/tqy/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/data/tqy/cann-9.0.T500/tools/msopgen
+/root/openeuler/data/tqy/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/data/tqy/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/data/h00804131/gr_cann/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/data/h00804131/gr_cann/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/data/h00804131/gr_cann/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/data/h00804131/gr_cann/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/179919ac307ba125e48e2112771eec5bf56f93080a7f4e529c050eab26304940/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/179919ac307ba125e48e2112771eec5bf56f93080a7f4e529c050eab26304940/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/179919ac307ba125e48e2112771eec5bf56f93080a7f4e529c050eab26304940/diff/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/179919ac307ba125e48e2112771eec5bf56f93080a7f4e529c050eab26304940/diff/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/179919ac307ba125e48e2112771eec5bf56f93080a7f4e529c050eab26304940/diff/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f60db3dfed39d3bf8657449357393c3ef9f69ecd39a637df5472300ec393b11d/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f60db3dfed39d3bf8657449357393c3ef9f69ecd39a637df5472300ec393b11d/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f60db3dfed39d3bf8657449357393c3ef9f69ecd39a637df5472300ec393b11d/diff/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f60db3dfed39d3bf8657449357393c3ef9f69ecd39a637df5472300ec393b11d/diff/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b1ea7c83921e4aa71600adfadf85d56327ac852b3b91c5acc25e2627f6608569/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/1542cf655fd757002069bc9f1430245c2dcc4759431d2c6da2b0621478f2aa33/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cwzmo22d73w9yozud43x3nwo4/diff/usr/local/Ascend/cann-A2/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cwzmo22d73w9yozud43x3nwo4/diff/usr/local/Ascend/cann-A2/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/cwzmo22d73w9yozud43x3nwo4/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cwzmo22d73w9yozud43x3nwo4/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/khi5fgfzx2v6zpb7w502fohze/diff/usr/local/Ascend/cann-9.0.T550/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/khi5fgfzx2v6zpb7w502fohze/diff/usr/local/Ascend/cann-9.0.T550/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/khi5fgfzx2v6zpb7w502fohze/diff/usr/local/Ascend/cann-9.0.T550/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/khi5fgfzx2v6zpb7w502fohze/diff/usr/local/Ascend/cann-9.0.T550/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/3fbab08f12108f18843f8f46c4283261aa6ccdc05daeb7388aab12bc2b7ecc59/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/3fbab08f12108f18843f8f46c4283261aa6ccdc05daeb7388aab12bc2b7ecc59/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/3fbab08f12108f18843f8f46c4283261aa6ccdc05daeb7388aab12bc2b7ecc59/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/3fbab08f12108f18843f8f46c4283261aa6ccdc05daeb7388aab12bc2b7ecc59/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/4d0d4ee150aa10ab11ddd3787cc4e6d7a9f6e4331afe9a3f752179fc15418032/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4d0d4ee150aa10ab11ddd3787cc4e6d7a9f6e4331afe9a3f752179fc15418032/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/4d0d4ee150aa10ab11ddd3787cc4e6d7a9f6e4331afe9a3f752179fc15418032/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4d0d4ee150aa10ab11ddd3787cc4e6d7a9f6e4331afe9a3f752179fc15418032/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/f9807fdd3401ac74ffe2a26519aa3c0f402d1c7bb0062efebbdeeb9ab3be138e/diff/usr/local/Ascend/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f9807fdd3401ac74ffe2a26519aa3c0f402d1c7bb0062efebbdeeb9ab3be138e/diff/usr/local/Ascend/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f9807fdd3401ac74ffe2a26519aa3c0f402d1c7bb0062efebbdeeb9ab3be138e/diff/usr/local/python3.7.5/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/ascend-toolkit/8.3.RC2/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/ascend-toolkit/8.3.RC2/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/a9914b459de7668d9ff8090f2155f4c465220505ba00760ac7224b7bd5025364/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/02c304dd5404ae9b3d512f3b46b07ef951673f0071b74bf22e9a73bc260e7e25/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/02c304dd5404ae9b3d512f3b46b07ef951673f0071b74bf22e9a73bc260e7e25/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/02c304dd5404ae9b3d512f3b46b07ef951673f0071b74bf22e9a73bc260e7e25/diff/usr/local/Ascend/ascend-toolkit/8.2.RC1/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/02c304dd5404ae9b3d512f3b46b07ef951673f0071b74bf22e9a73bc260e7e25/diff/usr/local/Ascend/ascend-toolkit/8.2.RC1/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e296519f46f193e08a796f7683fa77ac325fdecea8deba48128af42453910a47/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/2389a20cb15f9eec652abe9c348426bb79d71c0a648aeedde86db03da2446d04/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2389a20cb15f9eec652abe9c348426bb79d71c0a648aeedde86db03da2446d04/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/2389a20cb15f9eec652abe9c348426bb79d71c0a648aeedde86db03da2446d04/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2389a20cb15f9eec652abe9c348426bb79d71c0a648aeedde86db03da2446d04/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/zfxhwpu368nt1x7773lckj814/diff/usr/local/Ascend/cann-A5/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/zfxhwpu368nt1x7773lckj814/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/33923c84008d97b35e4cde96116dddef7100dd7ece7fef01b5f99195d46b97fa/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/33923c84008d97b35e4cde96116dddef7100dd7ece7fef01b5f99195d46b97fa/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/33923c84008d97b35e4cde96116dddef7100dd7ece7fef01b5f99195d46b97fa/diff/usr/local/Ascend/ascend-toolkit/8.3.RC2/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/33923c84008d97b35e4cde96116dddef7100dd7ece7fef01b5f99195d46b97fa/diff/usr/local/Ascend/ascend-toolkit/8.3.RC2/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4def2867fd5ddc21f5404326e3eccec8e78c1046e3e78e9be6fe752f5d767e0a/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/93c02b69e9f9fcf9a5a73b32371aec4de00ce8c48c2651267383458396a621f7/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/Ascend/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/b56c895afae1f8941fa7e9b93f46bbdae738047c620263c9495cf598a0cae932/merged/usr/local/python3.7.5/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1965778f7d882b8c96d2f4e4fa2ff2e54efe23bf3f59eca9e0e20d5e63fd80d3/diff/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1965778f7d882b8c96d2f4e4fa2ff2e54efe23bf3f59eca9e0e20d5e63fd80d3/diff/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/1965778f7d882b8c96d2f4e4fa2ff2e54efe23bf3f59eca9e0e20d5e63fd80d3/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1965778f7d882b8c96d2f4e4fa2ff2e54efe23bf3f59eca9e0e20d5e63fd80d3/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb3f3f9a6047433b5eae6e5971d8476dce142216c50e5016f9c2019716c11344/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb3f3f9a6047433b5eae6e5971d8476dce142216c50e5016f9c2019716c11344/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb3f3f9a6047433b5eae6e5971d8476dce142216c50e5016f9c2019716c11344/diff/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb3f3f9a6047433b5eae6e5971d8476dce142216c50e5016f9c2019716c11344/diff/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ec5b25534a7dc6001301370541cad0afe2174955cf712f59c589e4a4c051107e/merged/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ec5b25534a7dc6001301370541cad0afe2174955cf712f59c589e4a4c051107e/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ec5b25534a7dc6001301370541cad0afe2174955cf712f59c589e4a4c051107e/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ec5b25534a7dc6001301370541cad0afe2174955cf712f59c589e4a4c051107e/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ec5b25534a7dc6001301370541cad0afe2174955cf712f59c589e4a4c051107e/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/dd7d0bf4ffa1af41acb59a6d1bb800430a6a13cb81b81085e77210e229e2db52/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dd7d0bf4ffa1af41acb59a6d1bb800430a6a13cb81b81085e77210e229e2db52/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/dd7d0bf4ffa1af41acb59a6d1bb800430a6a13cb81b81085e77210e229e2db52/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dd7d0bf4ffa1af41acb59a6d1bb800430a6a13cb81b81085e77210e229e2db52/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/fb05c5d6caacfa5db98bba5a161034d2244906f1a9bd6735760a4983db11cbac/diff/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/30463387b09821940cce85605150a255e803d96bb96cca69b3c7c7020200abe8/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/30463387b09821940cce85605150a255e803d96bb96cca69b3c7c7020200abe8/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/30463387b09821940cce85605150a255e803d96bb96cca69b3c7c7020200abe8/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/30463387b09821940cce85605150a255e803d96bb96cca69b3c7c7020200abe8/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/edd4ba57c464486ba7ddf5439676457f5efba5444bf4337fbce211ab46dc361f/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/edd4ba57c464486ba7ddf5439676457f5efba5444bf4337fbce211ab46dc361f/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/edd4ba57c464486ba7ddf5439676457f5efba5444bf4337fbce211ab46dc361f/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/edd4ba57c464486ba7ddf5439676457f5efba5444bf4337fbce211ab46dc361f/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/528z496b0l5apu1qirgqsc7k2/diff/usr/local/Ascend/cann-A3/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/528z496b0l5apu1qirgqsc7k2/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/1bwpuu2w2252r8aamhp68nwsv/diff/usr/local/Ascend/cann-A5/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1bwpuu2w2252r8aamhp68nwsv/diff/usr/local/Ascend/cann-A5/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/1bwpuu2w2252r8aamhp68nwsv/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1bwpuu2w2252r8aamhp68nwsv/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/daf844517ef4801bed124d19272256523acb2a68248204fd4e34e28b217538b8/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/52c071a16635721e8fe90965ed32c40950b9c03a14aee0cbf4ab79c481e04d49/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/52c071a16635721e8fe90965ed32c40950b9c03a14aee0cbf4ab79c481e04d49/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/52c071a16635721e8fe90965ed32c40950b9c03a14aee0cbf4ab79c481e04d49/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/52c071a16635721e8fe90965ed32c40950b9c03a14aee0cbf4ab79c481e04d49/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/840c0ddb5ba12f6eb860d1385562e4c7da02988b273477c651abcf1b25219afb/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/840c0ddb5ba12f6eb860d1385562e4c7da02988b273477c651abcf1b25219afb/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/840c0ddb5ba12f6eb860d1385562e4c7da02988b273477c651abcf1b25219afb/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/840c0ddb5ba12f6eb860d1385562e4c7da02988b273477c651abcf1b25219afb/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/840c0ddb5ba12f6eb860d1385562e4c7da02988b273477c651abcf1b25219afb/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/b5cb26d083eac77b7b2e362bdf55db177860a1cd24d6ca1fcc03948b45e87d39/diff/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/63d5184c3937804077c89973fdfa4a15d7ce29f063a225d2117285ab9597cc21/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/63d5184c3937804077c89973fdfa4a15d7ce29f063a225d2117285ab9597cc21/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/63d5184c3937804077c89973fdfa4a15d7ce29f063a225d2117285ab9597cc21/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/63d5184c3937804077c89973fdfa4a15d7ce29f063a225d2117285ab9597cc21/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/63d5184c3937804077c89973fdfa4a15d7ce29f063a225d2117285ab9597cc21/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/65f2690d94fd01084f592421f426dcab4407ec46a524b406c4aaf04d11a0de66/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/65f2690d94fd01084f592421f426dcab4407ec46a524b406c4aaf04d11a0de66/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/65f2690d94fd01084f592421f426dcab4407ec46a524b406c4aaf04d11a0de66/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/65f2690d94fd01084f592421f426dcab4407ec46a524b406c4aaf04d11a0de66/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/0a608e79e84a126c10077bde12fcb840e30e3257aac7428ead41fdff4dea21b1/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/0a608e79e84a126c10077bde12fcb840e30e3257aac7428ead41fdff4dea21b1/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/0a608e79e84a126c10077bde12fcb840e30e3257aac7428ead41fdff4dea21b1/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/0a608e79e84a126c10077bde12fcb840e30e3257aac7428ead41fdff4dea21b1/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/snkcibb9pfr7aphm2cde364rv/diff/usr/local/Ascend/cann-A2/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/snkcibb9pfr7aphm2cde364rv/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/195b9a4a6dd0fc28e1b9ff8563ef793ee2276d9697c873665d60d155e851e568/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/195b9a4a6dd0fc28e1b9ff8563ef793ee2276d9697c873665d60d155e851e568/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/195b9a4a6dd0fc28e1b9ff8563ef793ee2276d9697c873665d60d155e851e568/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/195b9a4a6dd0fc28e1b9ff8563ef793ee2276d9697c873665d60d155e851e568/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/501dd64b14a1bb64e314800b8493b82532894002d9b084f3f9db89c8574d3206/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/l8l4q0mamtngsw0d190701tbj/diff/usr/local/Ascend/cann-A3/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/l8l4q0mamtngsw0d190701tbj/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/668da0493a1897d05b1dd82c1399e18fc634aacc757aceeea7c43f6cf3035c6a/diff/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/668da0493a1897d05b1dd82c1399e18fc634aacc757aceeea7c43f6cf3035c6a/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/668da0493a1897d05b1dd82c1399e18fc634aacc757aceeea7c43f6cf3035c6a/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/668da0493a1897d05b1dd82c1399e18fc634aacc757aceeea7c43f6cf3035c6a/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/668da0493a1897d05b1dd82c1399e18fc634aacc757aceeea7c43f6cf3035c6a/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/Ascend/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ad4e6223592877b968827870eee57da7b109c5f9e5c49bc53cec1fb2a79d8d66/merged/usr/local/python3.7.5/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7f3409dedb34233f2d7b0e0c3ff6b19b2024bd0a80c377d0811d0067a6e9b27/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/2a503a6142bd28bc4e76745456e898d93ff7c6342acef13f76ed73a3f325ab3a/merged/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2a503a6142bd28bc4e76745456e898d93ff7c6342acef13f76ed73a3f325ab3a/merged/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/2a503a6142bd28bc4e76745456e898d93ff7c6342acef13f76ed73a3f325ab3a/merged/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/2a503a6142bd28bc4e76745456e898d93ff7c6342acef13f76ed73a3f325ab3a/merged/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/0iwbc0qyt0g2w7yhvfszzp5kt/diff/usr/local/Ascend/cann-A2/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/0iwbc0qyt0g2w7yhvfszzp5kt/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d968785d6bada6904fda79e14c108a1ba0a009a33a0ca4223b5cb72b5b4ce911/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/2eb604fb31ee2e456182b677173929e1afb8b5b22c735bce5275a21b6226374f/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/to659yn24kqwgnwwv22taarod/diff/usr/local/Ascend/cann-A2/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/to659yn24kqwgnwwv22taarod/diff/usr/local/Ascend/cann-A2/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/to659yn24kqwgnwwv22taarod/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/to659yn24kqwgnwwv22taarod/diff/usr/local/Ascend/cann-A2/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/39fc801aede8b96d27838e202816c78cd76ce58573b0026429b57a82e5021af3/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/09664260c2fb625f9186c7764784be47d28b52897e1d2185bdfc9b78ca711e86/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/09664260c2fb625f9186c7764784be47d28b52897e1d2185bdfc9b78ca711e86/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/09664260c2fb625f9186c7764784be47d28b52897e1d2185bdfc9b78ca711e86/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/09664260c2fb625f9186c7764784be47d28b52897e1d2185bdfc9b78ca711e86/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/8zdklp256rjfjewzyhrjk04bg/diff/usr/local/Ascend/cann-A3/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/8zdklp256rjfjewzyhrjk04bg/diff/usr/local/Ascend/cann-A3/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/8zdklp256rjfjewzyhrjk04bg/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/8zdklp256rjfjewzyhrjk04bg/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/6956877f4fa1174e5fe0a87758972dd3463aa0aaca4099d2138086debf509dee/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/6956877f4fa1174e5fe0a87758972dd3463aa0aaca4099d2138086debf509dee/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/6956877f4fa1174e5fe0a87758972dd3463aa0aaca4099d2138086debf509dee/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/6956877f4fa1174e5fe0a87758972dd3463aa0aaca4099d2138086debf509dee/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/c07f0d55f754254194d0aa2ac4486840dda851c0cd9cf2ca92ef72d0453d9d4d/diff/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c07f0d55f754254194d0aa2ac4486840dda851c0cd9cf2ca92ef72d0453d9d4d/diff/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/c07f0d55f754254194d0aa2ac4486840dda851c0cd9cf2ca92ef72d0453d9d4d/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c07f0d55f754254194d0aa2ac4486840dda851c0cd9cf2ca92ef72d0453d9d4d/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/565eb5fd21892c38bc43edc8b59503f394ac768a38dc2b2c0889d7c7b1322c65/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/7cdfa1ac2dbcf52c0a4ca42037710bde7b2cea40474279f870915cfd23c8e8da/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2ea5df6fe6325e93aed368f65c7a51f86dba9ad31ecdc6a0758a8bab56d34da1/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2ea5df6fe6325e93aed368f65c7a51f86dba9ad31ecdc6a0758a8bab56d34da1/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/2ea5df6fe6325e93aed368f65c7a51f86dba9ad31ecdc6a0758a8bab56d34da1/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/2ea5df6fe6325e93aed368f65c7a51f86dba9ad31ecdc6a0758a8bab56d34da1/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb63b82b51163a433b0420c14a2dabc396854dbab7f226db12c19b521600ad75/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb63b82b51163a433b0420c14a2dabc396854dbab7f226db12c19b521600ad75/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb63b82b51163a433b0420c14a2dabc396854dbab7f226db12c19b521600ad75/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/cb63b82b51163a433b0420c14a2dabc396854dbab7f226db12c19b521600ad75/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/4a61cfeaf477f5829b290b6ae25d925d51ff7cba336f1da6455a857446a11ef3/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4a61cfeaf477f5829b290b6ae25d925d51ff7cba336f1da6455a857446a11ef3/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/4a61cfeaf477f5829b290b6ae25d925d51ff7cba336f1da6455a857446a11ef3/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/4a61cfeaf477f5829b290b6ae25d925d51ff7cba336f1da6455a857446a11ef3/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/be32e0bc8acde73a311ab9f78811b9423b8633ff463636c4e5615b18b96f7664/diff/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/be32e0bc8acde73a311ab9f78811b9423b8633ff463636c4e5615b18b96f7664/diff/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/be32e0bc8acde73a311ab9f78811b9423b8633ff463636c4e5615b18b96f7664/diff/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/be32e0bc8acde73a311ab9f78811b9423b8633ff463636c4e5615b18b96f7664/diff/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c18effc871674aa8aa97394000d6ee2f3ba9c54907d2becf549e4ad9808bb444/diff/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ca75b057f7b42f19cf286f2a0bb101b5578f5bb33aeee279e62d7d7e1d450120/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ca75b057f7b42f19cf286f2a0bb101b5578f5bb33aeee279e62d7d7e1d450120/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ca75b057f7b42f19cf286f2a0bb101b5578f5bb33aeee279e62d7d7e1d450120/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ca75b057f7b42f19cf286f2a0bb101b5578f5bb33aeee279e62d7d7e1d450120/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/ca75b057f7b42f19cf286f2a0bb101b5578f5bb33aeee279e62d7d7e1d450120/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/dbadb7d1531b6fc01e93fa40049992aaba650a7cba0e43461bc525aa16c6c4b5/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e16481ca309c00383bd831c688b8e3e69d03e8c0496831c637a6f56e2a853ec7/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/l6xyhblc14kpupdu43q3snycb/diff/usr/local/Ascend/cann-A3/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/l6xyhblc14kpupdu43q3snycb/diff/usr/local/Ascend/cann-A3/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/l6xyhblc14kpupdu43q3snycb/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/l6xyhblc14kpupdu43q3snycb/diff/usr/local/Ascend/cann-A3/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/knus01l961udiq2v9hsq5gsfo/diff/usr/local/Ascend/cann-A5/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/knus01l961udiq2v9hsq5gsfo/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/96a91e2334c6e64ae1b788de932cf7bc9ba5d6c50a94b0bc810535ba57630ff6/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/96a91e2334c6e64ae1b788de932cf7bc9ba5d6c50a94b0bc810535ba57630ff6/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/96a91e2334c6e64ae1b788de932cf7bc9ba5d6c50a94b0bc810535ba57630ff6/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/96a91e2334c6e64ae1b788de932cf7bc9ba5d6c50a94b0bc810535ba57630ff6/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/7aea778137fe113aaf2fffd1d56a6cb46b9ce0f2d8318e5c8093c4ff45d1c14a/diff/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/7aea778137fe113aaf2fffd1d56a6cb46b9ce0f2d8318e5c8093c4ff45d1c14a/diff/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/7aea778137fe113aaf2fffd1d56a6cb46b9ce0f2d8318e5c8093c4ff45d1c14a/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/7aea778137fe113aaf2fffd1d56a6cb46b9ce0f2d8318e5c8093c4ff45d1c14a/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/1a72f619898cd284b12c7b1a9c6c8b6a92e4f8bd06bfa45dee4886727e053589/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/83b502144408bc356b60aaac165682ae457988b4e87f38d7ccb9d1a94d8ea869/diff/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/83b502144408bc356b60aaac165682ae457988b4e87f38d7ccb9d1a94d8ea869/diff/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/49b11007a20f791dbdecefee31b6c685b2d93e55591a049f51981b5b48ef274e/merged/usr/local/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ngaea63duor26iri932l56cx2/diff/usr/local/Ascend/cann-A5/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ngaea63duor26iri932l56cx2/diff/usr/local/Ascend/cann-A5/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/ngaea63duor26iri932l56cx2/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/ngaea63duor26iri932l56cx2/diff/usr/local/Ascend/cann-A5/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/s4hpfqc7r68of3l7to5q8p7d7/diff/usr/local/Ascend/cann-9.0.T550/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/s4hpfqc7r68of3l7to5q8p7d7/diff/usr/local/Ascend/cann-9.0.T550/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/s4hpfqc7r68of3l7to5q8p7d7/diff/usr/local/Ascend/cann-9.0.T550/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/s4hpfqc7r68of3l7to5q8p7d7/diff/usr/local/Ascend/cann-9.0.T550/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascned/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascned/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascned/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/merged/usr/local/Ascned/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascned/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascned/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascned/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e47aa8d31d913ffd8dc15ad754cf56c186c519fcadd277e6910e21e966e3be30/diff/usr/local/Ascned/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/de6203dfca66fb6ced2d1c06e1f8aad57d7456888f23bdcead5fefb834445d20/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d615bd3abf384241dd9506457b1df2051992f79866e4b63b0b287ed494327671/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d615bd3abf384241dd9506457b1df2051992f79866e4b63b0b287ed494327671/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d615bd3abf384241dd9506457b1df2051992f79866e4b63b0b287ed494327671/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d615bd3abf384241dd9506457b1df2051992f79866e4b63b0b287ed494327671/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/merged/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/diff/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e4c983f3ac60e5836593e787d7b3e5d8323639c73fb1a79e95886ea73b51a0da/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/40bf267875a2d3f54722263ce1ba8ddfb00cf81bb2d9dfed39c17987d768fc36/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/Ascend/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/35750534b07578a8cb00d0c1e2af1378c0dd2a511526e2965c6dbc8016a8cd50/merged/usr/local/python3.7.5/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/62c9526a3dbfaabe50294e7376acb2e5149aa84a1d584dd567cdf7c92a6a2eef/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/62c9526a3dbfaabe50294e7376acb2e5149aa84a1d584dd567cdf7c92a6a2eef/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/62c9526a3dbfaabe50294e7376acb2e5149aa84a1d584dd567cdf7c92a6a2eef/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/62c9526a3dbfaabe50294e7376acb2e5149aa84a1d584dd567cdf7c92a6a2eef/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/62c9526a3dbfaabe50294e7376acb2e5149aa84a1d584dd567cdf7c92a6a2eef/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/bade01266e7473adb27c555f0bf27819e936e9ee400ad100529cd6c0fcbda2da/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/bade01266e7473adb27c555f0bf27819e936e9ee400ad100529cd6c0fcbda2da/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/bade01266e7473adb27c555f0bf27819e936e9ee400ad100529cd6c0fcbda2da/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/bade01266e7473adb27c555f0bf27819e936e9ee400ad100529cd6c0fcbda2da/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/690b04976d6e03fdea5be7f58537075cadecaa0b55693c5945b5e26f9b75383b/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/cann-9.0.T500/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/cann-9.0.T500/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/cann-9.0.T500/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/latest/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/Ascend/8.5.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/e3781d40697f78e6481cfe4dae7c11ceecd7006faa6e674e7c1ae662e911e869/merged/usr/local/python3.7.5/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c0816997413a0cf73dc1052044d2a951aa35c9b22f01da32171c3154af898922/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c0816997413a0cf73dc1052044d2a951aa35c9b22f01da32171c3154af898922/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/c0816997413a0cf73dc1052044d2a951aa35c9b22f01da32171c3154af898922/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/c0816997413a0cf73dc1052044d2a951aa35c9b22f01da32171c3154af898922/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/c0816997413a0cf73dc1052044d2a951aa35c9b22f01da32171c3154af898922/merged/root/python3.11.13/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/merged/usr/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/d7d630e092deed211656604d2a77aa5f87dfbe9ce126aa6b0f6ce966771afcee/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/merged/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/merged/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/merged/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/diff/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/diff/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/871b2afd748395b74ced4ab86e7cfbdeecc667056be8e4492bc04bdf4a5bd612/diff/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/merged/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/merged/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/merged/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/diff/usr/local/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/diff/usr/local/Ascend/cann-9.0.T501/tools/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/root/openeuler/var/lib/docker/overlay2/f056362eae2b28a61309ff6f5d9b406a45e0bd0bfd69ea5c00f196b339d46cdf/diff/usr/local/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/root/openeuler/usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/usr/local/Ascend/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/usr/local/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/usr/local/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/home/z00924008/pkg/8.5.T50.B110/cann/run_package/toolkit/toolkit/tools/msopgen
+/root/openeuler/home/z00576261/cann/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/root/openeuler/home/z00576261/cann/ascend-toolkit/latest/tools/msopgen
+/root/openeuler/home/z00576261/cann/ascend-toolkit/8.5.0/tools/msopgen
+/root/openeuler/home/z00576261/cann/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/home/zly/cann-8.5.0/x86_64-linux/bin/msopgen
+/root/openeuler/home/zly/cann-8.5.0/tools/msopgen
+/root/openeuler/home/zly/cann-8.5.0/python/site-packages/bin/msopgen
+/root/openeuler/home/tqy/cust_catlass/operators/linear_silu_split_uvqk/build/msopgen
+/root/openeuler/root/miniconda3/envs/py310_mlperf_model/bin/msopgen
+/root/openeuler/root/miniconda3/envs/byte/bin/msopgen
+/root/openeuler/root/miniconda3/envs/py310/bin/msopgen
+/root/openeuler/root/miniconda3/envs/py310_newest/bin/msopgen
+/root/openeuler/root/miniconda3/envs/py310_mlperf_opp/bin/msopgen
+/root/miniconda3/envs/py310_mlperf_model/bin/msopgen
+/root/miniconda3/envs/byte/bin/msopgen
+/root/miniconda3/envs/py310_mlperf_opp/bin/msopgen
+/root/miniconda3/envs/py310_newest/bin/msopgen
+/root/miniconda3/envs/py310/bin/msopgen
+/usr/local/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/usr/local/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/usr/local/Ascend/cann-9.0.0/python/site-packages/msopgen
+/usr/local/Ascend/cann-9.0.0/tools/msopgen
+/home/m00836041/0401/CANN/cann-9.0.T501/x86_64-linux/bin/msopgen
+/home/m00836041/0401/CANN/cann-9.0.T501/python/site-packages/msopgen
+/home/m00836041/0401/CANN/cann-9.0.T501/python/site-packages/bin/msopgen
+/home/m00836041/0401/CANN/cann-9.0.T501/tools/msopgen
+/home/lq00799889/run/cann-9.0.0/x86_64-linux/bin/msopgen
+/home/lq00799889/run/cann-9.0.0/python/site-packages/bin/msopgen
+/home/lq00799889/run/cann-9.0.0/python/site-packages/msopgen
+/home/lq00799889/run/cann-9.0.0/tools/msopgen
+/home/lq00799889/pkg/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/home/lq00799889/pkg/ascend-toolkit/8.5.0/tools/msopgen
+/home/lq00799889/pkg/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/home/lq00799889/pkg/ascend-toolkit/latest/tools/msopgen
+/home/czb/cann0425/cann-9.0.0/x86_64-linux/bin/msopgen
+/home/czb/cann0425/cann-9.0.0/python/site-packages/msopgen
+/home/czb/cann0425/cann-9.0.0/python/site-packages/bin/msopgen
+/home/czb/cann0425/cann-9.0.0/tools/msopgen
+/home/g00897531/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/home/g00897531/cann/cann-9.0.0/python/site-packages/msopgen
+/home/g00897531/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/home/g00897531/cann/cann-9.0.0/tools/msopgen
+/home/g00897531/hisi_cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/home/g00897531/hisi_cann/cann-9.0.0/python/site-packages/bin/msopgen
+/home/g00897531/hisi_cann/cann-9.0.0/python/site-packages/msopgen
+/home/g00897531/hisi_cann/cann-9.0.0/tools/msopgen
+/home/y00800260/cann-9.0.T500/x86_64-linux/bin/msopgen
+/home/y00800260/cann-9.0.T500/python/site-packages/bin/msopgen
+/home/y00800260/cann-9.0.T500/tools/msopgen
+/home/axy/cann_new/cann-9.0.T501/x86_64-linux/bin/msopgen
+/home/axy/cann_new/cann-9.0.T501/python/site-packages/msopgen
+/home/axy/cann_new/cann-9.0.T501/python/site-packages/bin/msopgen
+/home/axy/cann_new/cann-9.0.T501/tools/msopgen
+/home/zengxiong/cann/cann-9.0.T501/x86_64-linux/bin/msopgen
+/home/zengxiong/cann/cann-9.0.T501/python/site-packages/bin/msopgen
+/home/zengxiong/cann/cann-9.0.T501/python/site-packages/msopgen
+/home/zengxiong/cann/cann-9.0.T501/tools/msopgen
+/home/ljp/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/home/ljp/cann/cann-9.0.0/python/site-packages/msopgen
+/home/ljp/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/home/ljp/cann/cann-9.0.0/tools/msopgen
+/home/Ascend/cann-9.0.T501/x86_64-linux/bin/msopgen
+/home/Ascend/cann-9.0.T501/python/site-packages/msopgen
+/home/Ascend/cann-9.0.T501/python/site-packages/bin/msopgen
+/home/Ascend/cann-9.0.T501/tools/msopgen
+/test/j00960938/cann-0331/cann-9.0.0/tools/msopgen
+/test/j00960938/cann-0331/cann-9.0.0/python/site-packages/msopgen
+/test/j00960938/cann-0331/cann-9.0.0/python/site-packages/bin/msopgen
+/test/j00960938/cann-0331/cann-9.0.0/x86_64-linux/bin/msopgen
+/test/j00960938/cann0321/cann-9.0.0/tools/msopgen
+/test/j00960938/cann0321/cann-9.0.0/python/site-packages/msopgen
+/test/j00960938/cann0321/cann-9.0.0/python/site-packages/bin/msopgen
+/test/j00960938/cann0321/cann-9.0.0/x86_64-linux/bin/msopgen
+/test/j00960938/cann/cann-9.0.0/tools/msopgen
+/test/j00960938/cann/cann-9.0.0/python/site-packages/msopgen
+/test/j00960938/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/test/j00960938/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/test/g30055501/B131_update/ascend-toolkit/latest/tools/msopgen
+/test/g30055501/B131_update/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/test/g30055501/B131_update/ascend-toolkit/8.5.0/tools/msopgen
+/test/g30055501/B131_update/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/test/s00940019/Ascend_0409/cann-9.0.T500/tools/msopgen
+/test/s00940019/Ascend_0409/cann-9.0.T500/python/site-packages/msopgen
+/test/s00940019/Ascend_0409/cann-9.0.T500/python/site-packages/bin/msopgen
+/test/s00940019/Ascend_0409/cann-9.0.T500/x86_64-linux/bin/msopgen
+/test/cann_rec/ascend-toolkit/latest/tools/msopgen
+/test/cann_rec/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/test/cann_rec/ascend-toolkit/8.5.0/tools/msopgen
+/test/cann_rec/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/test/x30029338/Ascend/ascend-toolkit/latest/tools/msopgen
+/test/x30029338/Ascend/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/test/x30029338/Ascend/ascend-toolkit/8.5.0/tools/msopgen
+/test/x30029338/Ascend/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/test/w00637849/Ascend/cann-9.0.0/tools/msopgen
+/test/w00637849/Ascend/cann-9.0.0/python/site-packages/msopgen
+/test/w00637849/Ascend/cann-9.0.0/python/site-packages/bin/msopgen
+/test/w00637849/Ascend/cann-9.0.0/x86_64-linux/bin/msopgen
+/test/cann-1227/ascend-toolkit/latest/tools/msopgen
+/test/cann-1227/ascend-toolkit/latest/x86_64-linux/bin/msopgen
+/test/cann-1227/ascend-toolkit/8.5.0/tools/msopgen
+/test/cann-1227/ascend-toolkit/8.5.0/python/site-packages/bin/msopgen
+/test/lbj/cann-9.0.T501/tools/msopgen
+/test/lbj/cann-9.0.T501/python/site-packages/msopgen
+/test/lbj/cann-9.0.T501/python/site-packages/bin/msopgen
+/test/lbj/cann-9.0.T501/x86_64-linux/bin/msopgen
+/test/wxg/CANN_0211/cann/cann-9.0.T501/tools/msopgen
+/test/wxg/CANN_0211/cann/cann-9.0.T501/python/site-packages/msopgen
+/test/wxg/CANN_0211/cann/cann-9.0.T501/python/site-packages/bin/msopgen
+/test/wxg/CANN_0211/cann/cann-9.0.T501/x86_64-linux/bin/msopgen
+/test/q00666057/Ascend_0416/cann-9.0.T500/tools/msopgen
+/test/q00666057/Ascend_0416/cann-9.0.T500/python/site-packages/msopgen
+/test/q00666057/Ascend_0416/cann-9.0.T500/python/site-packages/bin/msopgen
+/test/q00666057/Ascend_0416/cann-9.0.T500/x86_64-linux/bin/msopgen
+/test/w00923628/cann/cann-9.0.0/tools/msopgen
+/test/w00923628/cann/cann-9.0.0/python/site-packages/msopgen
+/test/w00923628/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/test/w00923628/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/mlperf_test/cann/cann-9.0.0/x86_64-linux/bin/msopgen
+/mlperf_test/cann/cann-9.0.0/python/site-packages/msopgen
+/mlperf_test/cann/cann-9.0.0/python/site-packages/bin/msopgen
+/mlperf_test/cann/cann-9.0.0/tools/msopgen
